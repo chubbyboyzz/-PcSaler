@@ -26,13 +26,5 @@ namespace PcSaler.Controllers
 
             return View(model);
         }
-
-        public IActionResult Details(int id)
-        {
-            var product = _productService.GetProductDetails(id);
-            if (product == null) return NotFound();
-
-            return View(product);
-        }
     }
 }

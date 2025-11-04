@@ -74,7 +74,7 @@
                             <h6 class="card-title text-truncate mb-1" title="@p.ProductName">@p.ProductName</h6>
                             <p class="text-danger fw-bold mb-1">@p.Price.ToString("N0") ₫</p>
                             <a class="btn btn-outline-primary btn-sm mt-auto w-100"
-                               href="@Url.Action("Details", "Home", new { id = p.ProductID })">
+                               href="@Url.Action("Index", "Product", new { id = p.ProductID })">
                                 Chi tiết
                             </a>
                         </div>
