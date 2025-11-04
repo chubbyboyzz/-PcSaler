@@ -1,0 +1,16 @@
+﻿@model PcSaler.Models.ProductListViewModel
+@{
+    ViewData["Title"] = Model.ProductName;
+}
+<div class="row">
+    <div class="col-md-6">
+        <img src="@(Model.ImageURL ?? "/images/no-image.png")" class="img-fluid rounded" alt="@Model.ProductName" />
+    </div>
+    <div class="col-md-6">
+        <h3>@Model.ProductName</h3>
+        <p class="text-muted">@Model.CategoryName</p>
+        <h4 class="text-danger">@Model.Price.ToString("N0") ₫</h4>
+        <p>Stock: @Model.Stock</p>
+        <button class="btn btn-primary">Thêm vào giỏ</button>
+    </div>
+</div>

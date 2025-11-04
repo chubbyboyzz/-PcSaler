@@ -1,3 +1,8 @@
+
+using Microsoft.EntityFrameworkCore;
+using PcSaler.DBcontext;
+using PcSaler.Interfaces;
+
 namespace PcSaler
 {
     public class Program
@@ -5,6 +10,11 @@ namespace PcSaler
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // Add Database
+            builder.Services.AddDbContext<PCShopContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
+            builder.Services.AddScoped<IProductService, ProductService>();
+
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

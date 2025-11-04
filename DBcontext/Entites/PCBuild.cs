@@ -1,7 +1,10 @@
-﻿namespace PcSaler.DBcontext.Entites
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PcSaler.DBcontext.Entites
 {
     public class PCBuild
     {
+        [Key]
         public int PCBuildID { get; set; }
         public string PCBuildName { get; set; } = null!;
         public string? Description { get; set; }
