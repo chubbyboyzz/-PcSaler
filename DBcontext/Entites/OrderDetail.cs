@@ -1,7 +1,10 @@
-﻿namespace PcSaler.DBcontext.Entites
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PcSaler.DBcontext.Entites
 {
     public class OrderDetail
     {
+        [Key]
         public int OrderDetailID { get; set; }
         public int OrderID { get; set; }
         public int ProductID { get; set; }

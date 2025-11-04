@@ -1,7 +1,10 @@
-﻿namespace PcSaler.DBcontext.Entites
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PcSaler.DBcontext.Entites
 {
     public class Payment
     {
+        [Key]
         public int PaymentID { get; set; }
         public int OrderID { get; set; }
         public decimal Amount { get; set; }

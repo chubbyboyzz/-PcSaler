@@ -1,7 +1,10 @@
-﻿namespace PcSaler.DBcontext.Entites
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PcSaler.DBcontext.Entites
 {
     public class OrderStatusHistory
     {
+        [Key]
         public int HistoryID { get; set; }
         public int OrderID { get; set; }
         public int StatusID { get; set; }

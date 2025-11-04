@@ -1,7 +1,10 @@
-﻿namespace PcSaler.DBcontext.Entites
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PcSaler.DBcontext.Entites
 {
     public class Product
     {
+        [Key]
         public int ProductID { get; set; }
         public int CategoryID { get; set; }
         public string Brand { get; set; }

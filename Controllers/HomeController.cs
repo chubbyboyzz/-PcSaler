@@ -1,32 +1,34 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PcSaler.Interfaces;
 using PcSaler.Models;
 
 namespace PcSaler.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IProductService _productService;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IProductService productService)
         {
-            _logger = logger;
+            _productService = productService;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int? cat, string? q)
         {
-            return View();
+            var model = _productService.GetCategoryProducts(cat, q);
+            ViewBag.Categories = _productService.GetAllCategories();
+            ViewBag.SelectedCat = cat;
+            ViewBag.Query = q ?? "";
+
+            return View(model);
         }
 
-        public IActionResult Privacy()
+        public IActionResult Details(int id)
         {
-            return View();
-        }
+            var product = _productService.GetProductDetails(id);
+            if (product == null) return NotFound();
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(product);
         }
     }
 }
