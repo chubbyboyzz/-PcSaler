@@ -14,12 +14,15 @@ namespace PcSaler.Repository
         {
             _db = db;
         }
+
         public async Task<List<Category>> GetAllCategories()
         {
-            return _db.Categories
+            // Tạm thời giữ nguyên, nhưng nên dùng AsNoTracking() và ToListAsync()
+            return await _db.Categories
                 .OrderBy(c => c.CategoryName)
-                .ToList();
+                .ToListAsync();
         }
+
         public async Task<List<CategoryProductViewModel>> GetCategoryProducts(int? categoryId, string? query)
         {
             IQueryable<Category> queryable = _db.Categories.Include(c => c.Products);
@@ -30,10 +33,14 @@ namespace PcSaler.Repository
             if (!string.IsNullOrWhiteSpace(query))
                 queryable = queryable.Where(c => c.Products.Any(p => p.ProductName.Contains(query)));
 
-            return queryable.Select(c => new CategoryProductViewModel
+            return await queryable.Select(c => new CategoryProductViewModel
             {
                 CategoryID = c.CategoryID,
                 CategoryName = c.CategoryName,
+                // **THAY ĐỔI CẦN THIẾT: Ánh xạ các trường mới**
+                ComponentType = c.ComponentType,             // THÊM: Key cố định cho PC Builder
+                IsRequiredForBuild = c.IsRequiredForBuild,   // THÊM: Xác định linh kiện bắt buộc
+                // ***********************************************
                 Products = c.Products
                     .OrderByDescending(p => p.ProductID)
                     .Select(p => new ProductListViewModel
@@ -43,7 +50,7 @@ namespace PcSaler.Repository
                         Price = p.Price,
                         ImageURL = p.ImageURL
                     }).ToList()
-            }).ToList();
+            }).ToListAsync(); // Sửa ToList() thành ToListAsync() để tuân thủ async
         }
     }
 }
