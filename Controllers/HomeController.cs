@@ -1,34 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PcSaler.Interfaces;
 using PcSaler.Models;
+using PcSaler.Services;
+using System.Threading.Tasks;
 
 namespace PcSaler.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IProductService _productService;
+        private readonly CategoryService _categoryService;
+        private readonly ProductService _productService;
 
-        public HomeController(IProductService productService)
+        public HomeController(ProductService productService, CategoryService categoryService)
         {
             _productService = productService;
+            _categoryService = categoryService;
         }
 
-        public IActionResult Index(int? cat, string? q)
+        public async Task<IActionResult> Index(int? cat, string? q)
         {
-            var model = _productService.GetCategoryProducts(cat, q);
-            ViewBag.Categories = _productService.GetAllCategories();
+            var model = await _categoryService.GetCategoryProducts(cat, q);
+            ViewBag.Categories = await _categoryService.GetAllCategories();
             ViewBag.SelectedCat = cat;
             ViewBag.Query = q ?? "";
 
             return View(model);
-        }
-
-        public IActionResult Details(int id)
-        {
-            var product = _productService.GetProductDetails(id);
-            if (product == null) return NotFound();
-
-            return View(product);
         }
     }
 }

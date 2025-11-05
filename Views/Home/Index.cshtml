@@ -15,7 +15,6 @@
                 <li>
                     <a class="text-decoration-none @(selectedCat == null ? "fw-bold" : "")"
                        href="@Url.Action("Index", "Home")">
-                        Tất cả
                     </a>
                 </li>
                 @foreach (var c in categories ?? new List<PcSaler.DBcontext.Entites.Category>())
@@ -23,7 +22,7 @@
                     <li class="mb-1">
                         <a class="text-decoration-none @(selectedCat == c.CategoryID ? "fw-bold" : "")"
                            href="@Url.Action("Index", "Home", new { cat = c.CategoryID, q = query })">
-                            @c.CategoryName
+                            @c.ComponentType
                         </a>
                     </li>
                 }
@@ -74,7 +73,7 @@
                             <h6 class="card-title text-truncate mb-1" title="@p.ProductName">@p.ProductName</h6>
                             <p class="text-danger fw-bold mb-1">@p.Price.ToString("N0") ₫</p>
                             <a class="btn btn-outline-primary btn-sm mt-auto w-100"
-                               href="@Url.Action("Details", "Home", new { id = p.ProductID })">
+                               href="@Url.Action("Details", "Product", new { id = p.ProductID })">
                                 Chi tiết
                             </a>
                         </div>

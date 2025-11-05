@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PcSaler.DBcontext.Entites;
+
 namespace PcSaler.DBcontext
 {
     public class PCShopContext : DbContext
@@ -16,7 +17,9 @@ namespace PcSaler.DBcontext
         public DbSet<CustomPC> CustomPCs { get; set; }
         public DbSet<CustomPCDetail> CustomPCDetails { get; set; }
 
-        public DbSet<Cart> Carts { get; set; }
+        // **THAY ĐỔI 1: Tên DbSet phản ánh Carts (số nhiều) và CartItem**
+        public DbSet<Carts> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; } // THÊM MỚI
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
@@ -41,7 +44,9 @@ namespace PcSaler.DBcontext
             modelBuilder.Entity<CustomPC>().ToTable("CustomPC");
             modelBuilder.Entity<CustomPCDetail>().ToTable("CustomPCDetails");
 
-            modelBuilder.Entity<Cart>().ToTable("Cart");
+            // **THAY ĐỔI 2: Đặt tên bảng Carts và CartItems**
+            modelBuilder.Entity<Carts>().ToTable("Carts");
+            modelBuilder.Entity<CartItem>().ToTable("CartItems");
 
             modelBuilder.Entity<Order>().ToTable("Orders");
             modelBuilder.Entity<OrderDetail>().ToTable("OrderDetails");
@@ -51,7 +56,39 @@ namespace PcSaler.DBcontext
 
             modelBuilder.Entity<Payment>().ToTable("Payments");
 
-            // Thiết lập ràng buộc & cascade rules (nếu cần)
+
+            // ----------------------------------------------------
+            // Thiết lập RÀNG BUỘC VÀ QUAN HỆ (Fluent API)
+            // ----------------------------------------------------
+
+            // 1. Cấu hình Unique cho CustomerID trong Carts
+            // Mỗi khách hàng chỉ có một giỏ hàng duy nhất
+            modelBuilder.Entity<Carts>()
+                .HasIndex(c => c.CustomerID)
+                .IsUnique();
+
+            // 2. Cấu hình Quan hệ Giỏ hàng - Mục Giỏ hàng (Carts - CartItems)
+            modelBuilder.Entity<CartItem>()
+                .HasOne(ci => ci.Cart)
+                .WithMany(c => c.CartItems)
+                .HasForeignKey(ci => ci.CartID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // 3. Cấu hình Quan hệ Phân cấp Category (Self-Referencing)
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.ParentCategory)      // Category có một ParentCategory
+                .WithMany(c => c.Children)          // ParentCategory có nhiều Children
+                .HasForeignKey(c => c.ParentCategoryID)
+                .OnDelete(DeleteBehavior.Restrict); // Tránh xóa Category cha khi vẫn còn Category con
+
+            // 4. Cấu hình Quan hệ Orders - CurrentStatus (Đã thêm CurrentStatusID vào Orders)
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.CurrentStatus)       // Order có một CurrentStatus
+                .WithMany()                         // CurrentStatus có thể thuộc nhiều Order
+                .HasForeignKey(o => o.CurrentStatusID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 5. Cấu hình các ràng buộc đã có (giữ nguyên)
             modelBuilder.Entity<PCBuildDetail>()
                 .HasOne(d => d.PCBuild)
                 .WithMany(b => b.Details)
@@ -70,9 +107,23 @@ namespace PcSaler.DBcontext
                 .HasForeignKey(p => p.OrderID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Nếu Product có navigation collections to PCBuildDetails or CustomPCDetails,
-            // bạn có thể cấu hình thêm tương tự.  (Ở ví dụ này Product không khai báo collection để giữ đơn giản)
+            // Thêm CustomPCDetails (Thường thiết lập như PCBuildDetails)
+            modelBuilder.Entity<CustomPCDetail>()
+                .HasOne(d => d.CustomPC)
+                .WithMany(b => b.Details)
+                .HasForeignKey(d => d.CustomPCID)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CustomPCDetail>()
+                .HasOne(d => d.Product)
+                .WithMany()
+                .HasForeignKey(d => d.ProductID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Thiết lập Unique cho ComponentType trong Category
+            modelBuilder.Entity<Category>()
+                .HasIndex(c => c.ComponentType)
+                .IsUnique();
         }
     }
-
 }

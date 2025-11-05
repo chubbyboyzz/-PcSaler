@@ -16,7 +16,7 @@ namespace PcSaler.DBcontext.Entites
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public ICollection<Order>? Orders { get; set; }
-        public ICollection<Cart>? Carts { get; set; }
+        public ICollection<Carts>? Carts { get; set; }
         public ICollection<CustomPC>? CustomPCs { get; set; }
 
     }
