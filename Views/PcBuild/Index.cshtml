@@ -9,84 +9,188 @@
     <form id="pcBuilderForm">
         <div class="row g-4">
 
-            <!-- CPU -->
-            <div class="col-md-4">
-                <h5>CPU</h5>
-                <select class="form-select" name="cpu">
-                    <option value="">-- Chọn CPU --</option>
-                    @foreach (var item in Model.CPUs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
+            <div class="col-lg-8">
+                <div class="list-group shadow-sm">
+
+                    <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3">
+                        <h5 class="mb-2 mb-md-0">CPU (Vi xử lý)</h5>
+                        <select class="form-select build-component" name="cpu" data-type="cpu" style="max-width: 400px;">
+                            <option value="" data-price="0">-- Chọn CPU --</option>
+                            @foreach (var item in Model.CPUs)
+                            {
+                                <option value="@item.ProductID" data-price="@item.Price">
+                                    @item.ProductName - @item.Price.ToString("N0")₫
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3">
+                        <h5 class="mb-2 mb-md-0">Mainboard</h5>
+                        <select class="form-select build-component" name="mainboard" data-type="mainboard" style="max-width: 400px;">
+                            <option value="" data-price="0">-- Chọn Mainboard --</option>
+                            @foreach (var item in Model.Mainboards)
+                            {
+                                <option value="@item.ProductID" data-price="@item.Price">
+                                    @item.ProductName - @item.Price.ToString("N0")₫
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3">
+                        <h5 class="mb-2 mb-md-0">RAM</h5>
+                        <select class="form-select build-component" name="ram" data-type="ram" style="max-width: 400px;">
+                            <option value="" data-price="0">-- Chọn RAM --</option>
+                            @foreach (var item in Model.RAMs)
+                            {
+                                <option value="@item.ProductID" data-price="@item.Price">
+                                    @item.ProductName - @item.Price.ToString("N0")₫
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3">
+                        <h5 class="mb-2 mb-md-0">GPU (Card đồ họa)</h5>
+                        <select class="form-select build-component" name="gpu" data-type="gpu" style="max-width: 400px;">
+                            <option value="" data-price="0">-- Chọn GPU --</option>
+                            @foreach (var item in Model.GPUs)
+                            {
+                                <option value="@item.ProductID" data-price="@item.Price">
+                                    @item.ProductName - @item.Price.ToString("N0")₫
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3">
+                        <h5 class="mb-2 mb-md-0">PSU (Nguồn)</h5>
+                        <select class="form-select build-component" name="psu" data-type="psu" style="max-width: 400px;">
+                            <option value="" data-price="0">-- Chọn PSU --</option>
+                            @foreach (var item in Model.PSUs)
+                            {
+                                <option value="@item.ProductID" data-price="@item.Price">
+                                    @item.ProductName - @item.Price.ToString("N0")₫
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-md-center p-3">
+                        <h5 class="mb-2 mb-md-0">Case (Vỏ máy)</h5>
+                        <select class="form-select build-component" name="case" data-type="case" style="max-width: 400px;">
+                            <option value="" data-price="0">-- Chọn Case --</option>
+                            @foreach (var item in Model.Cases)
+                            {
+                                <option value="@item.ProductID" data-price="@item.Price">
+                                    @item.ProductName - @item.Price.ToString("N0")₫
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                </div>
             </div>
 
-            <!-- Mainboard -->
-            <div class="col-md-4">
-                <h5>Mainboard</h5>
-                <select class="form-select" name="mainboard">
-                    <option value="">-- Chọn Mainboard --</option>
-                    @foreach (var item in Model.Mainboards)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
+            <div class="col-lg-4">
+                <div class="card shadow-sm" style="position: sticky; top: 80px;">
+                    <div class="card-header">
+                        <h5 class="mb-0">Tóm tắt cấu hình</h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>CPU:</span>
+                            <span id="summary_cpu" class="fw-bold text-end text-muted">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Main:</span>
+                            <span id="summary_mainboard" class="fw-bold text-end text-muted">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>RAM:</span>
+                            <span id="summary_ram" class="fw-bold text-end text-muted">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>GPU:</span>
+                            <span id="summary_gpu" class="fw-bold text-end text-muted">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>PSU:</span>
+                            <span id="summary_psu" class="fw-bold text-end text-muted">...</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between">
+                            <span>Case:</span>
+                            <span id="summary_case" class="fw-bold text-end text-muted">...</span>
+                        </li>
+                    </ul>
+                    <div class="card-footer p-3">
+                        <h4 class="d-flex justify-content-between align-items-center mb-0">
+                            Tổng chi phí:
+                            <span id="total-price" class="text-danger fw-bold">0₫</span>
+                        </h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <button type="submit" class="btn btn-primary w-100">Xác nhận cấu hình</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- RAM -->
-            <div class="col-md-4">
-                <h5>RAM</h5>
-                <select class="form-select" name="ram">
-                    <option value="">-- Chọn RAM --</option>
-                    @foreach (var item in Model.RAMs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- GPU -->
-            <div class="col-md-4">
-                <h5>GPU</h5>
-                <select class="form-select" name="gpu">
-                    <option value="">-- Chọn GPU --</option>
-                    @foreach (var item in Model.GPUs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- PSU -->
-            <div class="col-md-4">
-                <h5>PSU (Nguồn)</h5>
-                <select class="form-select" name="psu">
-                    <option value="">-- Chọn PSU --</option>
-                    @foreach (var item in Model.PSUs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- Case -->
-            <div class="col-md-4">
-                <h5>Case</h5>
-                <select class="form-select" name="case">
-                    <option value="">-- Chọn Case --</option>
-                    @foreach (var item in Model.Cases)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-        </div>
-
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Xem cấu hình</button>
         </div>
     </form>
 </div>
+
 <script>
     console.log("CPU List:", @Html.Raw(Json.Serialize(Model.CPUs)));
+
+    // --- LOGIC TÍNH TIỀN REAL-TIME ---
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // 1. Hàm tính tổng tiền (Tuân thủ DRY)
+        function updateTotalPrice() {
+            let total = 0;
+            // Duyệt qua tất cả các dropdown
+            document.querySelectorAll('.build-component').forEach(function(select) {
+                // Lấy thẻ <option> đang được chọn
+                const selectedOption = select.options[select.selectedIndex];
+                // Lấy giá từ data-price (thêm || 0 để tránh lỗi)
+                total += parseFloat(selectedOption.dataset.price || 0);
+            });
+
+            // Cập nhật UI
+            document.getElementById('total-price').innerText = total.toLocaleString('vi-VN') + '₫';
+        }
+
+        // 2. Lắng nghe sự kiện "change" trên TẤT CẢ các dropdown
+        document.querySelectorAll('.build-component').forEach(function(select) {
+            select.addEventListener('change', function() {
+
+                // Lấy thông tin từ thẻ <select>
+                const componentType = this.dataset.type; // 'cpu', 'mainboard',...
+                const summaryElement = document.getElementById('summary_' + componentType);
+
+                // Lấy thông tin từ <option>
+                const selectedOption = this.options[this.selectedIndex];
+                const selectedText = selectedOption.text;
+
+                // Cập nhật bảng tóm tắt
+                if (this.value === "") { // Nếu chọn "-- Chọn --"
+                    summaryElement.innerText = "...";
+                    summaryElement.classList.add('text-muted');
+                } else {
+                    // Cắt bớt phần giá tiền cho nó gọn
+                    const nameOnly = selectedText.split(' - ')[0];
+                    summaryElement.innerText = nameOnly;
+                    summaryElement.classList.remove('text-muted');
+                }
+
+                // Cập nhật tổng tiền
+                updateTotalPrice();
+            });
+        });
+
+        // 3. Tính tổng tiền lần đầu khi tải trang (là 0₫)
+        updateTotalPrice();
+    });
+
 </script>
