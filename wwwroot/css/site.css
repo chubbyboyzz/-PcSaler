@@ -1,31 +1,279 @@
+﻿/* file: wwwroot/css/site.css */
+
+/* === GLOBAL STYLES & FONT (VINTAGE BASE) === */
 html {
-  font-size: 14px;
+    font-size: 15px; /* Tăng nhẹ font size để dễ đọc hơn */
+    scroll-behavior: smooth; /* Cuộn mượt mà */
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    html {
+        font-size: 16px;
+    }
 }
 
 body {
-  margin-bottom: 60px;
+    font-family: 'Georgia', serif; /* Font chữ có chân cổ điển */
+    /* Hoặc có thể dùng font sans-serif mềm mại hơn như 'Palatino Linotype', 'Book Antiqua', 'Times New Roman' */
+    color: #3f3f3f; /* Màu chữ hơi trầm, không phải đen tuyền */
+    background-color: #f7f3ed; /* Nền màu kem nhạt, ấm áp */
+    margin-bottom: 80px; /* Tăng khoảng cách footer */
+    line-height: 1.7; /* Tăng giãn dòng để dễ đọc */
 }
 
+/* === COLORS PALETTE (Tùy chỉnh biến CSS của Bootstrap) === */
+:root {
+    --bs-primary: #8d6b4b; /* Màu chủ đạo: Nâu vàng đất sét/Vintage Gold */
+    --bs-secondary: #5a7d7c; /* Màu phụ: Xanh xám đậm (Teal) */
+    --bs-success: #6c805c; /* Xanh rêu */
+    --bs-info: #c2b29c; /* Màu be nhạt */
+    --bs-warning: #e0ac5d; /* Vàng đất */
+    --bs-danger: #a34a4a; /* Đỏ gạch/Burgundy */
+    --bs-light: #f7f3ed; /* Kem nhạt */
+    --bs-dark: #2c3e50; /* Xanh đen than */
+    /* Các màu chữ */
+    --bs-body-color: #3f3f3f;
+    --bs-link-color: var(--bs-primary);
+    --bs-link-hover-color: #5c4735; /* Đậm hơn khi hover */
+}
+
+/* === HEADER & NAVIGATION === */
+header {
+    background-color: #fffaf0 !important; /* Màu kem trắng cho header, nổi bật hơn body */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Bóng đổ mềm mại hơn */
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-family: 'Playfair Display', serif; /* Font chữ độc đáo hơn cho logo */
+    font-size: 1.8rem;
+    color: var(--bs-primary) !important; /* Màu gold cho logo */
+    letter-spacing: 0.05em; /* Tăng khoảng cách chữ */
+}
+
+.navbar-nav .nav-link {
+    color: var(--bs-secondary) !important; /* Màu xanh xám cho nav link */
+    font-weight: 500;
+    margin-right: 15px;
+    transition: color 0.3s ease;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: var(--bs-primary) !important; /* Màu gold khi hover */
+    }
+
+/* Dropdown Danh mục */
+#category-dropdown-container .dropdown-toggle {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+    #category-dropdown-container .dropdown-toggle:hover {
+        background-color: #a37c57; /* Màu đậm hơn khi hover */
+        border-color: #a37c57;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    background-color: #fffaf0; /* Nền dropdown kem trắng */
+}
+
+.dropdown-item {
+    color: var(--bs-body-color);
+    padding: 0.7rem 1.5rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+    .dropdown-item:hover {
+        background-color: var(--bs-primary);
+        color: #fff;
+    }
+
+/* Nút "Xây dựng PC" */
+.btn-primary {
+    background-color: var(--bs-danger); /* Đổi màu đỏ gạch cho nút Build PC */
+    border-color: var(--bs-danger);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #b85c5c;
+        border-color: #b85c5c;
+    }
+
+/* === FORM CONTROL & SEARCH BAR === */
+.form-control {
+    border-color: var(--bs-info); /* Viền màu be nhạt */
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+    background-color: #fff;
+    box-shadow: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    .form-control:focus {
+        border-color: var(--bs-primary); /* Viền gold khi focus */
+        box-shadow: 0 0 0 0.25rem rgba(141, 107, 75, 0.25); /* Shadow nhẹ màu gold */
+        background-color: #fff;
+    }
+
+.btn-outline-primary {
+    color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--bs-primary);
+        color: #fff;
+        border-color: var(--bs-primary);
+    }
+
+
+/* === MAIN CONTENT (CONTAINER) === */
+.container.mt-4 {
+    margin-top: 2.5rem !important; /* Tăng khoảng cách trên */
+}
+
+/* === CATEGORY LIST ON HOMEPAGE (LEFT SIDE) === */
+.col-md-3 .card {
+    background-color: #fffaf0; /* Kem trắng cho card danh mục */
+    border: 1px solid rgba(141, 107, 75, 0.1); /* Viền mỏng màu gold nhạt */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Bóng đổ rất nhẹ */
+    border-radius: 0.75rem;
+}
+
+    .col-md-3 .card h6 {
+        color: var(--bs-dark);
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+.col-md-3 .list-unstyled a {
+    color: var(--bs-secondary);
+    padding: 0.3rem 0;
+    display: block;
+    transition: color 0.2s ease;
+}
+
+    .col-md-3 .list-unstyled a:hover {
+        color: var(--bs-primary);
+        text-decoration: underline;
+    }
+
+    .col-md-3 .list-unstyled a.fw-bold {
+        color: var(--bs-primary);
+        font-weight: 700 !important;
+    }
+
+/* === CAROUSEL (BANNER) === */
+.carousel-item img {
+    border-radius: 0.75rem !important; /* Bo tròn góc banner */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12); /* Bóng đổ vừa phải */
+}
+
+.carousel-control-prev-icon, .carousel-control-next-icon {
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); /* Thêm bóng cho icon điều hướng */
+    background-color: rgba(0, 0, 0, 0.3); /* Nền cho icon */
+    border-radius: 50%;
+    padding: 1.5rem;
+}
+
+/* === PRODUCT CATEGORY SECTIONS (TRANG CHỦ) === */
+.p-3.mb-4.border-top {
+    border-top: 1px solid rgba(141, 107, 75, 0.2) !important; /* Đường kẻ phân cách mỏng màu gold nhạt */
+    padding-top: 2.5rem !important;
+    margin-top: 3rem !important;
+}
+
+.p-3.mb-4 h5.fw-bold {
+    font-family: 'Playfair Display', serif;
+    color: var(--bs-dark);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* === PRODUCT CARDS === */
+.card.h-100 {
+    background-color: #fff;
+    border: 1px solid rgba(141, 107, 75, 0.08); /* Viền mỏng */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); /* Bóng đổ đẹp hơn */
+    border-radius: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden; /* Để ảnh bo góc */
+}
+
+    .card.h-100:hover {
+        transform: translateY(-5px); /* Hiệu ứng nổi lên khi hover */
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15); /* Bóng đổ mạnh hơn khi hover */
+    }
+
+.card-img-top {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.card-body.p-3 {
+    padding: 1rem !important;
+}
+
+.card-title {
+    color: var(--bs-dark);
+    font-weight: 600;
+    font-size: 1.05rem;
+    min-height: 48px; /* Giữ chiều cao cố định để card không bị xô lệch */
+}
+
+.card-text.text-danger.fw-bold {
+    color: var(--bs-danger) !important; /* Giá sản phẩm màu đỏ gạch */
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.btn-outline-primary.btn-sm.mt-auto {
+    border-width: 2px; /* Tăng độ dày viền */
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+}
+
+/* === FOOTER === */
+footer {
+    background-color: #e8e2d8 !important; /* Nền footer màu be đậm hơn */
+    color: #5c5c5c;
+    border-top: 1px solid rgba(141, 107, 75, 0.1); /* Đường kẻ chân trang */
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px; /* Phù hợp với margin-bottom của body */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* === FOCUS OUTLINE (Màu focus tinh tế hơn) === */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    outline: 0;
+    box-shadow: 0 0 0 0.1rem #f7f3ed, 0 0 0 0.25rem rgba(141, 107, 75, 0.4); /* Vòng focus màu kem và gold nhạt */
+}
+
+/* Place holder text align */
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    color: var(--bs-secondary-color);
+    text-align: end;
 }
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+    text-align: start;
 }
