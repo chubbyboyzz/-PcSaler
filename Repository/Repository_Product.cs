@@ -21,19 +21,23 @@ namespace PcSaler.Repository
 
             if (p == null) return null;
 
-            return new ProductListViewModel
-            {
-                ProductID = p.ProductID,
-                ProductName = p.ProductName,
-                CategoryName = p.Category?.CategoryName,
-                Brand = p.Brand,
-                Model = p.Model,
-                Specifications = p.Specifications,
-                Price = p.Price,
-                ImageURL = p.ImageURL,
-                WarrantyMonths = p.WarrantyMonths,
-                ReleaseDate = p.ReleaseDate
-            };
+            return await _db.Products
+                .Where(p => p.ProductID == id)
+                .Select(p => new ProductListViewModel
+                {
+                    ProductID = p.ProductID,
+                    ProductName = p.ProductName,
+                    // CategoryName được lấy thông qua navigation property
+                    CategoryName = p.Category.CategoryName,
+                    Brand = p.Brand,
+                    Model = p.Model,
+                    Specifications = p.Specifications,
+                    Price = p.Price,
+                    ImageURL = p.ImageURL,
+                    WarrantyMonths = p.WarrantyMonths,
+                    ReleaseDate = p.ReleaseDate
+                })
+                .FirstOrDefaultAsync();
         }
     }
 }

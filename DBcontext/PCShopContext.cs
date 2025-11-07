@@ -8,7 +8,7 @@ namespace PcSaler.DBcontext
         public PCShopContext(DbContextOptions<PCShopContext> options) : base(options) { }
 
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Categories> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
 
         public DbSet<PCBuild> PCBuilds { get; set; }
@@ -35,7 +35,7 @@ namespace PcSaler.DBcontext
 
             // Bảng tương ứng với tên SQL đã tạo
             modelBuilder.Entity<Customer>().ToTable("Customers");
-            modelBuilder.Entity<Category>().ToTable("Categories");
+            modelBuilder.Entity<Categories>().ToTable("Categories");
             modelBuilder.Entity<Product>().ToTable("Products");
 
             modelBuilder.Entity<PCBuild>().ToTable("PCBuild");
@@ -75,7 +75,7 @@ namespace PcSaler.DBcontext
                 .OnDelete(DeleteBehavior.Cascade);
 
             // 3. Cấu hình Quan hệ Phân cấp Category (Self-Referencing)
-            modelBuilder.Entity<Category>()
+            modelBuilder.Entity<Categories>()
                 .HasOne(c => c.ParentCategory)      // Category có một ParentCategory
                 .WithMany(c => c.Children)          // ParentCategory có nhiều Children
                 .HasForeignKey(c => c.ParentCategoryID)
@@ -121,7 +121,7 @@ namespace PcSaler.DBcontext
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Thiết lập Unique cho ComponentType trong Category
-            modelBuilder.Entity<Category>()
+            modelBuilder.Entity<Categories>()
                 .HasIndex(c => c.ComponentType)
                 .IsUnique();
         }

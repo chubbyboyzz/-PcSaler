@@ -13,7 +13,7 @@ namespace PcSaler.Controllers
             _productService = productService;
         }
 
-        public async Task<IActionResult> Index(int id)
+        public async Task<IActionResult> Details(int id)
         {
             var product = await _productService.GetProductDetails(id);
             if (product == null) return NotFound();

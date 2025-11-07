@@ -1,0 +1,92 @@
+﻿@model PcSaler.Models.ProductViewModel
+@{
+    ViewData["Title"] = "Xây Dựng Cấu Hình Máy Tính";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">🧩 Xây Dựng Cấu Hình Máy Tính</h2>
+
+    <form id="pcBuilderForm">
+        <div class="row g-4">
+
+            <!-- CPU -->
+            <div class="col-md-4">
+                <h5>CPU</h5>
+                <select class="form-select" name="cpu">
+                    <option value="">-- Chọn CPU --</option>
+                    @foreach (var item in Model.CPUs)
+                    {
+                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Mainboard -->
+            <div class="col-md-4">
+                <h5>Mainboard</h5>
+                <select class="form-select" name="mainboard">
+                    <option value="">-- Chọn Mainboard --</option>
+                    @foreach (var item in Model.Mainboards)
+                    {
+                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
+                    }
+                </select>
+            </div>
+
+            <!-- RAM -->
+            <div class="col-md-4">
+                <h5>RAM</h5>
+                <select class="form-select" name="ram">
+                    <option value="">-- Chọn RAM --</option>
+                    @foreach (var item in Model.RAMs)
+                    {
+                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
+                    }
+                </select>
+            </div>
+
+            <!-- GPU -->
+            <div class="col-md-4">
+                <h5>GPU</h5>
+                <select class="form-select" name="gpu">
+                    <option value="">-- Chọn GPU --</option>
+                    @foreach (var item in Model.GPUs)
+                    {
+                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
+                    }
+                </select>
+            </div>
+
+            <!-- PSU -->
+            <div class="col-md-4">
+                <h5>PSU (Nguồn)</h5>
+                <select class="form-select" name="psu">
+                    <option value="">-- Chọn PSU --</option>
+                    @foreach (var item in Model.PSUs)
+                    {
+                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
+                    }
+                </select>
+            </div>
+
+            <!-- Case -->
+            <div class="col-md-4">
+                <h5>Case</h5>
+                <select class="form-select" name="case">
+                    <option value="">-- Chọn Case --</option>
+                    @foreach (var item in Model.Cases)
+                    {
+                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Xem cấu hình</button>
+        </div>
+    </form>
+</div>
+<script>
+    console.log("CPU List:", @Html.Raw(Json.Serialize(Model.CPUs)));
+</script>
