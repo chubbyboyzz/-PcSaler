@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "_PolicyLayout";
+    ViewData["Title"] = "Chính sách vận chuyển";
+}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="p-3 border rounded-3 h-100">
+            <h6 class="mb-2"><i class="bi bi-geo-alt"></i> Phí vận chuyển</h6>
+            <ul class="mb-0">
+                <li>HN/HCM: <strong>Miễn phí</strong> đơn từ <strong>1.000.000đ</strong>.</li>
+                <li>Tỉnh khác: theo phí đối tác (GHTK, Viettel Post...).</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="p-3 border rounded-3 h-100">
+            <h6 class="mb-2"><i class="bi bi-stopwatch"></i> Thời gian giao hàng</h6>
+            <ul class="mb-0">
+                <li>HN/HCM: <strong>1–2 ngày</strong>.</li>
+                <li>Tỉnh khác: <strong>2–5 ngày làm việc</strong>.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="p-3 border rounded-3 h-100">
+            <h6 class="mb-2"><i class="bi bi-box-seam"></i> Đóng gói</h6>
+            <p class="mb-0">Đệm chống sốc, bọc chống tĩnh điện, niêm phong trước khi bàn giao.</p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="p-3 border rounded-3 h-100">
+            <h6 class="mb-2"><i class="bi bi-eye"></i> Kiểm tra hàng</h6>
+            <p class="mb-0">Được kiểm tra ngoại quan trước khi thanh toán (không bóc seal linh kiện).</p>
+        </div>
+    </div>
+</div>
+
+<div class="accordion mt-4" id="shipFaq">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="sf-1">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#sf-c1">
+                Nếu đơn hàng chậm hơn dự kiến?
+            </button>
+        </h2>
+        <div id="sf-c1" class="accordion-collapse collapse show" data-bs-parent="#shipFaq">
+            <div class="accordion-body">Gọi hotline <strong>1900 9999</strong> để cập nhật trạng thái chi tiết.</div>
+        </div>
+    </div>
+    <div class="accordion-item mt-2">
+        <h2 class="accordion-header" id="sf-2">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sf-c2">
+                Có giao hàng hẹn giờ không?
+            </button>
+        </h2>
+        <div id="sf-c2" class="accordion-collapse collapse" data-bs-parent="#shipFaq">
+            <div class="accordion-body">Có, áp dụng nội thành HN/HCM (ghi chú hoặc gọi trước).</div>
+        </div>
+    </div>
+</div>
