@@ -1,0 +1,470 @@
+@model PcSaler.DBcontext.Entites.PCBuild
+
+@{
+    ViewData["Title"] = "Tạo Bộ PC Mới";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .create-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .create-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .create-card .card-body {
+        padding: 50px;
+        background-color: #fff;
+    }
+
+    .image-upload-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 550px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(102, 126, 234, 0.5);
+    }
+
+    .image-upload-section h4 {
+        color: white;
+        margin-bottom: 25px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #667eea;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        padding: 12px 18px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        background-color: #f8fafc;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #cbd5e0;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        background-color: #fff;
+        outline: none;
+    }
+
+    .section-divider {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        margin: 40px 0;
+        position: relative;
+    }
+
+    .section-divider::before {
+        content: attr(data-label);
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 20px;
+        color: #667eea;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+
+    .image-preview-box {
+        border: 3px dashed rgba(255, 255, 255, 0.6);
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.15);
+        width: 100%;
+        margin-top: 25px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .image-preview-box:hover {
+        border-color: white;
+        background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .image-preview-box img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+    }
+
+    .image-preview-box img:hover {
+        transform: scale(1.02);
+    }
+
+    .upload-icon {
+        font-size: 6rem;
+        color: white;
+        opacity: 0.9;
+        animation: pulse 2s infinite;
+    }
+
+    .file-input-wrapper, .url-input-wrapper {
+        background-color: white;
+        padding: 20px;
+        border-radius: 15px;
+        width: 100%;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .file-input-wrapper:hover, .url-input-wrapper:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .file-input-wrapper label, .url-input-wrapper label {
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(160, 174, 192, 0.4);
+    }
+
+    .required-mark {
+        color: #e53e3e;
+        font-weight: bold;
+        margin-left: 2px;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    @@media (max-width: 991px) {
+        .create-card .card-body {
+            padding: 30px;
+        }
+        
+        .image-upload-section {
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .create-card .card-body {
+            padding: 20px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="create-container">
+    <div class="page-title">
+        <h2><i class="bi bi-pc-display-horizontal"></i> Thêm Bộ PC Mới</h2>
+        <p>Tạo cấu hình PC mới cho hệ thống</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="create-card card">
+        <div class="card-body">
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="row">
+                    <!-- Cột bên trái - Form nhập liệu -->
+                    <div class="col-lg-7">
+                        <!-- THÔNG TIN CƠ BẢN -->
+                        <div class="form-group">
+                            <label asp-for="PCBuildName" class="form-label">
+                                <i class="bi bi-pc-display-horizontal"></i> Tên Bộ PC <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="PCBuildName" class="form-control" placeholder="VD: Gaming PC RTX 4090" />
+                            <span asp-validation-for="PCBuildName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label">
+                                <i class="bi bi-file-text-fill"></i> Mô Tả
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="4" placeholder="Mô tả chi tiết về bộ PC..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="section-divider" data-label="💰 GIÁ TIỀN"></div>
+
+                        <div class="form-group">
+                            <label asp-for="TotalPrice" class="form-label">
+                                <i class="bi bi-cash-coin"></i> Tổng Giá <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="TotalPrice" class="form-control" type="number" step="0.01" value="0" placeholder="0.00" />
+                            <span asp-validation-for="TotalPrice" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Tổng giá sẽ tự động tính khi thêm linh kiện</small>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="bi bi-check-circle-fill"></i> Lưu Bộ PC
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải - Upload hình ảnh -->
+                    <div class="col-lg-5">
+                        <div class="image-upload-section">
+                            <h4><i class="bi bi-camera-fill"></i> Hình Ảnh Bộ PC</h4>
+                            
+                            <div class="file-input-wrapper">
+                                <label for="imageFile" class="form-label">
+                                    <i class="bi bi-cloud-upload-fill"></i> Tải ảnh từ máy tính
+                                </label>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event)" />
+                                <small class="form-text text-muted">
+                                    <i class="bi bi-info-circle"></i> Định dạng: JPG, PNG, GIF (Tối đa 5MB)
+                                </small>
+                            </div>
+                            
+                            <div class="text-center my-3">
+                                <span class="badge bg-light text-dark px-3 py-2">HOẶC</span>
+                            </div>
+                            
+                            <div class="url-input-wrapper">
+                                <label asp-for="ImageURL" class="form-label">
+                                    <i class="bi bi-link-45deg"></i> Nhập URL ảnh từ Internet
+                                </label>
+                                <input asp-for="ImageURL" class="form-control" placeholder="https://example.com/image.jpg" onchange="loadImageFromUrl()" />
+                                <span asp-validation-for="ImageURL" class="text-danger"></span>
+                                <small class="form-text text-muted">
+                                    <i class="bi bi-info-circle"></i> Ảnh từ máy tính sẽ được ưu tiên
+                                </small>
+                            </div>
+
+                            <div id="imagePreview" class="image-preview-box" style="display:none;">
+                                <img id="preview" src="#" alt="Preview" />
+                                <p class="text-white mt-3"><i class="bi bi-check-circle-fill"></i> Xem trước hình ảnh</p>
+                            </div>
+
+                            <div id="noImagePlaceholder" class="image-preview-box">
+                                <i class="bi bi-pc-display upload-icon"></i>
+                                <p class="text-white mt-3 mb-0">Chưa có hình ảnh</p>
+                                <small class="text-white-50">Vui lòng chọn hoặc tải ảnh lên</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Kích thước file quá lớn! Vui lòng chọn file nhỏ hơn 5MB.');
+                    event.target.value = '';
+                    return;
+                }
+
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                if (!validTypes.includes(file.type)) {
+                    alert('Định dạng file không hợp lệ! Vui lòng chọn file JPG, PNG hoặc GIF.');
+                    event.target.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(){
+                    const output = document.getElementById('preview');
+                    output.src = reader.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('noImagePlaceholder').style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function loadImageFromUrl() {
+            const urlInput = document.querySelector('input[name="ImageURL"]');
+            const url = urlInput.value.trim();
+            
+            if (url) {
+                const output = document.getElementById('preview');
+                output.src = url;
+                output.onerror = function() {
+                    alert('Không thể tải ảnh từ URL này. Vui lòng kiểm tra lại!');
+                    document.getElementById('imagePreview').style.display = 'none';
+                    document.getElementById('noImagePlaceholder').style.display = 'block';
+                };
+                output.onload = function() {
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('noImagePlaceholder').style.display = 'none';
+                };
+            } else {
+                document.getElementById('imagePreview').style.display = 'none';
+                document.getElementById('noImagePlaceholder').style.display = 'block';
+            }
+        }
+
+        document.querySelector('form').addEventListener('reset', function() {
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('noImagePlaceholder').style.display = 'block';
+        });
+    </script>
+}

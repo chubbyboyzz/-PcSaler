@@ -1,0 +1,436 @@
+@model PcSaler.DBcontext.Entites.Order
+
+@{
+    ViewData["Title"] = "Xóa Đơn Hàng";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+
+    .delete-container {
+        animation: fadeInUp 0.6s ease-out;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(252, 74, 26, 0.3);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-header h1 i {
+        font-size: 2.5rem;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .delete-content {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .warning-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border: 2px solid #fc8181;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: start;
+        gap: 1rem;
+    }
+
+    .warning-box i {
+        font-size: 2rem;
+        color: #c53030;
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+    }
+
+    .warning-box .content h3 {
+        color: #c53030;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .warning-box .content p {
+        color: #742a2a;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    .info-section h4 {
+        color: #fc4a1a;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem;
+        background: #f7fafc;
+        border-radius: 10px;
+        border-left: 4px solid #fc4a1a;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        background: #edf2f7;
+        transform: translateX(5px);
+    }
+
+    .info-item .label {
+        color: #718096;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-item .label i {
+        color: #fc4a1a;
+    }
+
+    .info-item .value {
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .sidebar-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .icon-section {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .icon-section i {
+        font-size: 5rem;
+        color: white;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .confirmation-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #fc8181;
+        margin-top: 1.5rem;
+    }
+
+    .confirmation-box h4 {
+        color: #c53030;
+        margin: 0 0 1rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .confirmation-box p {
+        color: #742a2a;
+        margin: 0 0 1rem 0;
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    .confirmation-box ul {
+        margin: 0 0 1rem 0;
+        padding-left: 1.5rem;
+        color: #742a2a;
+    }
+
+    .confirmation-box ul li {
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-delete {
+        flex: 1;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(252, 74, 26, 0.4);
+    }
+
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(252, 74, 26, 0.5);
+        animation: shake 0.3s ease-in-out;
+    }
+
+    .btn-cancel {
+        padding: 0.875rem 2rem;
+        background: #e2e8f0;
+        color: #4a5568;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #cbd5e0;
+        color: #2d3748;
+        transform: translateY(-2px);
+    }
+
+    .stats-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+    }
+
+    .stat-item {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid #fc4a1a;
+    }
+
+    .stat-item .number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #fc4a1a;
+        display: block;
+    }
+
+    .stat-item .label {
+        font-size: 0.85rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+
+    @@media (max-width: 991px) {
+        .delete-content {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar-card {
+            position: static;
+        }
+
+        .stats-box {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .delete-container {
+            padding: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .info-card, .sidebar-card {
+            padding: 1.5rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .stats-box {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="delete-container">
+    <div class="page-header">
+        <h1>
+            <i class="bi bi-trash3-fill"></i>
+            Xác Nhận Xóa Đơn Hàng
+        </h1>
+    </div>
+
+    <div class="delete-content">
+        <div class="info-card">
+            <div class="warning-box">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <div class="content">
+                    <h3>Cảnh Báo Quan Trọng!</h3>
+                    <p>Bạn đang thực hiện thao tác xóa đơn hàng. Hành động này không thể hoàn tác và sẽ xóa vĩnh viễn tất cả dữ liệu liên quan đến đơn hàng này.</p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h4>
+                    <i class="bi bi-info-circle"></i>
+                    Thông Tin Đơn Hàng
+                </h4>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">
+                            <i class="bi bi-hash"></i>
+                            Mã Đơn Hàng:
+                        </span>
+                        <span class="value">#@Model.OrderID</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">
+                            <i class="bi bi-person"></i>
+                            Khách Hàng:
+                        </span>
+                        <span class="value">@Model.Customer?.FullName</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">
+                            <i class="bi bi-envelope"></i>
+                            Email:
+                        </span>
+                        <span class="value">@Model.Customer?.Email</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">
+                            <i class="bi bi-calendar"></i>
+                            Ngày Đặt:
+                        </span>
+                        <span class="value">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">
+                            <i class="bi bi-cash-coin"></i>
+                            Tổng Tiền:
+                        </span>
+                        <span class="value">@Model.TotalAmount.ToString("N0") ₫</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="label">
+                            <i class="bi bi-flag"></i>
+                            Trạng Thái:
+                        </span>
+                        <span class="value">@Model.CurrentStatus?.StatusName</span>
+                    </div>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="OrderID" />
+                <div class="btn-group">
+                    <button type="submit" class="btn-delete">
+                        <i class="bi bi-trash3"></i>
+                        Xác Nhận Xóa
+                    </button>
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-circle"></i>
+                        Hủy Bỏ
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="icon-section">
+                <i class="bi bi-exclamation-octagon-fill"></i>
+            </div>
+
+            <div class="confirmation-box">
+                <h4>
+                    <i class="bi bi-shield-exclamation"></i>
+                    Điều Cần Biết
+                </h4>
+                <p><strong>Dữ liệu sẽ bị xóa vĩnh viễn:</strong></p>
+                <ul>
+                    <li>Thông tin đơn hàng</li>
+                    <li>Chi tiết sản phẩm trong đơn</li>
+                    <li>Lịch sử trạng thái</li>
+                    <li>Thông tin thanh toán</li>
+                </ul>
+                <p><strong>Lưu ý:</strong> Hãy chắc chắn rằng bạn muốn xóa đơn hàng này trước khi xác nhận.</p>
+            </div>
+
+            <div class="stats-box">
+                <div class="stat-item">
+                    <span class="number">@(Model.OrderDetails?.Count ?? 0)</span>
+                    <span class="label">Sản phẩm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="number">@(Model.Payments?.Count ?? 0)</span>
+                    <span class="label">Thanh toán</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

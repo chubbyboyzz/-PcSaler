@@ -1,0 +1,65 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Product>
+
+@{
+    ViewData["Title"] = "Danh Sách Sản Phẩm";
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">Danh Sách Sản Phẩm</h1>
+    
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">Thêm Sản Phẩm Mới</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Hình</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Thương Hiệu</th>
+                <th>Danh Mục</th>
+                <th>Giá</th>
+                <th>Tồn Kho</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductID</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ImageURL))
+                        {
+                            <img src="@item.ImageURL" alt="@item.ProductName" style="width: 40px; height: 40px; object-fit: cover;" />
+                        }
+                    </td>
+                    <td>@item.ProductName</td>
+                    <td>@item.Brand</td>
+                    <td><span class="badge bg-primary">@item.Category?.CategoryName</span></td>
+                    <td class="text-success fw-bold">@item.Price.ToString("N0") VNĐ</td>
+                    <td>
+                        @if (item.Stock > 10)
+                        {
+                            <span class="badge bg-success">@item.Stock</span>
+                        }
+                        else if (item.Stock > 0)
+                        {
+                            <span class="badge bg-warning">@item.Stock</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Hết</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ProductID" class="btn btn-sm btn-info">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.ProductID" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.ProductID" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

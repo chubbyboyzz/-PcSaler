@@ -1,0 +1,358 @@
+@model PcSaler.DBcontext.Entites.Customer
+
+@{
+    ViewData["Title"] = "Xóa Khách Hàng";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .delete-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .delete-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(220, 53, 69, 0.3);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .delete-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .customer-display-section {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .customer-display-section:hover {
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .customer-display-section .icon-wrapper {
+        font-size: 8rem;
+        color: white;
+        margin-bottom: 20px;
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .customer-display-section h4 {
+        color: white;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .customer-display-section .customer-info {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        width: 100%;
+        margin-top: 15px;
+    }
+
+    .customer-display-section .customer-info p {
+        color: white;
+        margin: 8px 0;
+        font-size: 1rem;
+    }
+
+    .warning-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+        border-left: 5px solid #dc3545;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 3px 10px rgba(220, 53, 69, 0.2);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .warning-box h4 {
+        color: #dc3545;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .warning-box p {
+        color: #721c24;
+        margin-bottom: 0;
+        font-size: 1.1rem;
+    }
+
+    .detail-row {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.3s;
+    }
+
+    .detail-row:hover {
+        background-color: #fff5f5;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .detail-label i {
+        color: #dc3545;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: #212529;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        transition: all 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+        color: #2d3748;
+    }
+
+    .action-buttons {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    @@media (max-width: 991px) {
+        .delete-card .card-body {
+            padding: 30px;
+        }
+        
+        .customer-display-section {
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 350px;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="delete-container">
+    <div class="page-title">
+        <h2><i class="bi bi-exclamation-triangle-fill"></i> Xóa Khách Hàng</h2>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="delete-card card">
+        <div class="card-body">
+            <div class="row">
+                <!-- Cột bên trái - Thông tin khách hàng -->
+                <div class="col-lg-7">
+                    <div class="warning-box">
+                        <h4><i class="bi bi-exclamation-octagon-fill"></i> Cảnh Báo!</h4>
+                        <p>Bạn có chắc chắn muốn xóa khách hàng này? Hành động này không thể hoàn tác!</p>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-hash"></i> Mã Khách Hàng:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-secondary">#@Model.CustomerID</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-person-fill"></i> Họ và Tên:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <strong style="color: #dc3545;">@Model.FullName</strong>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-person-circle"></i> Tên Đăng Nhập:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @Model.Username
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-envelope-fill"></i> Email:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @Model.Email
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-telephone-fill"></i> Số Điện Thoại:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Phone))
+                            {
+                                @Model.Phone
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa cập nhật</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-geo-alt-fill"></i> Địa Chỉ:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Address))
+                            {
+                                @Model.Address
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa cập nhật</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-calendar-check"></i> Ngày Tạo:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="CustomerID" />
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-danger btn-lg me-3">
+                                <i class="bi bi-trash-fill"></i> Xác Nhận Xóa
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Cột bên phải - Icon cảnh báo -->
+                <div class="col-lg-5">
+                    <div class="customer-display-section">
+                        <div class="icon-wrapper">
+                            <i class="bi bi-person-x-fill"></i>
+                        </div>
+                        <h4>Khách Hàng Sẽ Bị Xóa</h4>
+                        <div class="customer-info">
+                            <p><strong><i class="bi bi-person"></i> @Model.FullName</strong></p>
+                            <p><i class="bi bi-envelope"></i> @Model.Email</p>
+                            <p><i class="bi bi-hash"></i> ID: #@Model.CustomerID</p>
+                        </div>
+                        <div class="mt-4 text-white">
+                            <small><i class="bi bi-exclamation-circle"></i> Không thể hoàn tác</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

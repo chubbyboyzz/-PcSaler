@@ -1,0 +1,98 @@
+<div class="d-flex flex-column h-100 text-white">
+    <!-- Brand Logo -->
+    <div class="p-3 border-bottom border-secondary">
+        <a href="/Management/Dashboard" class="d-flex align-items-center text-white text-decoration-none">
+            <i class="bi bi-pc-display-horizontal fs-3 me-2"></i>
+            <span class="fs-5 fw-bold">PC Shop Admin</span>
+        </a>
+    </div>
+
+    <!-- Navigation Menu -->
+    <ul class="nav nav-pills flex-column p-3">
+        <!-- Dashboard -->
+        <li class="nav-item mb-2">
+            <a href="/Management/Dashboard/Index" class="nav-link text-white">
+                <i class="bi bi-speedometer2 me-2"></i>
+                Dashboard
+            </a>
+        </li>
+
+        <!-- Categories -->
+        <li class="nav-item mb-2">
+            <a href="/Management/CategoriesManagement/Index" class="nav-link text-white">
+                <i class="bi bi-folder me-2"></i>
+                Danh Mục
+            </a>
+        </li>
+
+        <!-- Products -->
+        <li class="nav-item mb-2">
+            <a href="/Management/ProductsManagement/Index" class="nav-link text-white">
+                <i class="bi bi-box-seam me-2"></i>
+                Sản Phẩm
+            </a>
+        </li>
+
+        <!-- PC Builds -->
+        <li class="nav-item mb-2">
+            <a href="/Management/PCBuildsManagement/Index" class="nav-link text-white">
+                <i class="bi bi-pc-display me-2"></i>
+                Bộ PC Build
+            </a>
+        </li>
+
+        <hr class="border-secondary" />
+
+        <!-- Customers -->
+        <li class="nav-item mb-2">
+            <a href="/Management/CustomersManagement/Index" class="nav-link text-white">
+                <i class="bi bi-people me-2"></i>
+                Khách Hàng
+            </a>
+        </li>
+
+        <!-- Orders -->
+        <li class="nav-item mb-2">
+            <a href="/Management/OrdersManagement/Index" class="nav-link text-white">
+                <i class="bi bi-cart-check me-2"></i>
+                Đơn Hàng
+            </a>
+        </li>
+
+        <!-- Payments -->
+        <li class="nav-item mb-2">
+            <a href="/Management/PaymentsManagement/Index" class="nav-link text-white">
+                <i class="bi bi-credit-card me-2"></i>
+                Thanh Toán
+            </a>
+        </li>
+
+        <hr class="border-secondary" />
+
+        <!-- Back to Store -->
+        <li class="nav-item mb-2">
+            <a href="/" class="nav-link text-white">
+                <i class="bi bi-shop me-2"></i>
+                Về Cửa Hàng
+            </a>
+        </li>
+    </ul>
+
+
+</div>
+
+<style>
+    .sidebar .nav-link {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        padding: 12px 15px;
+    }
+    .sidebar .nav-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        transform: translateX(5px);
+    }
+    .sidebar .nav-link.active,
+    .sidebar .nav-link:active {
+        background-color: #3498db !important;
+    }
+</style>

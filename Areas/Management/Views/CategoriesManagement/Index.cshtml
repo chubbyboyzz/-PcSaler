@@ -1,0 +1,129 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Categories>
+
+@{
+    ViewData["Title"] = "Quản Lý Danh Mục";
+}
+
+<link rel="stylesheet" href="~/css/management-style.css" />
+
+<div class="management-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1><i class="bi bi-folder-fill me-2"></i>Quản Lý Danh Mục Sản Phẩm</h1>
+                <div class="btn-group">
+                    <a asp-action="Create" class="action-btn action-btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Thêm Danh Mục</span>
+                    </a>
+                    <a asp-controller="Dashboard" asp-action="Index" class="action-btn action-btn-secondary">
+                        <i class="bi bi-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-custom alert-success-custom fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Error Message -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-custom alert alert-danger fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Table -->
+        <div class="table-container fade-in-up" style="animation-delay: 0.2s">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-table-cell">ID</th>
+                            <th>Tên Danh Mục</th>
+                            <th class="d-none d-md-table-cell">Component Type</th>
+                            <th class="d-none d-lg-table-cell">Bắt Buộc</th>
+                            <th class="d-none d-xl-table-cell">Danh Mục Cha</th>
+                            <th class="d-none d-xxl-table-cell">Mô Tả</th>
+                            <th class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="d-none d-lg-table-cell"><strong style="color: #667eea;">#@item.CategoryID</strong></td>
+                                    <td>
+                                        <div class="fw-bold text-dark">@item.CategoryName</div>
+                                        <small class="text-muted d-md-none">
+                                            <span class="status-badge badge-info" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">@item.ComponentType</span>
+                                        </small>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <span class="status-badge badge-info">@item.ComponentType</span>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
+                                        @if (item.IsRequiredForBuild == true)
+                                        {
+                                            <span class="status-badge badge-danger">
+                                                <i class="bi bi-exclamation-circle me-1"></i>Bắt buộc
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge" style="background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white;">
+                                                Không bắt buộc
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <i class="bi bi-folder me-1 text-muted"></i>
+                                        @(item.ParentCategory?.CategoryName ?? "N/A")
+                                    </td>
+                                    <td class="d-none d-xxl-table-cell">
+                                        <small class="text-muted">@(item.Description ?? "N/A")</small>
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        <a asp-action="Details" asp-route-id="@item.CategoryID" class="btn-table-action btn-table-view" title="Chi Tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.CategoryID" class="btn-table-action btn-table-edit" title="Sửa">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.CategoryID" class="btn-table-action btn-table-delete" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <h4>Không có danh mục nào</h4>
+                                        <p>Hãy thêm danh mục đầu tiên của bạn</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

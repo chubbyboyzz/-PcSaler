@@ -1,0 +1,231 @@
+@model PcSaler.DBcontext.Entites.Product
+
+@{
+    ViewData["Title"] = "Xóa Sản Phẩm";
+}
+
+<style>
+    .delete-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .delete-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(220, 53, 69, 0.3);
+        overflow: hidden;
+    }
+    .delete-card .card-header {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        color: white;
+        padding: 25px;
+        border: none;
+    }
+    .delete-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+    .image-display-section {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+    }
+    .image-display-section img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        border: 3px solid white;
+    }
+    .image-display-section h4 {
+        color: white;
+        margin-bottom: 20px;
+    }
+    .no-image-placeholder {
+        border: 3px dashed white;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .no-image-icon {
+        font-size: 5rem;
+        color: white;
+        opacity: 0.8;
+    }
+    .warning-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+        border-left: 5px solid #dc3545;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 3px 10px rgba(220, 53, 69, 0.2);
+    }
+    .warning-box h4 {
+        color: #dc3545;
+        font-weight: 700;
+    }
+    .warning-box p {
+        color: #721c24;
+        margin-bottom: 0;
+        font-size: 1.1rem;
+    }
+    .detail-row {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.3s;
+    }
+    .detail-row:hover {
+        background-color: #fff5f5;
+    }
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    .detail-value {
+        font-size: 1.1rem;
+        color: #212529;
+    }
+    .product-name-highlight {
+        color: #dc3545;
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+    .btn-danger {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s;
+    }
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+    .action-buttons {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="delete-container">
+
+    <div class="warning-box">
+        <h4 class="alert-heading">
+            <i class="bi bi-exclamation-triangle-fill"></i> Cảnh báo!
+        </h4>
+        <p>Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác.</p>
+    </div>
+
+    <div class="row">
+        <!-- Cột bên trái - Thông tin sản phẩm -->
+        <div class="col-lg-7">
+            <div class="delete-card card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-card-list"></i> Thông Tin Sản Phẩm Sẽ Bị Xóa</h4>
+                </div>
+                <div class="card-body">
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-hash"></i> ID:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-secondary">@Model.ProductID</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-box-seam"></i> Tên Sản Phẩm:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="product-name-highlight">@Model.ProductName</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-building"></i> Thương Hiệu:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @Model.Brand
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-folder"></i> Danh Mục:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-primary fs-6">@Model.Category?.CategoryName</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-cash-coin"></i> Giá:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <strong style="color: #28a745; font-size: 1.3rem;">@Model.Price.ToString("N0") VNĐ</strong>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-boxes"></i> Tồn Kho:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-info fs-6">@Model.Stock sản phẩm</span>
+                        </div>
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        <input type="hidden" asp-for="ProductID" />
+                        <div class="action-buttons text-center">
+                            <button type="submit" class="btn btn-danger btn-lg me-3">
+                                <i class="bi bi-trash-fill"></i> Xác Nhận Xóa
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle"></i> Hủy
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột bên phải - Hình ảnh sản phẩm -->
+        <div class="col-lg-5">
+            <div class="image-display-section">
+                <h4><i class="bi bi-image"></i> Hình Ảnh Sản Phẩm</h4>
+                @if (!string.IsNullOrEmpty(Model.ImageURL))
+                {
+                    <img src="@Model.ImageURL" alt="@Model.ProductName" />
+                }
+                else
+                {
+                    <div class="no-image-placeholder">
+                        <i class="bi bi-image no-image-icon"></i>
+                        <p class="text-white mt-3 mb-0">Không có hình ảnh</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

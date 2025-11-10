@@ -1,0 +1,335 @@
+@model PcSaler.DBcontext.Entites.Product
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Sản Phẩm";
+}
+
+<style>
+    .edit-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .edit-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+    }
+    .edit-card .card-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 25px;
+        border: none;
+    }
+    .edit-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+    .image-upload-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 600px;
+        position: sticky;
+        top: 20px;
+    }
+    .image-upload-section h4 {
+        color: white;
+        margin-bottom: 20px;
+    }
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #f5576c;
+        box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+    }
+    .section-divider {
+        border-top: 2px solid #e9ecef;
+        margin: 30px 0;
+        position: relative;
+    }
+    .section-divider::before {
+        content: attr(data-label);
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 15px;
+        color: #f5576c;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .current-image-box {
+        border: 3px solid white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.1);
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .current-image-box img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .image-preview-box {
+        border: 3px dashed white;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        background-color: rgba(255, 255, 255, 0.1);
+        width: 100%;
+        margin-top: 20px;
+    }
+    .image-preview-box img {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+    .upload-icon {
+        font-size: 5rem;
+        color: white;
+        opacity: 0.8;
+    }
+    .file-input-wrapper {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+    .url-input-wrapper {
+        background-color: white;
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s;
+    }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+    }
+    .required-mark {
+        color: #dc3545;
+        font-weight: bold;
+    }
+</style>
+
+<div class="edit-container">
+
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="edit-card card">
+        <div class="card-body">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                <input type="hidden" asp-for="ProductID" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="row">
+                    <!-- Cột bên trái - Form nhập liệu -->
+                    <div class="col-lg-7">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="ProductName" class="form-label">
+                                        <i class="bi bi-box-seam"></i> Tên Sản Phẩm <span class="required-mark">*</span>
+                                    </label>
+                                    <input asp-for="ProductName" class="form-control" />
+                                    <span asp-validation-for="ProductName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Brand" class="form-label">
+                                        <i class="bi bi-building"></i> Thương Hiệu <span class="required-mark">*</span>
+                                    </label>
+                                    <input asp-for="Brand" class="form-control" />
+                                    <span asp-validation-for="Brand" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="CategoryID" class="form-label">
+                                        <i class="bi bi-folder"></i> Danh Mục <span class="required-mark">*</span>
+                                    </label>
+                                    <select asp-for="CategoryID" class="form-select" asp-items="ViewBag.Categories">
+                                        <option value="">-- Chọn Danh Mục --</option>
+                                    </select>
+                                    <span asp-validation-for="CategoryID" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Model" class="form-label">
+                                        <i class="bi bi-tag"></i> Model
+                                    </label>
+                                    <input asp-for="Model" class="form-control" />
+                                    <span asp-validation-for="Model" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider" data-label="GIÁ VÀ TỒN KHO"></div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Price" class="form-label">
+                                        <i class="bi bi-cash-coin"></i> Giá <span class="required-mark">*</span>
+                                    </label>
+                                    <input asp-for="Price" class="form-control" type="number" step="0.01" />
+                                    <span asp-validation-for="Price" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Stock" class="form-label">
+                                        <i class="bi bi-boxes"></i> Tồn Kho
+                                    </label>
+                                    <input asp-for="Stock" class="form-control" type="number" />
+                                    <span asp-validation-for="Stock" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="WarrantyMonths" class="form-label">
+                                        <i class="bi bi-shield-check"></i> Bảo Hành (tháng)
+                                    </label>
+                                    <input asp-for="WarrantyMonths" class="form-control" type="number" />
+                                    <span asp-validation-for="WarrantyMonths" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-divider" data-label="CHI TIẾT SẢN PHẨM"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Specifications" class="form-label">
+                                <i class="bi bi-cpu"></i> Thông Số Kỹ Thuật
+                            </label>
+                            <textarea asp-for="Specifications" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Specifications" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ReleaseDate" class="form-label">
+                                <i class="bi bi-calendar-event"></i> Ngày Ra Mắt
+                            </label>
+                            <input asp-for="ReleaseDate" class="form-control" type="date" />
+                            <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="bi bi-save"></i> Cập Nhật
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-arrow-left-circle"></i> Quay Lại
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải - Upload hình ảnh -->
+                    <div class="col-lg-5">
+                        <div class="image-upload-section">
+                            <h4><i class="bi bi-image"></i> Hình Ảnh Sản Phẩm</h4>
+                            
+                            @if (!string.IsNullOrEmpty(Model.ImageURL))
+                            {
+                                <div class="current-image-box">
+                                    <label class="form-label text-white mb-2">
+                                        <i class="bi bi-image-fill"></i> Ảnh hiện tại:
+                                    </label>
+                                    <div>
+                                        <img src="@Model.ImageURL" alt="Current Image" />
+                                    </div>
+                                </div>
+                            }
+                            
+                            <div class="file-input-wrapper">
+                                <label for="imageFile" class="form-label">
+                                    <i class="bi bi-upload"></i> Tải ảnh mới từ máy tính
+                                </label>
+                                <input type="file" class="form-control" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event)" />
+                                <small class="form-text text-muted">Chọn file ảnh mới nếu muốn thay đổi</small>
+                            </div>
+                            
+                            <div class="url-input-wrapper">
+                                <label asp-for="ImageURL" class="form-label">
+                                    <i class="bi bi-link-45deg"></i> Hoặc nhập URL ảnh mới
+                                </label>
+                                <input asp-for="ImageURL" class="form-control" />
+                                <span asp-validation-for="ImageURL" class="text-danger"></span>
+                                <small class="form-text text-muted">Nếu bạn tải ảnh lên, URL này sẽ bị ghi đè</small>
+                            </div>
+
+                            <div id="imagePreview" class="image-preview-box" style="display:none;">
+                                <label class="form-label text-white"><i class="bi bi-eye"></i> Xem trước ảnh mới:</label>
+                                <div class="mt-2">
+                                    <img id="preview" src="#" alt="Preview" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+                document.getElementById('imagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+}

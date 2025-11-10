@@ -1,0 +1,52 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.PCBuild>
+
+@{
+    ViewData["Title"] = "Danh Sách Bộ PC";
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">Danh Sách Bộ PC Build</h1>
+    
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">Thêm Bộ PC Mới</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Hình</th>
+                <th>Tên Bộ PC</th>
+                <th>Mô Tả</th>
+                <th>Tổng Giá</th>
+                <th>Số Linh Kiện</th>
+                <th>Ngày Tạo</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.PCBuildID</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.ImageURL))
+                        {
+                            <img src="@item.ImageURL" alt="@item.PCBuildName" style="width: 40px; height: 40px; object-fit: cover;" />
+                        }
+                    </td>
+                    <td><strong>@item.PCBuildName</strong></td>
+                    <td>@(item.Description?.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description)</td>
+                    <td class="text-success fw-bold">@item.TotalPrice.ToString("N0") VNĐ</td>
+                    <td><span class="badge bg-info">@(item.Details?.Count ?? 0)</span></td>
+                    <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.PCBuildID" class="btn btn-sm btn-info">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.PCBuildID" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.PCBuildID" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

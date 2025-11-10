@@ -1,0 +1,155 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Product>
+
+@{
+    ViewData["Title"] = "Quản Lý Sản Phẩm";
+}
+
+<link rel="stylesheet" href="~/css/management-style.css" />
+
+<div class="management-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1><i class="bi bi-box-seam-fill me-2"></i>Quản Lý Sản Phẩm</h1>
+                <div class="btn-group">
+                    <a asp-action="Create" class="action-btn action-btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Thêm Sản Phẩm</span>
+                    </a>
+                    <a asp-controller="Dashboard" asp-action="Index" class="action-btn action-btn-secondary">
+                        <i class="bi bi-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-custom alert-success-custom fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Error Message -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-custom alert alert-danger fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Table -->
+        <div class="table-container fade-in-up" style="animation-delay: 0.2s">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-table-cell">ID</th>
+                            <th class="d-none d-md-table-cell">Hình</th>
+                            <th>Sản Phẩm</th>
+                            <th class="d-none d-xl-table-cell">Danh Mục</th>
+                            <th>Giá</th>
+                            <th class="d-none d-lg-table-cell">Kho</th>
+                            <th class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="d-none d-lg-table-cell"><strong style="color: #667eea;">#@item.ProductID</strong></td>
+                                    <td class="d-none d-md-table-cell">
+                                        @if (!string.IsNullOrEmpty(item.ImageURL))
+                                        {
+                                            <img src="@item.ImageURL" alt="@item.ProductName" class="table-img" />
+                                        }
+                                        else
+                                        {
+                                            <div class="table-img d-flex align-items-center justify-content-center" 
+                                                 style="background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div class="fw-bold text-dark">@item.ProductName</div>
+                                            <small class="text-muted"><i class="bi bi-tag me-1"></i>@item.Brand</small>
+                                            <div class="d-xl-none mt-1">
+                                                <span class="status-badge badge-primary">@item.Category?.CategoryName</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <span class="status-badge badge-primary">@item.Category?.CategoryName</span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <strong style="color: #28a745; font-size: 1.05em;">@item.Price.ToString("N0") VNĐ</strong>
+                                        <div class="d-lg-none mt-1">
+                                            @if (item.Stock > 10)
+                                            {
+                                                <span class="status-badge badge-success" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">SL: @item.Stock</span>
+                                            }
+                                            else if (item.Stock > 0)
+                                            {
+                                                <span class="status-badge badge-warning" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">SL: @item.Stock</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="status-badge badge-danger" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">Hết hàng</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
+                                        @if (item.Stock > 10)
+                                        {
+                                            <span class="status-badge badge-success">@item.Stock</span>
+                                        }
+                                        else if (item.Stock > 0)
+                                        {
+                                            <span class="status-badge badge-warning">@item.Stock</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="status-badge badge-danger">Hết hàng</span>
+                                        }
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        <a asp-action="Details" asp-route-id="@item.ProductID" class="btn-table-action btn-table-view" title="Chi Tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.ProductID" class="btn-table-action btn-table-edit" title="Sửa">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.ProductID" class="btn-table-action btn-table-delete" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <h4>Không có sản phẩm nào</h4>
+                                        <p>Hãy thêm sản phẩm đầu tiên của bạn</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

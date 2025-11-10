@@ -1,0 +1,391 @@
+@model PcSaler.DBcontext.Entites.Categories
+
+@{
+    ViewData["Title"] = "Thêm Danh Mục Mới";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .create-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .create-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .create-card .card-body {
+        padding: 50px;
+        background-color: #fff;
+    }
+
+    .category-icon-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 35px;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .category-icon-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(102, 126, 234, 0.5);
+    }
+
+    .category-icon-section .icon-wrapper {
+        font-size: 8rem;
+        color: white;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+
+    .category-icon-section h4 {
+        color: white;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .category-icon-section p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #667eea;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        padding: 12px 18px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+        background-color: #f8fafc;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #cbd5e0;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        background-color: #fff;
+        outline: none;
+    }
+
+    .form-check-input {
+        width: 1.5em;
+        height: 1.5em;
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+
+    .form-check-label {
+        margin-left: 10px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .section-divider {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #667eea, transparent);
+        margin: 40px 0;
+        position: relative;
+    }
+
+    .section-divider::before {
+        content: attr(data-label);
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 20px;
+        color: #667eea;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 1px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 14px 40px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(160, 174, 192, 0.4);
+    }
+
+    .required-mark {
+        color: #e53e3e;
+        font-weight: bold;
+        margin-left: 2px;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    @@media (max-width: 991px) {
+        .create-card .card-body {
+            padding: 30px;
+        }
+        
+        .category-icon-section {
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .create-card .card-body {
+            padding: 20px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="create-container">
+    <div class="page-title">
+        <h2><i class="bi bi-folder-plus"></i> Thêm Danh Mục Mới</h2>
+        <p>Tạo danh mục sản phẩm mới cho hệ thống</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="create-card card">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="row">
+                    <!-- Cột bên trái - Form nhập liệu -->
+                    <div class="col-lg-7">
+                        <!-- THÔNG TIN CƠ BẢN -->
+                        <div class="form-group">
+                            <label asp-for="CategoryName" class="form-label">
+                                <i class="bi bi-folder-fill"></i> Tên Danh Mục <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="CategoryName" class="form-control" placeholder="VD: CPU, RAM, Mainboard..." />
+                            <span asp-validation-for="CategoryName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ComponentType" class="form-label">
+                                <i class="bi bi-tag-fill"></i> Component Type <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="ComponentType" class="form-control" placeholder="VD: CPU, MAINBOARD, RAM..." />
+                            <span asp-validation-for="ComponentType" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Key cố định dùng trong logic build PC</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label">
+                                <i class="bi bi-file-text-fill"></i> Mô Tả
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả chi tiết về danh mục..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="section-divider" data-label="⚙️ CÀI ĐẶT"></div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input asp-for="IsRequiredForBuild" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsRequiredForBuild" class="form-check-label">
+                                    <i class="bi bi-exclamation-circle-fill text-danger"></i> Linh kiện bắt buộc cho build PC
+                                </label>
+                            </div>
+                            <small class="text-muted ms-4"><i class="bi bi-info-circle"></i> Đánh dấu nếu đây là linh kiện bắt buộc khi xây dựng cấu hình PC</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ParentCategoryID" class="form-label">
+                                <i class="bi bi-diagram-3-fill"></i> Danh Mục Cha (Tùy chọn)
+                            </label>
+                            <select asp-for="ParentCategoryID" class="form-select">
+                                <option value="">-- Không có danh mục cha (Danh mục gốc) --</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    var categories = ViewBag.Categories as List<PcSaler.DBcontext.Entites.Categories>;
+                                    if (categories != null)
+                                    {
+                                        @foreach (var cat in categories)
+                                        {
+                                            <option value="@cat.CategoryID">@cat.CategoryName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ParentCategoryID" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Chọn danh mục cha nếu đây là danh mục con</small>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="bi bi-check-circle-fill"></i> Lưu Danh Mục
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải - Icon danh mục -->
+                    <div class="col-lg-5">
+                        <div class="category-icon-section">
+                            <div class="icon-wrapper">
+                                <i class="bi bi-folder-fill"></i>
+                            </div>
+                            <h4>Danh Mục Mới</h4>
+                            <p>Danh mục giúp phân loại và quản lý sản phẩm hiệu quả hơn trong hệ thống.</p>
+                            <div class="mt-4 text-white">
+                                <small><i class="bi bi-lightbulb"></i> Sử dụng Component Type để xác định loại linh kiện</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

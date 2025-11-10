@@ -1,0 +1,140 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.PCBuild>
+
+@{
+    ViewData["Title"] = "Quản Lý Bộ PC";
+}
+
+<link rel="stylesheet" href="~/css/management-style.css" />
+
+<div class="management-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1><i class="bi bi-pc-display-horizontal me-2"></i>Quản Lý Bộ PC Build</h1>
+                <div class="btn-group">
+                    <a asp-action="Create" class="action-btn action-btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Thêm Bộ PC</span>
+                    </a>
+                    <a asp-controller="Dashboard" asp-action="Index" class="action-btn action-btn-secondary">
+                        <i class="bi bi-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-custom alert-success-custom fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Error Message -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-custom alert alert-danger fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Table -->
+        <div class="table-container fade-in-up" style="animation-delay: 0.2s">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-table-cell">ID</th>
+                            <th class="d-none d-md-table-cell">Hình Ảnh</th>
+                            <th>Tên Bộ PC</th>
+                            <th class="d-none d-xl-table-cell">Mô Tả</th>
+                            <th>Tổng Giá</th>
+                            <th class="d-none d-lg-table-cell">Số Linh Kiện</th>
+                            <th class="d-none d-xxl-table-cell">Ngày Tạo</th>
+                            <th class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="d-none d-lg-table-cell"><strong style="color: #667eea;">#@item.PCBuildID</strong></td>
+                                    <td class="d-none d-md-table-cell">
+                                        @if (!string.IsNullOrEmpty(item.ImageURL))
+                                        {
+                                            <img src="@item.ImageURL" alt="@item.PCBuildName" class="table-img" />
+                                        }
+                                        else
+                                        {
+                                            <div class="table-img d-flex align-items-center justify-content-center" 
+                                                 style="background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);">
+                                                <i class="bi bi-pc-display text-muted"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark">@item.PCBuildName</div>
+                                        <small class="text-muted d-lg-none">
+                                            <span class="status-badge badge-info" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                                                @(item.Details?.Count ?? 0) linh kiện
+                                            </span>
+                                        </small>
+                                    </td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <small class="text-muted">
+                                            @(item.Description?.Length > 50 ? item.Description.Substring(0, 50) + "..." : item.Description ?? "N/A")
+                                        </small>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <strong style="color: #28a745; font-size: 1.05em;">
+                                            @item.TotalPrice.ToString("N0") VNĐ
+                                        </strong>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell">
+                                        <span class="status-badge badge-info">
+                                            <i class="bi bi-cpu me-1"></i>@(item.Details?.Count ?? 0) linh kiện
+                                        </span>
+                                    </td>
+                                    <td class="d-none d-xxl-table-cell">
+                                        <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                        @item.CreatedAt.ToString("dd/MM/yyyy")
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        <a asp-action="Details" asp-route-id="@item.PCBuildID" class="btn-table-action btn-table-view" title="Chi Tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.PCBuildID" class="btn-table-action btn-table-edit" title="Sửa">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.PCBuildID" class="btn-table-action btn-table-delete" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <h4>Không có bộ PC nào</h4>
+                                        <p>Hãy thêm bộ PC đầu tiên của bạn</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

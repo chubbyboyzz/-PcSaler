@@ -1,0 +1,564 @@
+@model PcSaler.DBcontext.Entites.Order
+
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Hàng";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .details-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .details-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+        margin-bottom: 30px;
+    }
+
+    .details-card .card-body {
+        padding: 30px;
+        background-color: #fff;
+    }
+
+    .icon-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        color: white;
+        text-align: center;
+    }
+
+    .order-icon {
+        font-size: 5rem;
+        color: white;
+        opacity: 0.9;
+        margin-bottom: 15px;
+    }
+
+    .info-section {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .section-header i {
+        font-size: 2rem;
+        color: #667eea;
+    }
+
+    .section-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 15px;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 15px;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .info-box:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .info-box .label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+
+    .info-box .value {
+        font-size: 1.1rem;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .products-table {
+        margin-top: 15px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .products-table table {
+        margin-bottom: 0;
+    }
+
+    .products-table thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .products-table thead th {
+        border: none;
+        padding: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+    }
+
+    .products-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .products-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .products-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .product-image {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+    }
+
+    .badge {
+        font-size: 0.85rem;
+        padding: 5px 12px;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .btn {
+        padding: 10px 25px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffd89b 0%, #f9a825 100%);
+        border: none;
+        color: #2d3748;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(249, 168, 37, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        border: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    .price-highlight {
+        font-size: 1.5rem;
+        color: #28a745;
+        font-weight: 700;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
+
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -30px;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background: #e9ecef;
+    }
+
+    .timeline-item:last-child:before {
+        display: none;
+    }
+
+    .timeline-dot {
+        position: absolute;
+        left: -36px;
+        top: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #667eea;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #667eea;
+    }
+
+    .timeline-content {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 3px solid #667eea;
+    }
+
+    @@media (max-width: 991px) {
+        .details-card .card-body {
+            padding: 20px;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+
+        .products-table {
+            overflow-x: auto;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <div class="page-title">
+        <h2><i class="bi bi-cart-check-fill"></i> Chi Tiết Đơn Hàng #@Model.OrderID</h2>
+        <p>Thông tin đầy đủ về đơn hàng và sản phẩm</p>
+    </div>
+
+    <div class="row">
+        <!-- Cột bên trái -->
+        <div class="col-lg-8">
+            <!-- Thông tin đơn hàng -->
+            <div class="details-card card">
+                <div class="card-body">
+                    <div class="section-header">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <h4>Thông Tin Đơn Hàng</h4>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-box">
+                            <div class="label">
+                                <i class="bi bi-hash"></i> Mã Đơn Hàng
+                            </div>
+                            <div class="value">#@Model.OrderID</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">
+                                <i class="bi bi-calendar-event"></i> Ngày Đặt
+                            </div>
+                            <div class="value">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">
+                                <i class="bi bi-cash-stack"></i> Tổng Tiền
+                            </div>
+                            <div class="value text-success">@Model.TotalAmount.ToString("N0") VNĐ</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="label">
+                                <i class="bi bi-flag-fill"></i> Trạng Thái
+                            </div>
+                            <div class="value">
+                                <span class="badge bg-primary">@Model.CurrentStatus?.StatusName</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thông tin khách hàng -->
+            @if (Model.Customer != null)
+            {
+                <div class="details-card card">
+                    <div class="card-body">
+                        <div class="section-header">
+                            <i class="bi bi-person-fill"></i>
+                            <h4>Thông Tin Khách Hàng</h4>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-person-badge"></i> Họ Tên
+                                </div>
+                                <div class="value">@Model.Customer.FullName</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-envelope"></i> Email
+                                </div>
+                                <div class="value">@Model.Customer.Email</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-telephone"></i> Số Điện Thoại
+                                </div>
+                                <div class="value">@Model.Customer.Phone</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-geo-alt"></i> Địa Chỉ
+                                </div>
+                                <div class="value">@Model.Customer.Address</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Danh sách sản phẩm -->
+            <div class="details-card card">
+                <div class="card-body">
+                    <div class="section-header">
+                        <i class="bi bi-box-seam-fill"></i>
+                        <h4>Sản Phẩm Trong Đơn Hàng</h4>
+                        <span class="badge bg-primary ms-auto">@(Model.OrderDetails?.Count ?? 0) sản phẩm</span>
+                    </div>
+
+                    @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                    {
+                        <div class="products-table">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Ảnh</th>
+                                        <th>Sản Phẩm</th>
+                                        <th class="text-center">SL</th>
+                                        <th class="text-end">Đơn Giá</th>
+                                        <th class="text-end">Thành Tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in Model.OrderDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(detail.Product?.ImageURL))
+                                                {
+                                                    <img src="@detail.Product.ImageURL" alt="@detail.Product.ProductName" class="product-image" />
+                                                }
+                                                else
+                                                {
+                                                    <div class="product-image d-flex align-items-center justify-content-center bg-light">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong>@detail.Product?.ProductName</strong><br />
+                                                <small class="text-muted">@detail.Product?.Category?.CategoryName</small>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge bg-secondary">@detail.Quantity</span>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>@detail.UnitPrice.ToString("N0") VNĐ</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                <strong class="text-success">@((detail.UnitPrice * detail.Quantity).ToString("N0")) VNĐ</strong>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+                                        <td colspan="4" class="text-end"><strong>TỔNG CỘNG:</strong></td>
+                                        <td class="text-end">
+                                            <strong class="price-highlight">@Model.TotalAmount.ToString("N0") VNĐ</strong>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-inbox"></i> Chưa có sản phẩm nào trong đơn hàng này.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột bên phải -->
+        <div class="col-lg-4">
+            <!-- Icon section -->
+            <div class="details-card card">
+                <div class="card-body p-0">
+                    <div class="icon-section">
+                        <i class="bi bi-cart-check-fill order-icon"></i>
+                        <h4>Đơn Hàng #@Model.OrderID</h4>
+                        
+                        <div class="info-section">
+                            <div class="info-row">
+                                <span>Tổng Tiền:</span>
+                                <span class="price-highlight">@Model.TotalAmount.ToString("N0") VNĐ</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Số Sản Phẩm:</span>
+                                <span>@(Model.OrderDetails?.Count ?? 0)</span>
+                            </div>
+                            <div class="info-row">
+                                <span>Trạng Thái:</span>
+                                <span class="badge bg-light text-dark">@Model.CurrentStatus?.StatusName</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lịch sử trạng thái -->
+            @if (Model.StatusHistory != null && Model.StatusHistory.Any())
+            {
+                <div class="details-card card">
+                    <div class="card-body">
+                        <div class="section-header">
+                            <i class="bi bi-clock-history"></i>
+                            <h4>Lịch Sử Trạng Thái</h4>
+                        </div>
+                        <div class="timeline">
+                            @foreach (var history in Model.StatusHistory.OrderByDescending(h => h.UpdatedAt))
+                            {
+                                <div class="timeline-item">
+                                    <div class="timeline-dot"></div>
+                                    <div class="timeline-content">
+                                        <strong>@history.Status?.StatusName</strong><br />
+                                        <small class="text-muted">
+                                            <i class="bi bi-clock"></i> @history.UpdatedAt.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Nút hành động -->
+            <div class="details-card card">
+                <div class="card-body">
+                    <div class="action-buttons">
+                        <a asp-action="Edit" asp-route-id="@Model.OrderID" class="btn btn-warning w-100">
+                            <i class="bi bi-pencil-square"></i> Chỉnh Sửa
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.OrderID" class="btn btn-danger w-100">
+                            <i class="bi bi-trash-fill"></i> Xóa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-left-circle-fill"></i> Quay Lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

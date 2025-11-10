@@ -1,0 +1,123 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Customer>
+
+@{
+    ViewData["Title"] = "Quản Lý Khách Hàng";
+}
+
+<link rel="stylesheet" href="~/css/management-style.css" />
+
+<div class="management-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1><i class="bi bi-people-fill me-2"></i>Quản Lý Khách Hàng</h1>
+                <div class="btn-group">
+                    <a asp-action="Create" class="action-btn action-btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Thêm Khách Hàng</span>
+                    </a>
+                    <a asp-controller="Dashboard" asp-action="Index" class="action-btn action-btn-secondary">
+                        <i class="bi bi-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-custom alert-success-custom fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <!-- Error Message -->
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-custom alert alert-danger fade-in-up" style="animation-delay: 0.1s">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Table -->
+        <div class="table-container fade-in-up" style="animation-delay: 0.2s">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-table-cell">ID</th>
+                            <th>Khách Hàng</th>
+                            <th class="d-none d-xl-table-cell">Email</th>
+                            <th class="d-none d-md-table-cell">Điện Thoại</th>
+                            <th class="d-none d-xxl-table-cell">Địa Chỉ</th>
+                            <th class="d-none d-lg-table-cell">Ngày Tạo</th>
+                            <th class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="d-none d-lg-table-cell"><strong style="color: #667eea;">#@item.CustomerID</strong></td>
+                                    <td>
+                                        <div>
+                                            <div class="fw-bold text-dark">@item.FullName</div>
+                                            <small class="text-muted"><i class="bi bi-person-circle me-1"></i>@item.Username</small>
+                                            <div class="d-xl-none mt-1">
+                                                <small class="text-muted d-block"><i class="bi bi-envelope me-1"></i>@item.Email</small>
+                                            </div>
+                                            <div class="d-md-none mt-1">
+                                                <small class="text-muted d-block"><i class="bi bi-telephone me-1"></i>@item.Phone</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-xl-table-cell">
+                                        <i class="bi bi-envelope me-1 text-primary"></i>@item.Email
+                                    </td>
+                                    <td class="d-none d-md-table-cell text-nowrap">
+                                        <i class="bi bi-telephone me-1 text-success"></i>@item.Phone
+                                    </td>
+                                    <td class="d-none d-xxl-table-cell">
+                                        <small>@item.Address</small>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell text-nowrap">
+                                        <span class="status-badge badge-info">@item.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                    </td>
+                                    <td class="text-center text-nowrap">
+                                        <a asp-action="Details" asp-route-id="@item.CustomerID" class="btn-table-action btn-table-view" title="Chi Tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@item.CustomerID" class="btn-table-action btn-table-edit" title="Sửa">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.CustomerID" class="btn-table-action btn-table-delete" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7">
+                                    <div class="empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        <h4>Không có khách hàng nào</h4>
+                                        <p>Hãy thêm khách hàng đầu tiên</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

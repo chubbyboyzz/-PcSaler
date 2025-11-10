@@ -1,0 +1,321 @@
+@model PcSaler.DBcontext.Entites.Customer
+
+@{
+    ViewData["Title"] = "Chi Tiết Khách Hàng";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .details-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .customer-icon-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .customer-icon-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .customer-icon-container .icon-wrapper {
+        font-size: 10rem;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .customer-icon-container h4 {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .customer-icon-container .badge {
+        font-size: 1rem;
+        padding: 8px 20px;
+        margin-top: 10px;
+    }
+
+    .detail-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .detail-card .card-body {
+        padding: 30px;
+    }
+
+    .detail-row {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.3s;
+    }
+
+    .detail-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .detail-label i {
+        color: #667eea;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: #212529;
+    }
+
+    .action-buttons {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        color: white;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        transition: all 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+        color: #2d3748;
+    }
+
+    .section-title {
+        color: #667eea;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin: 20px 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    @@media (max-width: 991px) {
+        .customer-icon-container {
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <div class="page-title">
+        <h2><i class="bi bi-info-circle-fill"></i> Chi Tiết Khách Hàng</h2>
+    </div>
+
+    <div class="row">
+        <!-- Cột bên trái - Icon và thông tin cơ bản -->
+        <div class="col-lg-4">
+            <div class="customer-icon-container">
+                <div class="icon-wrapper">
+                    <i class="bi bi-person-circle"></i>
+                </div>
+                <h4>@Model.FullName</h4>
+                <p class="text-white">@Model.Username</p>
+                <span class="badge bg-light text-dark">
+                    <i class="bi bi-calendar"></i> Tham gia: @Model.CreatedAt.ToString("dd/MM/yyyy")
+                </span>
+            </div>
+        </div>
+
+        <!-- Cột bên phải - Thông tin chi tiết -->
+        <div class="col-lg-8">
+            <div class="detail-card card">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <i class="bi bi-person-badge"></i> Thông Tin Cơ Bản
+                    </h5>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-hash"></i> Mã Khách Hàng:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-secondary">#@Model.CustomerID</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-person-fill"></i> Họ và Tên:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <strong style="color: #667eea;">@Model.FullName</strong>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-person-circle"></i> Tên Đăng Nhập:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @Model.Username
+                        </div>
+                    </div>
+
+                    <h5 class="section-title">
+                        <i class="bi bi-telephone-fill"></i> Thông Tin Liên Hệ
+                    </h5>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-envelope-fill"></i> Email:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <a href="mailto:@Model.Email" style="color: #667eea; text-decoration: none;">@Model.Email</a>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-telephone-fill"></i> Số Điện Thoại:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Phone))
+                            {
+                                <a href="tel:@Model.Phone" style="color: #667eea; text-decoration: none;">@Model.Phone</a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa cập nhật</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-geo-alt-fill"></i> Địa Chỉ:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Address))
+                            {
+                                @Model.Address
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa cập nhật</span>
+                            }
+                        </div>
+                    </div>
+
+                    <h5 class="section-title">
+                        <i class="bi bi-clock-history"></i> Thông Tin Hệ Thống
+                    </h5>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-calendar-check"></i> Ngày Tạo Tài Khoản:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a asp-action="Edit" asp-route-id="@Model.CustomerID" class="btn btn-edit me-3">
+                            <i class="bi bi-pencil-square"></i> Chỉnh Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-back">
+                            <i class="bi bi-arrow-left-circle"></i> Quay Lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
