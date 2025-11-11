@@ -1,0 +1,814 @@
+@{
+    ViewData["Title"] = "Dashboard - Quản Lý PC Shop";
+}
+
+<style>
+    .dashboard-container {
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #7a8bebff 0%, #3191c9ff 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(94, 114, 228, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+    
+    .page-header h1 {
+        color: white;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Statistics Cards với màu nhẹ nhàng */
+    .stat-card {
+        border: none;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+    
+    .stat-card .card-body {
+        position: relative;
+        z-index: 1;
+        padding: 1.5rem;
+    }
+    
+    .stat-card i {
+        opacity: 0.9;
+        filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+    }
+    
+    .stat-card h2, .stat-card h4 {
+        font-weight: 700;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* Palette màu pastel nhẹ nhàng */
+    .bg-card-1 {
+        background: linear-gradient(135deg, #667eea 0%, #3191c9ff 100%);
+    }
+    
+    .bg-card-2 {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .bg-card-3 {
+        background: linear-gradient(135deg, #4facfe 0%, #2cb2b9ff 100%);
+    }
+    
+    .bg-card-4 {
+        background: linear-gradient(135deg, #43e97b 0%, #2abda2ff 100%);
+    }
+    
+    /* Chart Cards */
+    .chart-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+        background: white;
+        overflow: hidden;
+    }
+    
+    .chart-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transform: translateY(-3px);
+    }
+    
+    .chart-card .card-header {
+        background: linear-gradient(135deg, #5e72e4 0%, #3191c9ff 100%);
+        color: white;
+        border: none;
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+    }
+    
+    .chart-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .chart-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Quick Links với màu nhẹ nhàng */
+    .quick-link-btn {
+        border: none;
+        border-radius: 12px;
+        padding: 1.25rem 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        text-decoration: none;
+        color: white;
+        font-weight: 600;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .quick-link-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.25);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+    
+    .quick-link-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .quick-link-btn:hover {
+        transform: translateY(-3px) scale(1.03);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        color: white;
+    }
+    
+    .quick-link-btn i {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .quick-link-btn span {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Table Styles */
+    .table-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        overflow: hidden;
+        background: white;
+    }
+    
+    .table-card .card-header {
+        background: linear-gradient(135deg, #5e72e4 0%, #3191c9ff 100%);
+        color: white;
+        border: none;
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .table-card .card-header h4 {
+        margin: 0;
+        font-weight: 600;
+    }
+    
+    .table-striped tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    .table-striped tbody tr:hover {
+        background-color: rgba(94, 114, 228, 0.05);
+        transform: scale(1.005);
+    }
+    
+    /* Section Title */
+    .section-title {
+        color: #2d3748;
+        font-weight: 700;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-left: 1rem;
+    }
+    
+    .section-title::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 70%;
+        background: linear-gradient(135deg, #6e7cceff 0%, #3191c9ff 100%);
+        border-radius: 10px;
+    }
+    
+    /* Animation */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    /* Badge */
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+    
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .stat-card .card-body {
+            padding: 1rem;
+        }
+        .stat-card h2, .stat-card h4 {
+            font-size: 1.25rem;
+        }
+        .stat-card h6 {
+            font-size: 0.875rem;
+        }
+        .stat-card i {
+            font-size: 2rem !important;
+        }
+        .page-header {
+            padding: 1.5rem;
+        }
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <h1><i class="bi bi-speedometer2 me-2"></i>Dashboard - Quản Lý Hệ Thống</h1>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card stat-card text-white bg-card-1 h-100 fade-in-up" style="animation-delay: 0.1s">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <i class="bi bi-people fs-1 mb-2"></i>
+                            <h6 class="card-title mb-0">Khách Hàng</h6>
+                        </div>
+                        <h2 class="mb-0 mt-2">@ViewBag.TotalCustomers</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card stat-card text-white bg-card-2 h-100 fade-in-up" style="animation-delay: 0.2s">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <i class="bi bi-cart-check fs-1 mb-2"></i>
+                            <h6 class="card-title mb-0">Đơn Hàng</h6>
+                        </div>
+                        <h2 class="mb-0 mt-2">@ViewBag.TotalOrders</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card stat-card text-white bg-card-3 h-100 fade-in-up" style="animation-delay: 0.3s">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <i class="bi bi-cash-stack fs-1 mb-2"></i>
+                            <h6 class="card-title mb-0">Doanh Thu</h6>
+                        </div>
+                        <h4 class="mb-0 mt-2">@ViewBag.TotalRevenue.ToString("N0") <small style="font-size: 0.7em">VNĐ</small></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-md-6 col-lg-3">
+                <div class="card stat-card text-white bg-card-4 h-100 fade-in-up" style="animation-delay: 0.4s">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <i class="bi bi-clock-history fs-1 mb-2"></i>
+                            <h6 class="card-title mb-0">Đơn Mới</h6>
+                        </div>
+                        <h2 class="mb-0 mt-2">@ViewBag.RecentOrders.Count</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="section-title fade-in-up">
+            <i class="bi bi-bar-chart-fill me-2"></i>Biểu Đồ Thống Kê
+        </div>
+        
+        <div class="row g-4 mb-4">
+            <!-- Biểu đồ Doanh Thu 6 Tháng -->
+            <div class="col-12 col-lg-8">
+                <div class="card chart-card h-100 fade-in-up" style="animation-delay: 0.5s">
+                    <div class="card-header">
+                        <h5><i class="bi bi-graph-up me-2"></i>Doanh Thu 6 Tháng Gần Đây</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="revenueChart" style="max-height: 320px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Biểu đồ Trạng Thái Đơn Hàng -->
+            <div class="col-12 col-lg-4">
+                <div class="card chart-card h-100 fade-in-up" style="animation-delay: 0.6s">
+                    <div class="card-header">
+                        <h5><i class="bi bi-pie-chart me-2"></i>Trạng Thái Đơn Hàng</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="orderStatusChart" style="max-height: 320px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Biểu đồ Sản Phẩm Theo Danh Mục -->
+            <div class="col-12 col-lg-6">
+                <div class="card chart-card h-100 fade-in-up" style="animation-delay: 0.7s">
+                    <div class="card-header">
+                        <h5><i class="bi bi-diagram-3 me-2"></i>Sản Phẩm Theo Danh Mục</h5>
+                    </div>
+                    <div class="card-body d-flex align-items-center justify-content-center">
+                        <canvas id="categoryChart" style="max-height: 320px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Links Compact -->
+            <div class="col-12 col-lg-6">
+                <div class="card chart-card h-100 fade-in-up" style="animation-delay: 0.8s">
+                    <div class="card-header">
+                        <h5><i class="bi bi-grid-3x3-gap me-2"></i>Quản Lý Nhanh</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <a asp-controller="CustomersManagement" asp-action="Index" class="quick-link-btn btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="bi bi-people fs-2 mb-2"></i>
+                                    <span>Khách Hàng</span>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="OrdersManagement" asp-action="Index" class="quick-link-btn btn btn-success w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="bi bi-cart fs-2 mb-2"></i>
+                                    <span>Đơn Hàng</span>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="ProductsManagement" asp-action="Index" class="quick-link-btn btn btn-warning w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="bi bi-box-seam fs-2 mb-2"></i>
+                                    <span>Sản Phẩm</span>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="PaymentsManagement" asp-action="Index" class="quick-link-btn btn btn-info w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="bi bi-credit-card fs-2 mb-2"></i>
+                                    <span>Thanh Toán</span>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="CategoriesManagement" asp-action="Index" class="quick-link-btn btn btn-secondary w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="bi bi-folder fs-2 mb-2"></i>
+                                    <span>Danh Mục</span>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a asp-controller="PCBuildsManagement" asp-action="Index" class="quick-link-btn btn btn-dark w-100 d-flex flex-column align-items-center py-3">
+                                    <i class="bi bi-pc-display fs-2 mb-2"></i>
+                                    <span>PC Build</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders Table -->
+        <div class="section-title fade-in-up">
+            <i class="bi bi-table me-2"></i>Đơn Hàng Gần Đây
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card table-card fade-in-up" style="animation-delay: 0.9s">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="bi bi-receipt me-2"></i>10 Đơn Hàng Mới Nhất</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0 align-middle">
+                                <thead style="background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);">
+                                    <tr>
+                                        <th class="fw-bold" style="color: #495057;">Mã ĐH</th>
+                                        <th class="d-none d-md-table-cell fw-bold" style="color: #495057;">Khách Hàng</th>
+                                        <th class="d-none d-lg-table-cell fw-bold" style="color: #495057;">Ngày Đặt</th>
+                                        <th class="fw-bold" style="color: #495057;">Tổng Tiền</th>
+                                        <th class="d-none d-sm-table-cell fw-bold" style="color: #495057;">Trạng Thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in ViewBag.RecentOrders)
+                                    {
+                                        <tr>
+                                            <td><strong style="color: #5e72e4;">#@order.OrderID</strong></td>
+                                            <td class="d-none d-md-table-cell">
+                                                <i class="bi bi-person-circle me-1" style="color: #6c757d;"></i>@order.Customer?.FullName
+                                            </td>
+                                            <td class="d-none d-lg-table-cell">
+                                                <i class="bi bi-calendar3 me-1" style="color: #6c757d;"></i>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                                            </td>
+                                            <td class="text-nowrap">
+                                                <strong style="color: #5e72e4; font-size: 1.05em;">
+                                                    @order.TotalAmount.ToString("N0") VNĐ
+                                                </strong>
+                                            </td>
+                                            <td class="d-none d-sm-table-cell">
+                                                <span class="status-badge" style="background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);">
+                                                    <i class="bi bi-check-circle me-1"></i>@order.CurrentStatus?.StatusName
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media (max-width: 576px) {
+        .card-body h2, .card-body h4 {
+            font-size: 1.5rem;
+        }
+        .card-body h6 {
+            font-size: 0.875rem;
+        }
+        .card-body i {
+            font-size: 2rem !important;
+        }
+    }
+</style>
+
+@section Scripts {
+<script>
+    // Dữ liệu từ server
+    const monthlyRevenueLabels = @Html.Raw(Json.Serialize(ViewBag.MonthlyRevenueLabels));
+    const monthlyRevenueData = @Html.Raw(Json.Serialize(ViewBag.MonthlyRevenueData));
+    const categoryLabels = @Html.Raw(Json.Serialize(ViewBag.CategoryLabels));
+    const categoryData = @Html.Raw(Json.Serialize(ViewBag.CategoryData));
+    const orderStatusLabels = @Html.Raw(Json.Serialize(ViewBag.OrderStatusLabels));
+    const orderStatusData = @Html.Raw(Json.Serialize(ViewBag.OrderStatusData));
+
+    // Plugin để hiển thị số liệu trên biểu đồ cột
+    const datalabelsPlugin = {
+        id: 'datalabels',
+        afterDatasetsDraw(chart, args, options) {
+            const { ctx, data, chartArea: { top, bottom, left, right, width, height }, scales: { x, y } } = chart;
+            ctx.save();
+            
+            data.datasets.forEach((dataset, datasetIndex) => {
+                chart.getDatasetMeta(datasetIndex).data.forEach((datapoint, index) => {
+                    const value = dataset.data[index];
+                    if (value > 0) {
+                        ctx.font = 'bold 12px Arial';
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'bottom';
+                        
+                        const text = value.toLocaleString('vi-VN');
+                        ctx.fillText(text, datapoint.x, datapoint.y - 5);
+                    }
+                });
+            });
+            
+            ctx.restore();
+        }
+    };
+
+    // Biểu đồ cột - Doanh thu 6 tháng với số liệu hiển thị
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: monthlyRevenueLabels,
+            datasets: [{
+                label: 'Doanh Thu (VNĐ)',
+                data: monthlyRevenueData,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: {
+                            size: 13,
+                            weight: 'bold'
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    callbacks: {
+                        title: function(context) {
+                            return 'Tháng ' + context[0].label;
+                        },
+                        label: function(context) {
+                            return 'Doanh thu: ' + context.parsed.y.toLocaleString('vi-VN') + ' VNĐ';
+                        },
+                        afterLabel: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed.y / total) * 100).toFixed(1);
+                            return 'Chiếm: ' + percentage + '% tổng doanh thu';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString('vi-VN');
+                        },
+                        font: {
+                            size: 11
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        },
+        plugins: [datalabelsPlugin]
+    });
+
+    // Plugin để hiển thị phần trăm trên biểu đồ tròn
+    const pieLabelsPlugin = {
+        id: 'pieLabels',
+        afterDatasetsDraw(chart, args, options) {
+            const { ctx, data, chartArea: { width, height } } = chart;
+            ctx.save();
+            
+            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+            
+            chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
+                const value = data.datasets[0].data[index];
+                const percentage = ((value / total) * 100).toFixed(1);
+                
+                if (percentage > 5) { // Chỉ hiển thị nếu > 5%
+                    const { x, y } = datapoint.tooltipPosition();
+                    
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillStyle = '#fff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 3;
+                    
+                    // Chỉ hiển thị phần trăm
+                    ctx.fillText(percentage + '%', x, y);
+                    
+                    ctx.shadowBlur = 0;
+                }
+            });
+            
+            ctx.restore();
+        }
+    };
+
+    // Biểu đồ tròn - Sản phẩm theo danh mục
+    const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: categoryLabels,
+            datasets: [{
+                data: categoryData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(199, 199, 199, 0.8)',
+                    'rgba(83, 102, 255, 0.8)'
+                ],
+                borderColor: '#fff',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    
+                                    return {
+                                        text: `${label}: ${value} (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.parsed;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return [
+                                context.label + ': ' + value + ' sản phẩm',
+                                'Chiếm: ' + percentage + '% tổng số'
+                            ];
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [pieLabelsPlugin]
+    });
+
+    // Biểu đồ tròn - Trạng thái đơn hàng
+    const orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+    new Chart(orderStatusCtx, {
+        type: 'pie',
+        data: {
+            labels: orderStatusLabels,
+            datasets: [{
+                data: orderStatusData,
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(220, 53, 69, 0.8)',
+                    'rgba(23, 162, 184, 0.8)',
+                    'rgba(108, 117, 125, 0.8)',
+                    'rgba(0, 123, 255, 0.8)'
+                ],
+                borderColor: '#fff',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: {
+                            size: 12
+                        },
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                return data.labels.map((label, i) => {
+                                    const value = data.datasets[0].data[i];
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    
+                                    return {
+                                        text: `${label}: ${value} đơn (${percentage}%)`,
+                                        fillStyle: data.datasets[0].backgroundColor[i],
+                                        hidden: false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
+                        }
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    padding: 12,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const value = context.parsed;
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return [
+                                context.label + ': ' + value + ' đơn hàng',
+                                'Chiếm: ' + percentage + '% tổng số',
+                                'Tổng: ' + total + ' đơn hàng'
+                            ];
+                        }
+                    }
+                }
+            }
+        },
+        plugins: [pieLabelsPlugin]
+    });
+</script>
+}
+

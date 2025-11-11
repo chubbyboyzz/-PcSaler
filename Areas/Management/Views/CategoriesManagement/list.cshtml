@@ -1,0 +1,52 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Categories>
+
+@{
+    ViewData["Title"] = "Danh Sách Danh Mục";
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">Danh Sách Danh Mục</h1>
+    
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">Thêm Mới</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tên Danh Mục</th>
+                <th>Component Type</th>
+                <th>Bắt Buộc</th>
+                <th>Danh Mục Cha</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CategoryID</td>
+                    <td>@item.CategoryName</td>
+                    <td><span class="badge bg-info">@item.ComponentType</span></td>
+                    <td>
+                        @if (item.IsRequiredForBuild == true)
+                        {
+                            <span class="badge bg-danger">Có</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Không</span>
+                        }
+                    </td>
+                    <td>@(item.ParentCategory?.CategoryName ?? "-")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.CategoryID" class="btn btn-sm btn-info">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.CategoryID" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.CategoryID" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

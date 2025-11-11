@@ -1,0 +1,449 @@
+@model PcSaler.DBcontext.Entites.Payment
+
+@{
+    ViewData["Title"] = "Xóa Thanh Toán";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+        20%, 40%, 60%, 80% { transform: translateX(10px); }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .delete-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .warning-alert {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+        border: 2px solid #fc8181;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .warning-alert i {
+        font-size: 2rem;
+        color: #e53e3e;
+        margin-right: 15px;
+    }
+
+    .warning-alert h4 {
+        color: #c53030;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .warning-alert p {
+        color: #742a2a;
+        margin-bottom: 0;
+        font-size: 1.05rem;
+    }
+
+    .delete-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .delete-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .icon-section {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .icon-section h4 {
+        color: white;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .delete-icon {
+        font-size: 10rem;
+        color: white;
+        opacity: 0.9;
+        animation: shake 0.5s ease-in-out;
+        margin-bottom: 20px;
+    }
+
+    .info-section {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .info-section h5 {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .info-value {
+        text-align: right;
+        font-weight: 500;
+    }
+
+    .details-section {
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #fc4a1a;
+    }
+
+    .section-header i {
+        font-size: 2rem;
+        color: #fc4a1a;
+    }
+
+    .section-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #fc4a1a;
+        transition: all 0.3s ease;
+    }
+
+    .info-box:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(252, 74, 26, 0.2);
+    }
+
+    .info-box .label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .info-box .value {
+        font-size: 1.2rem;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 15px;
+        font-weight: 600;
+    }
+
+    .confirmation-box {
+        background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
+        border: 2px dashed #fc8181;
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .confirmation-box h5 {
+        color: #c53030;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .confirmation-box p {
+        color: #742a2a;
+        margin-bottom: 25px;
+        font-size: 1.05rem;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 1.05rem;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(252, 74, 26, 0.4);
+        animation: shake 0.5s ease-in-out;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    @@media (max-width: 991px) {
+        .delete-card .card-body {
+            padding: 30px;
+        }
+        
+        .icon-section {
+            margin-top: 30px;
+            position: relative;
+            min-height: auto;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .delete-card .card-body {
+            padding: 20px;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="delete-container">
+    <div class="page-title">
+        <h2><i class="bi bi-trash-fill"></i> Xóa Thanh Toán</h2>
+        <p>Xác nhận xóa giao dịch thanh toán khỏi hệ thống</p>
+    </div>
+
+    <div class="warning-alert d-flex align-items-start">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>
+            <h4>⚠️ Cảnh Báo Quan Trọng!</h4>
+            <p>Bạn đang thực hiện xóa thanh toán khỏi hệ thống. Hành động này sẽ <strong>KHÔNG THỂ HOÀN TÁC</strong>. Vui lòng kiểm tra kỹ thông tin trước khi xác nhận.</p>
+        </div>
+    </div>
+
+    <div class="delete-card card">
+        <div class="card-body">
+            <div class="row">
+                <!-- Cột bên trái - Chi tiết -->
+                <div class="col-lg-7">
+                    <!-- Thông tin cơ bản -->
+                    <div class="details-section">
+                        <div class="section-header">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <h4>Thông Tin Thanh Toán Sẽ Bị Xóa</h4>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-fingerprint"></i> Mã Thanh Toán
+                                </div>
+                                <div class="value">#@Model.PaymentID</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-box-seam"></i> Mã Đơn Hàng
+                                </div>
+                                <div class="value">#@Model.OrderID</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-cash-coin"></i> Số Tiền
+                                </div>
+                                <div class="value text-success">@Model.Amount.ToString("N0") VNĐ</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-wallet2"></i> Phương Thức
+                                </div>
+                                <div class="value">
+                                    <span class="badge bg-info">@(Model.PaymentMethod ?? "N/A")</span>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-calendar-event"></i> Ngày Thanh Toán
+                                </div>
+                                <div class="value">@Model.PaymentDate.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ghi chú -->
+                    @if (!string.IsNullOrEmpty(Model.Note))
+                    {
+                        <div class="details-section">
+                            <div class="section-header">
+                                <i class="bi bi-journal-text"></i>
+                                <h4>Ghi Chú</h4>
+                            </div>
+                            <div class="info-box">
+                                <div class="value" style="font-size: 1rem; line-height: 1.6;">
+                                    @Model.Note
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Form xác nhận -->
+                    <div class="confirmation-box">
+                        <h5>
+                            <i class="bi bi-shield-exclamation"></i> Xác Nhận Xóa Thanh Toán
+                        </h5>
+                        <p>
+                            Sau khi xóa, tất cả thông tin về thanh toán "<strong>#@Model.PaymentID</strong>" 
+                            với số tiền <strong>@Model.Amount.ToString("N0") VNĐ</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống.
+                        </p>
+                        <form asp-action="Delete" method="post">
+                            <input type="hidden" asp-for="PaymentID" />
+                            <div class="d-flex gap-3 justify-content-center">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-trash-fill"></i> Xác Nhận Xóa
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                    <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cột bên phải - Icon -->
+                <div class="col-lg-5">
+                    <div class="icon-section">
+                        <h4>Xóa Thanh Toán</h4>
+                        <i class="bi bi-credit-card-2-front-fill delete-icon"></i>
+                        
+                        <div class="info-section">
+                            <h5>⚠️ Lưu Ý Quan Trọng</h5>
+                            <div class="info-row">
+                                <span class="info-label">Mã TT:</span>
+                                <span class="info-value">#@Model.PaymentID</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Đơn Hàng:</span>
+                                <span class="info-value">#@Model.OrderID</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Số Tiền:</span>
+                                <span class="info-value">@Model.Amount.ToString("N0") VNĐ</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phương Thức:</span>
+                                <span class="info-value">@Model.PaymentMethod</span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-light mt-3" style="border: 2px solid white;">
+                            <p class="mb-0 text-dark">
+                                <i class="bi bi-info-circle-fill text-warning"></i>
+                                <strong>Lưu ý:</strong> Xóa thanh toán không ảnh hưởng đến trạng thái đơn hàng. Vui lòng kiểm tra kỹ trước khi xóa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

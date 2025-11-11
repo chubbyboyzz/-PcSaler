@@ -1,0 +1,389 @@
+@model PcSaler.DBcontext.Entites.Categories
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Danh Mục";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .edit-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .edit-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .edit-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .category-icon-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .category-icon-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-icon-section .icon-wrapper {
+        font-size: 7rem;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .category-icon-section h4 {
+        color: white;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .category-icon-section .category-info {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .category-icon-section .category-info p {
+        color: white;
+        margin: 5px 0;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #f5576c;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #cbd5e0;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #f5576c;
+        box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+        background-color: #fff;
+        outline: none;
+    }
+
+    .form-check-input {
+        width: 1.5em;
+        height: 1.5em;
+        cursor: pointer;
+    }
+
+    .form-check-input:checked {
+        background-color: #f5576c;
+        border-color: #f5576c;
+    }
+
+    .form-check-label {
+        margin-left: 10px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .section-divider {
+        border-top: 2px solid #e9ecef;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .section-divider::before {
+        content: attr(data-label);
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 15px;
+        color: #f5576c;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    .required-mark {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    @@media (max-width: 991px) {
+        .edit-card .card-body {
+            padding: 30px;
+        }
+        
+        .category-icon-section {
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .edit-card .card-body {
+            padding: 20px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="page-title">
+        <h2><i class="bi bi-pencil-square"></i> Chỉnh Sửa Danh Mục</h2>
+        <p>Cập nhật thông tin danh mục sản phẩm</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="edit-card card">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="CategoryID" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="row">
+                    <!-- Cột bên trái - Form nhập liệu -->
+                    <div class="col-lg-7">
+                        <!-- THÔNG TIN CƠ BẢN -->
+                        <div class="form-group">
+                            <label asp-for="CategoryName" class="form-label">
+                                <i class="bi bi-folder-fill"></i> Tên Danh Mục <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="CategoryName" class="form-control" placeholder="VD: CPU, RAM, Mainboard..." />
+                            <span asp-validation-for="CategoryName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ComponentType" class="form-label">
+                                <i class="bi bi-tag-fill"></i> Component Type <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="ComponentType" class="form-control" placeholder="VD: CPU, MAINBOARD, RAM..." />
+                            <span asp-validation-for="ComponentType" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Key cố định dùng trong logic build PC</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label">
+                                <i class="bi bi-file-text-fill"></i> Mô Tả
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="3" placeholder="Mô tả chi tiết về danh mục..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="section-divider" data-label="⚙️ CÀI ĐẶT"></div>
+
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input asp-for="IsRequiredForBuild" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsRequiredForBuild" class="form-check-label">
+                                    <i class="bi bi-exclamation-circle-fill text-danger"></i> Linh kiện bắt buộc cho build PC
+                                </label>
+                            </div>
+                            <small class="text-muted ms-4"><i class="bi bi-info-circle"></i> Đánh dấu nếu đây là linh kiện bắt buộc khi xây dựng cấu hình PC</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="ParentCategoryID" class="form-label">
+                                <i class="bi bi-diagram-3-fill"></i> Danh Mục Cha (Tùy chọn)
+                            </label>
+                            <select asp-for="ParentCategoryID" class="form-select">
+                                <option value="">-- Không có danh mục cha (Danh mục gốc) --</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    var categories = ViewBag.Categories as List<PcSaler.DBcontext.Entites.Categories>;
+                                    if (categories != null)
+                                    {
+                                        @foreach (var cat in categories)
+                                        {
+                                            @if (cat.CategoryID != Model.CategoryID)
+                                            {
+                                                <option value="@cat.CategoryID">@cat.CategoryName</option>
+                                            }
+                                        }
+                                    }
+                                }
+                            </select>
+                            <span asp-validation-for="ParentCategoryID" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Chọn danh mục cha nếu đây là danh mục con</small>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="bi bi-check-circle-fill"></i> Cập Nhật
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải - Thông tin danh mục -->
+                    <div class="col-lg-5">
+                        <div class="category-icon-section">
+                            <div class="icon-wrapper">
+                                <i class="bi bi-folder"></i>
+                            </div>
+                            <h4>Thông Tin Hiện Tại</h4>
+                            <div class="category-info">
+                                <p><strong><i class="bi bi-hash"></i> ID:</strong> #@Model.CategoryID</p>
+                                <p><strong><i class="bi bi-folder"></i> Tên:</strong> @Model.CategoryName</p>
+                                <p><strong><i class="bi bi-tag"></i> Type:</strong> @Model.ComponentType</p>
+                                <p><strong><i class="bi bi-exclamation-circle"></i> Bắt buộc:</strong> @(Model.IsRequiredForBuild ? "Có" : "Không")</p>
+                            </div>
+                            <div class="mt-4 text-white">
+                                <small><i class="bi bi-lightbulb"></i> Cập nhật thông tin danh mục</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

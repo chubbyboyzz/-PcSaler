@@ -1,0 +1,63 @@
+@model PcSaler.DBcontext.Entites.Categories
+
+@{
+    ViewData["Title"] = "Chi Tiết Danh Mục";
+}
+
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col-12">
+            <h1 class="display-5">Chi Tiết Danh Mục</h1>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Thông Tin Chi Tiết</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID:</dt>
+                        <dd class="col-sm-9">@Model.CategoryID</dd>
+
+                        <dt class="col-sm-3">Tên Danh Mục:</dt>
+                        <dd class="col-sm-9"><strong>@Model.CategoryName</strong></dd>
+
+                        <dt class="col-sm-3">Component Type:</dt>
+                        <dd class="col-sm-9"><span class="badge bg-info">@Model.ComponentType</span></dd>
+
+                        <dt class="col-sm-3">Bắt Buộc:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.IsRequiredForBuild == true)
+                            {
+                                <span class="badge bg-danger">Bắt buộc</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Không bắt buộc</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Danh Mục Cha:</dt>
+                        <dd class="col-sm-9">@(Model.ParentCategory?.CategoryName ?? "N/A")</dd>
+
+                        <dt class="col-sm-3">Mô Tả:</dt>
+                        <dd class="col-sm-9">@(Model.Description ?? "N/A")</dd>
+                    </dl>
+
+                    <div class="d-flex gap-2 mt-3">
+                        <a asp-action="Edit" asp-route-id="@Model.CategoryID" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Chỉnh Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay Lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

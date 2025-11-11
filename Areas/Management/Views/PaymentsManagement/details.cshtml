@@ -1,0 +1,440 @@
+@model PcSaler.DBcontext.Entites.Payment
+
+@{
+    ViewData["Title"] = "Chi Tiết Thanh Toán";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .details-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .details-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .details-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .icon-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 600px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .icon-section h4 {
+        color: white;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .payment-icon {
+        font-size: 8rem;
+        color: white;
+        opacity: 0.9;
+        margin-bottom: 30px;
+    }
+
+    .info-section {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .info-section h5 {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        opacity: 0.9;
+    }
+
+    .info-value {
+        text-align: right;
+        font-weight: 500;
+    }
+
+    .details-section {
+        margin-bottom: 30px;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .section-header i {
+        font-size: 2rem;
+        color: #667eea;
+    }
+
+    .section-header h4 {
+        margin: 0;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .info-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 12px;
+        border-left: 4px solid #667eea;
+        transition: all 0.3s ease;
+    }
+
+    .info-box:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .info-box .label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }
+
+    .info-box .value {
+        font-size: 1.2rem;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 15px;
+        font-weight: 600;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        font-size: 1.05rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-warning {
+        background: linear-gradient(135deg, #ffd89b 0%, #f9a825 100%);
+        border: none;
+        color: #2d3748;
+    }
+
+    .btn-warning:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(249, 168, 37, 0.3);
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        border: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 101, 101, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        color: #2d3748;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    .price-highlight {
+        font-size: 1.5rem;
+        color: #28a745;
+        font-weight: 700;
+    }
+
+    @@media (max-width: 991px) {
+        .details-card .card-body {
+            padding: 30px;
+        }
+        
+        .icon-section {
+            margin-bottom: 30px;
+            position: relative;
+            min-height: auto;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .details-card .card-body {
+            padding: 20px;
+        }
+        
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <div class="page-title">
+        <h2><i class="bi bi-credit-card-fill"></i> Chi Tiết Thanh Toán</h2>
+        <p>Thông tin đầy đủ về giao dịch thanh toán</p>
+    </div>
+
+    <div class="details-card card">
+        <div class="card-body">
+            <div class="row">
+                <!-- Cột bên trái - Icon -->
+                <div class="col-lg-4">
+                    <div class="icon-section">
+                        <h4>Thanh Toán</h4>
+                        <i class="bi bi-credit-card-2-front-fill payment-icon"></i>
+
+                        <div class="info-section">
+                            <h5>Thông Tin Tổng Quan</h5>
+                            <div class="info-row">
+                                <span class="info-label">Mã TT:</span>
+                                <span class="info-value">#@Model.PaymentID</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Đơn Hàng:</span>
+                                <span class="info-value">#@Model.OrderID</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Số Tiền:</span>
+                                <span class="info-value price-highlight">@Model.Amount.ToString("N0") VNĐ</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phương Thức:</span>
+                                <span class="info-value">@Model.PaymentMethod</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cột bên phải - Chi tiết -->
+                <div class="col-lg-8">
+                    <!-- Thông tin thanh toán -->
+                    <div class="details-section">
+                        <div class="section-header">
+                            <i class="bi bi-cash-coin"></i>
+                            <h4>Thông Tin Thanh Toán</h4>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-fingerprint"></i> Mã Thanh Toán
+                                </div>
+                                <div class="value">#@Model.PaymentID</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-box-seam"></i> Mã Đơn Hàng
+                                </div>
+                                <div class="value">
+                                    <a asp-controller="OrdersManagement" asp-action="Details" asp-route-id="@Model.OrderID" class="text-decoration-none">
+                                        #@Model.OrderID
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-cash-stack"></i> Số Tiền
+                                </div>
+                                <div class="value text-success">@Model.Amount.ToString("N0") VNĐ</div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-wallet2"></i> Phương Thức
+                                </div>
+                                <div class="value">
+                                    <span class="badge bg-primary">@(Model.PaymentMethod ?? "N/A")</span>
+                                </div>
+                            </div>
+                            <div class="info-box">
+                                <div class="label">
+                                    <i class="bi bi-calendar-event"></i> Ngày Thanh Toán
+                                </div>
+                                <div class="value">@Model.PaymentDate.ToString("dd/MM/yyyy HH:mm:ss")</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin khách hàng -->
+                    @if (Model.Order?.Customer != null)
+                    {
+                        <div class="details-section">
+                            <div class="section-header">
+                                <i class="bi bi-person-fill"></i>
+                                <h4>Thông Tin Khách Hàng</h4>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-box">
+                                    <div class="label">
+                                        <i class="bi bi-person-badge"></i> Tên Khách Hàng
+                                    </div>
+                                    <div class="value">@Model.Order.Customer.FullName</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="label">
+                                        <i class="bi bi-envelope"></i> Email
+                                    </div>
+                                    <div class="value">@Model.Order.Customer.Email</div>
+                                </div>
+                                <div class="info-box">
+                                    <div class="label">
+                                        <i class="bi bi-telephone"></i> Số Điện Thoại
+                                    </div>
+                                    <div class="value">@Model.Order.Customer.Phone</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Ghi chú -->
+                    @if (!string.IsNullOrEmpty(Model.Note))
+                    {
+                        <div class="details-section">
+                            <div class="section-header">
+                                <i class="bi bi-journal-text"></i>
+                                <h4>Ghi Chú</h4>
+                            </div>
+                            <div class="info-box">
+                                <div class="value" style="font-size: 1rem; line-height: 1.6;">
+                                    @Model.Note
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Nút hành động -->
+                    <div class="action-buttons">
+                        <a asp-action="Edit" asp-route-id="@Model.PaymentID" class="btn btn-warning">
+                            <i class="bi bi-pencil-square"></i> Chỉnh Sửa
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.PaymentID" class="btn btn-danger">
+                            <i class="bi bi-trash-fill"></i> Xóa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary ms-auto">
+                            <i class="bi bi-arrow-left-circle-fill"></i> Quay Lại Danh Sách
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

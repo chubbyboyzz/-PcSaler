@@ -1,0 +1,112 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Payment>
+
+@{
+    ViewData["Title"] = "Quản Lý Thanh Toán";
+}
+
+<link rel="stylesheet" href="~/css/management-style.css" />
+
+<div class="management-container">
+    <div class="container-fluid">
+        <!-- Page Header -->
+        <div class="page-header fade-in-up">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <h1><i class="bi bi-credit-card-fill me-2"></i>Quản Lý Thanh Toán</h1>
+                <div class="btn-group">
+                    <a asp-action="Create" class="action-btn action-btn-primary">
+                        <i class="bi bi-plus-circle"></i>
+                        <span>Tạo Thanh Toán</span>
+                    </a>
+                    <a asp-controller="Dashboard" asp-action="Index" class="action-btn action-btn-secondary">
+                        <i class="bi bi-house"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <!-- Table -->
+        <div class="table-container fade-in-up" style="animation-delay: 0.2s">
+            <div class="table-responsive">
+                <table class="table modern-table">
+                    <thead>
+                        <tr>
+                            <th class="d-none d-lg-table-cell">Mã TT</th>
+                            <th>Mã ĐH</th>
+                            <th class="d-none d-md-table-cell">Khách Hàng</th>
+                            <th>Số Tiền</th>
+                            <th class="d-none d-lg-table-cell">Phương Thức</th>
+                            <th class="d-none d-xl-table-cell">Ngày TT</th>
+                            <th class="d-none d-xxl-table-cell">Ghi Chú</th>
+                            <th class="text-center">Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="d-none d-lg-table-cell"><strong style="color: #667eea;">#@item.PaymentID</strong></td>
+                                <td>
+                                    <strong style="color: #28a745;">#@item.OrderID</strong>
+                                    <div class="d-md-none small text-muted">
+                                        <i class="bi bi-person me-1"></i>@item.Order?.Customer?.FullName
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell">
+                                    <i class="bi bi-person-circle me-1 text-muted"></i>
+                                    @item.Order?.Customer?.FullName
+                                </td>
+                                <td class="text-nowrap">
+                                    <strong style="color: #28a745; font-size: 1.05em;">
+                                        @item.Amount.ToString("N0") VNĐ
+                                    </strong>
+                                </td>
+                                <td class="d-none d-lg-table-cell">
+                                    <span class="status-badge badge-success">
+                                        <i class="bi bi-credit-card me-1"></i>@item.PaymentMethod
+                                    </span>
+                                </td>
+                                <td class="d-none d-xl-table-cell">
+                                    <i class="bi bi-calendar3 me-1 text-muted"></i>
+                                    @item.PaymentDate.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td class="d-none d-xxl-table-cell">
+                                    <small class="text-muted">@item.Note</small>
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <a asp-action="Edit" asp-route-id="@item.PaymentID" class="btn-table-action btn-table-edit" title="Sửa">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.PaymentID" class="btn-table-action btn-table-view" title="Chi Tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.PaymentID" class="btn-table-action btn-table-delete" title="Xóa">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,387 @@
+@model PcSaler.DBcontext.Entites.Payment
+
+@{
+    ViewData["Title"] = "Tạo Thanh Toán";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .create-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .create-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .create-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .icon-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .icon-section h4 {
+        color: white;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .payment-icon {
+        font-size: 10rem;
+        color: white;
+        opacity: 0.9;
+        animation: pulse 2s infinite;
+        margin-bottom: 20px;
+    }
+
+    .info-box {
+        background-color: rgba(255, 255, 255, 0.2);
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        width: 100%;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .info-box p {
+        margin: 10px 0;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #667eea;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #cbd5e0;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background-color: #fff;
+        outline: none;
+    }
+
+    .section-divider {
+        border-top: 2px solid #e9ecef;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .section-divider::before {
+        content: attr(data-label);
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 15px;
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    .required-mark {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .payment-method-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .payment-method-option {
+        padding: 12px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: center;
+        background-color: #f8f9fa;
+    }
+
+    .payment-method-option:hover {
+        border-color: #667eea;
+        background-color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .payment-method-option.selected {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    @@media (max-width: 991px) {
+        .create-card .card-body {
+            padding: 30px;
+        }
+        
+        .icon-section {
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .create-card .card-body {
+            padding: 20px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="create-container">
+    <div class="page-title">
+        <h2><i class="bi bi-credit-card-fill"></i> Tạo Thanh Toán Mới</h2>
+        <p>Ghi nhận thanh toán cho đơn hàng</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="create-card card">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                
+                <div class="row">
+                    <!-- Cột bên trái - Form nhập liệu -->
+                    <div class="col-lg-7">
+                        <div class="form-group">
+                            <label asp-for="OrderID" class="form-label">
+                                <i class="bi bi-box-seam-fill"></i> Đơn Hàng <span class="required-mark">*</span>
+                            </label>
+                            <select asp-for="OrderID" class="form-select" asp-items="ViewBag.Orders">
+                                <option value="">-- Chọn đơn hàng --</option>
+                            </select>
+                            <span asp-validation-for="OrderID" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Chọn đơn hàng cần thanh toán</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Amount" class="form-label">
+                                <i class="bi bi-cash-coin"></i> Số Tiền <span class="required-mark">*</span>
+                            </label>
+                            <input asp-for="Amount" class="form-control" type="number" step="0.01" placeholder="0.00" />
+                            <span asp-validation-for="Amount" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Nhập số tiền thanh toán (VNĐ)</small>
+                        </div>
+
+                        <div class="section-divider" data-label="💳 PHƯƠNG THỨC THANH TOÁN"></div>
+
+                        <div class="form-group">
+                            <label asp-for="PaymentMethod" class="form-label">
+                                <i class="bi bi-wallet2"></i> Phương Thức Thanh Toán <span class="required-mark">*</span>
+                            </label>
+                            <select asp-for="PaymentMethod" class="form-select">
+                                <option value="">-- Chọn phương thức --</option>
+                                <option value="Credit Card">💳 Thẻ Tín Dụng</option>
+                                <option value="COD">📦 Thanh Toán Khi Nhận Hàng</option>
+                                <option value="Bank Transfer">🏦 Chuyển Khoản Ngân Hàng</option>
+                                <option value="Momo">📱 Momo</option>
+                                <option value="ZaloPay">💵 ZaloPay</option>
+                                <option value="VNPay">💰 VNPay</option>
+                            </select>
+                            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                        </div>
+
+                        <div class="section-divider" data-label="📝 GHI CHÚ"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Note" class="form-label">
+                                <i class="bi bi-journal-text"></i> Ghi Chú
+                            </label>
+                            <textarea asp-for="Note" class="form-control" rows="4" placeholder="Nhập ghi chú về thanh toán (nếu có)..."></textarea>
+                            <span asp-validation-for="Note" class="text-danger"></span>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="bi bi-check-circle-fill"></i> Tạo Thanh Toán
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải - Icon section -->
+                    <div class="col-lg-5">
+                        <div class="icon-section">
+                            <h4>Thanh Toán</h4>
+                            <i class="bi bi-credit-card-2-front-fill payment-icon"></i>
+                            
+                            <div class="info-box">
+                                <h5 style="border-bottom: 2px solid rgba(255,255,255,0.5); padding-bottom: 10px; margin-bottom: 15px;">
+                                    <i class="bi bi-info-circle-fill"></i> Hướng Dẫn
+                                </h5>
+                                <p><i class="bi bi-check-circle"></i> Chọn đơn hàng cần thanh toán</p>
+                                <p><i class="bi bi-check-circle"></i> Nhập số tiền thanh toán chính xác</p>
+                                <p><i class="bi bi-check-circle"></i> Chọn phương thức thanh toán phù hợp</p>
+                                <p><i class="bi bi-check-circle"></i> Thêm ghi chú nếu cần thiết</p>
+                                <p><i class="bi bi-check-circle"></i> Hệ thống sẽ tự động ghi nhận thời gian</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

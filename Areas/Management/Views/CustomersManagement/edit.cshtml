@@ -1,0 +1,374 @@
+@model PcSaler.DBcontext.Entites.Customer
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Khách Hàng";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .edit-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .page-title p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    .edit-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .edit-card .card-body {
+        padding: 40px;
+        background-color: #fff;
+    }
+
+    .customer-icon-section {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .customer-icon-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .customer-icon-section .icon-wrapper {
+        font-size: 7rem;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .customer-icon-section h4 {
+        color: white;
+        margin-bottom: 15px;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .customer-icon-section .customer-info {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+        margin-top: 20px;
+    }
+
+    .customer-icon-section .customer-info p {
+        color: white;
+        margin: 5px 0;
+        font-size: 0.95rem;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-label i {
+        color: #f5576c;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        padding: 10px 15px;
+        transition: all 0.3s;
+        background-color: #f8f9fa;
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e0;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #f5576c;
+        box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+        background-color: #fff;
+        outline: none;
+    }
+
+    .section-divider {
+        border-top: 2px solid #e9ecef;
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .section-divider::before {
+        content: attr(data-label);
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 0 15px;
+        color: #f5576c;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+    }
+
+    .required-mark {
+        color: #dc3545;
+        font-weight: bold;
+    }
+
+    .alert {
+        border-radius: 12px;
+        border: none;
+        padding: 15px 20px;
+        animation: fadeInUp 0.5s ease-out;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+        color: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    @@media (max-width: 991px) {
+        .edit-card .card-body {
+            padding: 30px;
+        }
+        
+        .customer-icon-section {
+            margin-top: 30px;
+            position: relative;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .edit-card .card-body {
+            padding: 20px;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="page-title">
+        <h2><i class="bi bi-pencil-square"></i> Chỉnh Sửa Khách Hàng</h2>
+        <p>Cập nhật thông tin khách hàng</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="edit-card card">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="CustomerID" />
+                <input type="hidden" asp-for="CreatedAt" />
+                
+                <div class="row">
+                    <!-- Cột bên trái - Form nhập liệu -->
+                    <div class="col-lg-7">
+                        <!-- THÔNG TIN CƠ BẢN -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="FullName" class="form-label">
+                                        <i class="bi bi-person-fill"></i> Họ và Tên <span class="required-mark">*</span>
+                                    </label>
+                                    <input asp-for="FullName" class="form-control" placeholder="VD: Nguyễn Văn A" />
+                                    <span asp-validation-for="FullName" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Username" class="form-label">
+                                        <i class="bi bi-person-circle"></i> Tên Đăng Nhập <span class="required-mark">*</span>
+                                    </label>
+                                    <input asp-for="Username" class="form-control" placeholder="VD: nguyenvana" />
+                                    <span asp-validation-for="Username" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="PasswordHash" class="form-label">
+                                <i class="bi bi-lock-fill"></i> Mật Khẩu
+                            </label>
+                            <input asp-for="PasswordHash" type="password" class="form-control" placeholder="Để trống nếu không thay đổi" />
+                            <span asp-validation-for="PasswordHash" class="text-danger"></span>
+                            <small class="text-muted"><i class="bi bi-info-circle"></i> Để trống nếu không muốn thay đổi mật khẩu</small>
+                        </div>
+
+                        <div class="section-divider" data-label="📧 THÔNG TIN LIÊN HỆ"></div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="form-label">
+                                        <i class="bi bi-envelope-fill"></i> Email <span class="required-mark">*</span>
+                                    </label>
+                                    <input asp-for="Email" type="email" class="form-control" placeholder="example@email.com" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Phone" class="form-label">
+                                        <i class="bi bi-telephone-fill"></i> Số Điện Thoại
+                                    </label>
+                                    <input asp-for="Phone" class="form-control" placeholder="0123456789" />
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Address" class="form-label">
+                                <i class="bi bi-geo-alt-fill"></i> Địa Chỉ
+                            </label>
+                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ đầy đủ..."></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="bi bi-check-circle-fill"></i> Cập Nhật
+                            </button>
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle-fill"></i> Hủy Bỏ
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Cột bên phải - Thông tin khách hàng -->
+                    <div class="col-lg-5">
+                        <div class="customer-icon-section">
+                            <div class="icon-wrapper">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                            <h4>Thông Tin Hiện Tại</h4>
+                            <div class="customer-info">
+                                <p><strong><i class="bi bi-hash"></i> ID:</strong> #@Model.CustomerID</p>
+                                <p><strong><i class="bi bi-person"></i> Tên:</strong> @Model.FullName</p>
+                                <p><strong><i class="bi bi-envelope"></i> Email:</strong> @Model.Email</p>
+                                <p><strong><i class="bi bi-calendar"></i> Ngày tạo:</strong> @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div class="mt-4 text-white">
+                                <small><i class="bi bi-shield-check"></i> Thông tin được bảo mật</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

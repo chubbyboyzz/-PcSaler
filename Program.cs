@@ -4,6 +4,9 @@ using PcSaler.DBcontext;
 using PcSaler.Interfaces;
 using PcSaler.Repository;
 using PcSaler.Services;
+using PcSaler.Management_System.Interfaces;
+using PcSaler.Management_System.Repository;
+using PcSaler.Management_System.Services;
 
 namespace PcSaler
 {
@@ -25,6 +28,24 @@ namespace PcSaler
             builder.Services.AddScoped<IProductService, Repository_Product>();
             builder.Services.AddScoped<ProductService>();
 
+            // Register Management System Repositories
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
+            builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IOrderStatusRepository, OrderStatusRepository>();
+            builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+            builder.Services.AddScoped<IPCBuildRepository, PCBuildRepository>();
+
+            // Register Management System Services
+            builder.Services.AddScoped<CategoryManagementService>();
+            builder.Services.AddScoped<ProductManagementService>();
+            builder.Services.AddScoped<CustomerService>();
+            builder.Services.AddScoped<OrderService>();
+            builder.Services.AddScoped<OrderStatusService>();
+            builder.Services.AddScoped<PaymentService>();
+            builder.Services.AddScoped<PCBuildManagementService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -36,11 +57,18 @@ namespace PcSaler
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.MapStaticAssets();
+
+            // Route cho Management Area
+            app.MapControllerRoute(
+                name: "management",
+                pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

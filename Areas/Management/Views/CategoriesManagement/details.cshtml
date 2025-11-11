@@ -1,0 +1,331 @@
+@model PcSaler.DBcontext.Entites.Categories
+
+@{
+    ViewData["Title"] = "Chi Tiết Danh Mục";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+    }
+
+    .details-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    .page-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 10px;
+    }
+
+    .category-icon-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        position: sticky;
+        top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .category-icon-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .category-icon-container .icon-wrapper {
+        font-size: 10rem;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .category-icon-container h4 {
+        color: white;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .category-icon-container .badge {
+        font-size: 1rem;
+        padding: 8px 20px;
+        margin-top: 10px;
+    }
+
+    .detail-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        background: white;
+        animation: fadeInUp 0.7s ease-out;
+    }
+
+    .detail-card .card-body {
+        padding: 30px;
+    }
+
+    .detail-row {
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.3s;
+    }
+
+    .detail-row:hover {
+        background-color: #f8f9fa;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .detail-label i {
+        color: #667eea;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: #212529;
+    }
+
+    .action-buttons {
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
+        color: white;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #cbd5e0 0%, #a0aec0 100%);
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        transition: all 0.3s;
+        font-size: 1.05rem;
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(160, 174, 192, 0.4);
+        color: #2d3748;
+    }
+
+    .section-title {
+        color: #667eea;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin: 20px 0 15px 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    @@media (max-width: 991px) {
+        .category-icon-container {
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 300px;
+        }
+        
+        .page-title h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="details-container">
+    <div class="page-title">
+        <h2><i class="bi bi-info-circle-fill"></i> Chi Tiết Danh Mục</h2>
+    </div>
+
+    <div class="row">
+        <!-- Cột bên trái - Icon và thông tin cơ bản -->
+        <div class="col-lg-4">
+            <div class="category-icon-container">
+                <div class="icon-wrapper">
+                    <i class="bi bi-folder-fill"></i>
+                </div>
+                <h4>@Model.CategoryName</h4>
+                <p class="text-white">@Model.ComponentType</p>
+                @if (Model.IsRequiredForBuild)
+                {
+                    <span class="badge bg-danger">
+                        <i class="bi bi-exclamation-circle"></i> Linh kiện bắt buộc
+                    </span>
+                }
+                else
+                {
+                    <span class="badge bg-light text-dark">
+                        Linh kiện tùy chọn
+                    </span>
+                }
+            </div>
+        </div>
+
+        <!-- Cột bên phải - Thông tin chi tiết -->
+        <div class="col-lg-8">
+            <div class="detail-card card">
+                <div class="card-body">
+                    <h5 class="section-title">
+                        <i class="bi bi-folder-fill"></i> Thông Tin Cơ Bản
+                    </h5>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-hash"></i> ID Danh Mục:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-secondary">#@Model.CategoryID</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-folder-fill"></i> Tên Danh Mục:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <strong style="color: #667eea;">@Model.CategoryName</strong>
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-tag-fill"></i> Component Type:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            <span class="badge bg-info">@Model.ComponentType</span>
+                        </div>
+                    </div>
+
+                    <h5 class="section-title">
+                        <i class="bi bi-gear-fill"></i> Cấu Hình
+                    </h5>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-exclamation-circle-fill"></i> Bắt Buộc Build PC:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @if (Model.IsRequiredForBuild)
+                            {
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-check-circle-fill"></i> Bắt buộc
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    Không bắt buộc
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="detail-row row">
+                        <div class="col-md-4 detail-label">
+                            <i class="bi bi-diagram-3-fill"></i> Danh Mục Cha:
+                        </div>
+                        <div class="col-md-8 detail-value">
+                            @if (Model.ParentCategory != null)
+                            {
+                                <span class="badge bg-primary">
+                                    <i class="bi bi-folder"></i> @Model.ParentCategory.CategoryName
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Danh mục gốc (Không có cha)</span>
+                            }
+                        </div>
+                    </div>
+
+                    <h5 class="section-title">
+                        <i class="bi bi-file-text-fill"></i> Mô Tả
+                    </h5>
+
+                    <div class="detail-row row">
+                        <div class="col-md-12 detail-value">
+                            @if (!string.IsNullOrEmpty(Model.Description))
+                            {
+                                <p>@Model.Description</p>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa có mô tả</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a asp-action="Edit" asp-route-id="@Model.CategoryID" class="btn btn-edit me-3">
+                            <i class="bi bi-pencil-square"></i> Chỉnh Sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-back">
+                            <i class="bi bi-arrow-left-circle"></i> Quay Lại
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

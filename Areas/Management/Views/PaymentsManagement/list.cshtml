@@ -1,0 +1,45 @@
+@model IEnumerable<PcSaler.DBcontext.Entites.Payment>
+
+@{
+    ViewData["Title"] = "Danh Sách Thanh Toán";
+}
+
+<div class="container-fluid">
+    <h1 class="mb-4">Danh Sách Thanh Toán</h1>
+    
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">Tạo Thanh Toán Mới</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Đơn Hàng ID</th>
+                <th>Khách Hàng</th>
+                <th>Số Tiền</th>
+                <th>Phương Thức</th>
+                <th>Ngày Thanh Toán</th>
+                <th>Thao Tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.PaymentID</td>
+                    <td>@item.OrderID</td>
+                    <td>@item.Order?.Customer?.FullName</td>
+                    <td class="text-success fw-bold">@item.Amount.ToString("N0") VNĐ</td>
+                    <td><span class="badge bg-primary">@(item.PaymentMethod ?? "N/A")</span></td>
+                    <td>@item.PaymentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.PaymentID" class="btn btn-sm btn-info">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@item.PaymentID" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.PaymentID" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

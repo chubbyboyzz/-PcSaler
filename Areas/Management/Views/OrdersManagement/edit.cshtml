@@ -1,0 +1,380 @@
+@model PcSaler.DBcontext.Entites.Order
+
+@{
+    ViewData["Title"] = "Sửa Đơn Hàng";
+}
+
+<style>
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .edit-container {
+        animation: fadeInUp 0.6s ease-out;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(245, 87, 108, 0.3);
+    }
+
+    .page-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-header h1 i {
+        font-size: 2.5rem;
+        animation: pulse 2s infinite;
+    }
+
+    .edit-content {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        gap: 2rem;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .form-card h3 {
+        color: #f5576c;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2d3748;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+
+    .form-control, .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: #f7fafc;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #f5576c;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.1);
+    }
+
+    .sidebar-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 2rem;
+        height: fit-content;
+    }
+
+    .icon-section {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .icon-section i {
+        font-size: 5rem;
+        color: white;
+        animation: pulse 2s infinite;
+    }
+
+    .info-section {
+        margin-top: 1.5rem;
+    }
+
+    .info-section h4 {
+        color: #f5576c;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: #f7fafc;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid #f5576c;
+    }
+
+    .info-item .label {
+        color: #718096;
+        font-weight: 500;
+    }
+
+    .info-item .value {
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-update {
+        flex: 1;
+        padding: 0.875rem 2rem;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+    }
+
+    .btn-update:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 87, 108, 0.5);
+    }
+
+    .btn-cancel {
+        padding: 0.875rem 2rem;
+        background: #e2e8f0;
+        color: #4a5568;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background: #cbd5e0;
+        color: #2d3748;
+        transform: translateY(-2px);
+    }
+
+    .text-danger {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .input-icon {
+        position: relative;
+    }
+
+    .input-icon i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #f5576c;
+        font-size: 1.2rem;
+    }
+
+    .input-icon .form-control,
+    .input-icon .form-select {
+        padding-left: 3rem;
+    }
+
+    @@media (max-width: 991px) {
+        .edit-content {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar-card {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 576px) {
+        .edit-container {
+            padding: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-card, .sidebar-card {
+            padding: 1.5rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="edit-container">
+    <div class="page-header">
+        <h1>
+            <i class="bi bi-pencil-square"></i>
+            Chỉnh Sửa Đơn Hàng
+        </h1>
+    </div>
+
+    <div class="edit-content">
+        <div class="form-card">
+            <h3>
+                <i class="bi bi-file-earmark-text"></i>
+                Cập Nhật Thông Tin Đơn Hàng
+            </h3>
+
+            <form asp-action="Edit" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="OrderID" />
+                <input type="hidden" asp-for="OrderDate" />
+
+                <div class="form-group">
+                    <label asp-for="CustomerID">
+                        <i class="bi bi-person-fill text-primary"></i>
+                        Khách Hàng
+                    </label>
+                    <div class="input-icon">
+                        <i class="bi bi-person"></i>
+                        <select asp-for="CustomerID" class="form-select" asp-items="ViewBag.Customers">
+                            <option value="">-- Chọn khách hàng --</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="CustomerID" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="TotalAmount">
+                        <i class="bi bi-cash-coin text-success"></i>
+                        Tổng Tiền (VNĐ)
+                    </label>
+                    <div class="input-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                        <input asp-for="TotalAmount" class="form-control" type="number" step="1000" min="0" placeholder="Nhập tổng tiền đơn hàng" />
+                    </div>
+                    <span asp-validation-for="TotalAmount" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CurrentStatusID">
+                        <i class="bi bi-flag-fill text-info"></i>
+                        Trạng Thái Đơn Hàng
+                    </label>
+                    <div class="input-icon">
+                        <i class="bi bi-flag"></i>
+                        <select asp-for="CurrentStatusID" class="form-select" asp-items="ViewBag.OrderStatuses">
+                            <option value="">-- Chọn trạng thái --</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="CurrentStatusID" class="text-danger"></span>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn-update">
+                        <i class="bi bi-check-circle"></i>
+                        Cập Nhật Đơn Hàng
+                    </button>
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-circle"></i>
+                        Hủy Bỏ
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <div class="sidebar-card">
+            <div class="icon-section">
+                <i class="bi bi-cart-check-fill"></i>
+            </div>
+
+            <div class="info-section">
+                <h4>
+                    <i class="bi bi-info-circle"></i>
+                    Thông Tin Hiện Tại
+                </h4>
+
+                <div class="info-item">
+                    <span class="label">Mã Đơn Hàng:</span>
+                    <span class="value">#@Model.OrderID</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Ngày Tạo:</span>
+                    <span class="value">@Model.OrderDate.ToString("dd/MM/yyyy")</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Khách Hàng:</span>
+                    <span class="value">@Model.Customer?.FullName</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Tổng Tiền:</span>
+                    <span class="value">@Model.TotalAmount.ToString("N0") ₫</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="label">Trạng Thái:</span>
+                    <span class="value">@Model.CurrentStatus?.StatusName</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
