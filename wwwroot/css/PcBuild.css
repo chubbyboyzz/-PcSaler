@@ -1,0 +1,23 @@
+﻿/* File: wwwroot/css/PcBuild.css */
+
+/* ... (các style khác) ... */
+
+/* Đảm bảo phần cha (col-md-9) có chiều cao đầy đủ */
+.modal-body .row {
+    height: 100%;
+}
+
+/* KHU VỰC QUAN TRỌNG: Cố định Chiều cao và cho phép cuộn */
+#modal-product-list {
+    /* Đặt chiều cao cố định (fix cứng) - Ví dụ: 60vh */
+    height: 60vh;
+    /* Tự động thêm thanh cuộn dọc khi nội dung tràn */
+    overflow-y: auto;
+    /* Đảm bảo vùng này vẫn chiếm không gian còn lại trong cột Flex */
+    flex-grow: 1 !important;
+    /* Thêm padding nhẹ */
+    padding-right: 10px;
+    /* Dùng background mờ để dễ thấy box khi không có sản phẩm */
+    background-color: #f7f7f7;
+    border-radius: 0.25rem;
+}

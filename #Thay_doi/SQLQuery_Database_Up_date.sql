@@ -199,3 +199,15 @@ CREATE TABLE Payments (
     FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE
 );
 GO
+
+CREATE TABLE ProductAttributes (
+    AttributeID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductID INT NOT NULL,
+    AttributeName NVARCHAR(100) NOT NULL, -- Tên thuộc tính (VD: 'Chipset', 'Socket', 'Dung lượng')
+    AttributeValue NVARCHAR(255) NOT NULL, -- Giá trị thuộc tính (VD: 'Z790', 'LGA1700', '16GB')
+    
+    -- Tạo khóa ngoại liên kết tới bảng Products
+    -- ON DELETE CASCADE nghĩa là nếu bạn xóa 1 sản phẩm, tất cả thuộc tính của nó cũng tự động bị xóa.
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID) ON DELETE CASCADE
+);
+GO

@@ -1,92 +1,133 @@
-﻿@model PcSaler.Models.ProductViewModel
-@{
-    ViewData["Title"] = "Xây Dựng Cấu Hình Máy Tính";
+﻿@* File: Views/PcBuild/Index.cshtml *@
+@* View này sử dụng Bootstrap 5 để khớp với Layout gốc *@
+
+@* 1. Nhúng CSS/JS tùy chỉnh cho Build PC vào Sections *@
+@section Styles {
+    <link rel="stylesheet" href="/css/PcBuild.css" asp-append-version="true" />
 }
 
-<div class="container mt-4">
-    <h2 class="mb-4 text-center">🧩 Xây Dựng Cấu Hình Máy Tính</h2>
+@section Scripts {
+    <script src="/js/PcBuild.js" asp-append-version="true"></script>
 
-    <form id="pcBuilderForm">
-        <div class="row g-4">
+    <script>
+        // Sửa lại logic gọi showProductSelectionModal sau khi DOM sẵn sàng
+        // Khởi tạo Modal Instance và gắn vào window object để JS có thể truy cập
+        let bsModalInstance = null;
 
-            <!-- CPU -->
-            <div class="col-md-4">
-                <h5>CPU</h5>
-                <select class="form-select" name="cpu">
-                    <option value="">-- Chọn CPU --</option>
-                    @foreach (var item in Model.CPUs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productModalElement = document.getElementById('product-modal');
+
+            // Khởi tạo Modal Instance một lần
+            bsModalInstance = new bootstrap.Modal(productModalElement, { keyboard: true });
+
+            // Ghi đè hàm JS với logic Bootstrap API
+            window.showProductSelectionModal = async (category) => {
+                const categoryData = pcCategories.find(c => c.id === category);
+                modalState.category = category;
+                modalTitle.textContent = `Chọn ${categoryData.name}`;
+                modalSearchInput.value = '';
+
+                // Hiển thị Modal
+                bsModalInstance.show();
+
+                try {
+                    // Tải sản phẩm (Giả định fetch API thành công)
+                    const response = await fetch(`/api/APIPcBuild?category=${category}`);
+                    const products = await response.json();
+
+                    modalState.allProducts = products.map(p => ({
+                        id: p.productID,
+                        name: p.productName,
+                        category: p.categoryName,
+                        brand: p.brand,
+                        price: p.price,
+                        img: p.imageURL
+                    }));
+
+                    modalState.currentPage = 1;
+                    renderModalFilters();
+                    updateModalProductList();
+
+                } catch (err) {
+                    console.error("Lỗi khi tải sản phẩm:", err);
+                    modalState.allProducts = [];
+                    updateModalProductList();
+                }
+            };
+
+            window.closeModal = () => {
+                bsModalInstance.hide();
+            };
+        });
+    </script>
+}
+
+
+<div class="container mt-4 mb-4">
+
+    <div id="build-pc-view" class="view active">
+        <h2 class="h3 fw-bold text-dark mb-4">Xây Dựng Cấu Hình PC</h2>
+        <div class="card shadow-lg overflow-hidden">
+            <div id="build-pc-categories" class="list-group list-group-flush">
             </div>
-
-            <!-- Mainboard -->
-            <div class="col-md-4">
-                <h5>Mainboard</h5>
-                <select class="form-select" name="mainboard">
-                    <option value="">-- Chọn Mainboard --</option>
-                    @foreach (var item in Model.Mainboards)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- RAM -->
-            <div class="col-md-4">
-                <h5>RAM</h5>
-                <select class="form-select" name="ram">
-                    <option value="">-- Chọn RAM --</option>
-                    @foreach (var item in Model.RAMs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- GPU -->
-            <div class="col-md-4">
-                <h5>GPU</h5>
-                <select class="form-select" name="gpu">
-                    <option value="">-- Chọn GPU --</option>
-                    @foreach (var item in Model.GPUs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- PSU -->
-            <div class="col-md-4">
-                <h5>PSU (Nguồn)</h5>
-                <select class="form-select" name="psu">
-                    <option value="">-- Chọn PSU --</option>
-                    @foreach (var item in Model.PSUs)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
-            </div>
-
-            <!-- Case -->
-            <div class="col-md-4">
-                <h5>Case</h5>
-                <select class="form-select" name="case">
-                    <option value="">-- Chọn Case --</option>
-                    @foreach (var item in Model.Cases)
-                    {
-                        <option value="@item.ProductID">@item.ProductName - @item.Price.ToString("N0")₫</option>
-                    }
-                </select>
+            <div id="build-pc-summary" class="card-footer bg-light p-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="fs-5 fw-bold text-dark">Tổng cộng (Tạm tính):</span>
+                    <span id="build-total-price" class="fs-4 fw-bold text-danger">0₫</span>
+                </div>
+                <button id="add-build-to-cart-btn" class="btn btn-primary w-100 btn-lg fw-semibold" disabled>
+                    Lưu Cấu Hình (Demo)
+                </button>
             </div>
         </div>
+    </div>
 
-        <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">Xem cấu hình</button>
-        </div>
-    </form>
 </div>
-<script>
-    console.log("CPU List:", @Html.Raw(Json.Serialize(Model.CPUs)));
-</script>
+
+<div class="modal fade" id="product-modal" tabindex="-1" aria-labelledby="modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-fullscreen-md-down">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modal-title">Chọn linh kiện</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row g-4">
+
+                    <div id="modal-filter-sidebar" class="col-md-3 border-end">
+                        <div class="space-y-3">
+                            <div id="dynamic-filter-container">
+                                <h4 class="fs-5 fw-semibold mb-3">Lọc theo Hãng</h4>
+                                <div id="modal-filter-options" class="list-unstyled space-y-2">
+                                </div>
+                                <hr class="my-3" />
+
+                                <h4 class="fs-5 fw-semibold mt-4 mb-3">Lọc theo Giá</h4>
+                                <div id="modal-price-filter-options" class="list-unstyled space-y-2">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-9 d-flex flex-column" style="height: 100%;">
+
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input type="text" id="modal-search-input" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm...">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            </div>
+                        </div>
+
+                        <div id="modal-product-list" class="flex-grow-1 overflow-auto space-y-3">
+                        </div>
+
+                        <div id="modal-pagination" class="pt-3 border-top mt-3">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
