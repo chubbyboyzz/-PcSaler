@@ -17,10 +17,8 @@ namespace PcSaler.DBcontext
 
         public DbSet<CustomPC> CustomPCs { get; set; }
         public DbSet<CustomPCDetail> CustomPCDetails { get; set; }
-
-        // **THAY ĐỔI 1: Tên DbSet phản ánh Carts (số nhiều) và CartItem**
         public DbSet<Carts> Carts { get; set; }
-        public DbSet<CartItem> CartItems { get; set; } // THÊM MỚI
+        public DbSet<CartItem> CartItems { get; set; } 
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
@@ -29,6 +27,8 @@ namespace PcSaler.DBcontext
         public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; }
 
         public DbSet<Payment> Payments { get; set; }
+
+        public DbSet<PriceRange> PriceRanges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,6 +58,7 @@ namespace PcSaler.DBcontext
 
             modelBuilder.Entity<Payment>().ToTable("Payments");
 
+            modelBuilder.Entity<PriceRange>().ToTable("PriceRanges");
 
             // ----------------------------------------------------
             // Thiết lập RÀNG BUỘC VÀ QUAN HỆ (Fluent API)
@@ -124,8 +125,26 @@ namespace PcSaler.DBcontext
 
             // Thiết lập Unique cho ComponentType trong Category
             modelBuilder.Entity<Categories>()
-                .HasIndex(c => c.ComponentType)
+                 .HasIndex(c => c.ComponentType)
+                 .IsUnique();
+
+
+            // --- THÊM MỚI (2/2) ---
+            // 6. Cấu hình Bảng PriceRanges
+
+            // Thiết lập Unique cho cột Identifier
+            modelBuilder.Entity<PriceRange>()
+                .HasIndex(pr => pr.Identifier)
                 .IsUnique();
+
+            // Thiết lập khóa ngoại CategoryID (cho phép NULL)
+            modelBuilder.Entity<PriceRange>()
+                .HasOne(pr => pr.Category) // PriceRange có 1 Category (hoặc null)
+                .WithMany()                // Một Category có thể có nhiều PriceRanges (hoặc không cần trỏ ngược)
+                .HasForeignKey(pr => pr.CategoryID)
+                .IsRequired(false) // Quan trọng: Đánh dấu là không bắt buộc (cho phép NULL)
+                .OnDelete(DeleteBehavior.Restrict); // Không cho xóa Category nếu đang được PriceRange tham chiếu
+            // -----------------------
         }
     }
 }

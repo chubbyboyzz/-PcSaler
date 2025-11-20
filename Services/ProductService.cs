@@ -16,5 +16,9 @@ public class ProductService
     {
         return await _productService.GetProductDetails(id);
     }
-   
+    public async Task<List<ProductListViewModel>> GetProductsByCategory(int? categoryId)
+    {
+        return await _productService.GetProductsByCategory(categoryId);
+    }
+
 }

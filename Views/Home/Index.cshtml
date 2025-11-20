@@ -9,26 +9,57 @@
 <div class="row mb-4">
     <!-- Bên trái: Danh mục -->
     <div class="col-md-3">
-        <div class="card p-3" style="height: 450px; overflow-y: auto;">
-            <h6>Danh mục</h6>
-            <ul class="list-unstyled">
-                <li>
-                    <a class="text-decoration-none @(selectedCat == null ? "fw-bold" : "")"
-                       href="@Url.Action("Index", "Home")">
-                    </a>
-                </li>
-                @foreach (var c in categories ?? new List<PcSaler.DBcontext.Entites.Categories>())
-                {
-                    <li class="mb-1">
-                        <a class="text-decoration-none @(selectedCat == c.CategoryID ? "fw-bold" : "")"
-                           href="@Url.Action("Index", "Home", new { cat = c.CategoryID, q = query })">
-                            @c.ComponentType
-                        </a>
-                    </li>
-                }
-            </ul>
-        </div>
-    </div>
+    <h6>Danh mục</h6>
+
+    <ul class="list-unstyled">
+        @foreach (var c in categories ?? new List<PcSaler.DBcontext.Entites.Categories>())
+        {
+            <li class="mb-1 category-item position-relative">
+
+                <a class="text-decoration-none @(selectedCat == c.CategoryID ? "fw-bold" : "")"
+                    href="@Url.Action("Index", "Product", new { id = c.CategoryID })">
+                    @c.ComponentType
+                </a>
+
+                @* Bắt đầu Flyout Box - Sẽ hiển thị khi hover *@
+                <div class="flyout-box card shadow-lg p-3">
+                    <div class="row">
+                        @{
+                            // 1. Lấy dữ liệu Filter cho danh mục hiện tại (VD: VGA)
+                            // Bạn cần sửa Controller để gửi dữ liệu này qua ViewBag.FlyoutFilters
+                            var currentFilters = (ViewBag.FlyoutFilters as IEnumerable<dynamic>)
+                            ?.FirstOrDefault(f => f.CategoryKey == c.ComponentType);
+                        }
+                    </div>
+                        @if (currentFilters != null)
+                        {
+                            @* 2. Lặp qua các nhóm thuộc tính (VD: VGA NVIDIA, Kiểu Bộ Nhớ, Giao Diện) *@
+                            @foreach (var filterGroup in currentFilters.Filters.Take(4))
+                            {
+                                <div class="col-3">
+                                    <h6 class="text-primary mb-2 small">@filterGroup.Name</h6>
+                                    <ul class="list-unstyled small">
+                                        @* 3. Lặp qua các giá trị thuộc tính (VD: RTX 5090, GDDR6, 256 bits) *@
+                                        @foreach (var val in filterGroup.Values.Take(6))
+                                        {
+                                            <li>
+                                                @* Link tới trang Product/Index với tham số lọc *@
+                                                <a href="@Url.Action("Index", "Product", new { category = c.CategoryID, @filterGroup = val })">@val</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="col-12"><p class="text-secondary small">Đang cập nhật bộ lọc...</p></div>
+                        }
+                    </div>
+            </li>
+        }
+    </ul>
+</div>
 
     <!-- Bên phải: Banner -->
     <div class="col-md-9">
@@ -57,7 +88,7 @@
     <div class="p-3 mb-4 rounded" style="background-color: #f5f5f5;"> <!-- Màu xám nhạt -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h5 class="fw-bold mb-0">@cat.CategoryName</h5>
-            <a href="@Url.Action("Index", "Home", new { cat = cat.CategoryID })" class="btn btn-sm btn-outline-secondary">
+            <a href="@Url.Action("Index", "Product", new { id = cat.CategoryID })" class="btn btn-sm btn-outline-secondary">
                 Xem thêm →
             </a>
         </div>

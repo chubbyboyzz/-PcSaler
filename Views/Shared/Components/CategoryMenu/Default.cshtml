@@ -1,0 +1,20 @@
+﻿@model IEnumerable<dynamic>
+
+<ul class="dropdown-menu" aria-labelledby="categoryDropdownMenu">
+    @if (Model != null)
+    {
+        @foreach (var cat in Model)
+        {
+            <li>
+                <a class="dropdown-item" href="@Url.Action("Index", "Product", new { id = cat.CategoryID })">
+                    @* Giả định Description là tên hiển thị đẹp nhất *@
+                    @cat.ComponentType
+                </a>
+            </li>
+        }
+    }
+    else
+    {
+        <li><a class="dropdown-item text-danger" href="#">Không tải được danh mục</a></li>
+    }
+</ul>

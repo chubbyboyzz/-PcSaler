@@ -7,61 +7,15 @@
 }
 
 @section Scripts {
-    <script src="/js/PcBuild.js" asp-append-version="true"></script>
 
     <script>
-        // Sửa lại logic gọi showProductSelectionModal sau khi DOM sẵn sàng
-        // Khởi tạo Modal Instance và gắn vào window object để JS có thể truy cập
-        let bsModalInstance = null;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const productModalElement = document.getElementById('product-modal');
-
-            // Khởi tạo Modal Instance một lần
-            bsModalInstance = new bootstrap.Modal(productModalElement, { keyboard: true });
-
-            // Ghi đè hàm JS với logic Bootstrap API
-            window.showProductSelectionModal = async (category) => {
-                const categoryData = pcCategories.find(c => c.id === category);
-                modalState.category = category;
-                modalTitle.textContent = `Chọn ${categoryData.name}`;
-                modalSearchInput.value = '';
-
-                // Hiển thị Modal
-                bsModalInstance.show();
-
-                try {
-                    // Tải sản phẩm (Giả định fetch API thành công)
-                    const response = await fetch(`/api/APIPcBuild?category=${category}`);
-                    const products = await response.json();
-
-                    modalState.allProducts = products.map(p => ({
-                        id: p.productID,
-                        name: p.productName,
-                        category: p.categoryName,
-                        brand: p.brand,
-                        price: p.price,
-                        img: p.imageURL
-                    }));
-
-                    modalState.currentPage = 1;
-                    renderModalFilters();
-                    updateModalProductList();
-
-                } catch (err) {
-                    console.error("Lỗi khi tải sản phẩm:", err);
-                    modalState.allProducts = [];
-                    updateModalProductList();
-                }
-            };
-
-            window.closeModal = () => {
-                bsModalInstance.hide();
-            };
-        });
+        let pcCategories = @Html.Raw(Json.Serialize(ViewBag.Categories));
+        let priceRanges = [];
     </script>
-}
 
+    <script src="/js/PcBuild.js" asp-append-version="true"></script>
+
+}
 
 <div class="container mt-4 mb-4">
 

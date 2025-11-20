@@ -13,6 +13,36 @@ namespace PcSaler.Repository
         {
             _db = db;
         }
+        public async Task<List<ProductListViewModel>> GetProductsByCategory(int? categoryId)
+        {
+            // Bắt đầu với IQueryable
+            var query = _db.Products
+                           .Include(p => p.Category) // Cần thiết để truy cập p.Category.CategoryName
+                           .AsQueryable();
+
+            // === SỬA LỖI KIỂM TRA ĐIỀU KIỆN VÀ LỌC ===
+            // 1. Kiểm tra nếu categoryId có giá trị (không null)
+            if (categoryId.HasValue)
+            {
+                // 2. Lọc trực tiếp bằng số nguyên (int)
+                // Không cần String.IsNullOrEmpty nữa.
+                query = query.Where(p => p.Category.CategoryID == categoryId.Value);
+            }
+            // =========================================
+
+            return await query
+                .Select(p => new ProductListViewModel
+                {
+                    ProductID = p.ProductID,
+                    ProductName = p.ProductName,
+                    CategoryName = p.Category.CategoryName,
+                    Brand = p.Brand,
+                    Model = p.Model,
+                    Price = p.Price,
+                    ImageURL = p.ImageURL,
+                })
+                .ToListAsync();
+        }
         public async Task<ProductListViewModel?> GetProductDetails(int id)
         {
             var p = _db.Products

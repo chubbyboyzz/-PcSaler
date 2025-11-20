@@ -276,3 +276,88 @@ footer {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+
+/* === CATEGORY LIST ON HOMEPAGE (LEFT SIDE) - Đã chỉnh sửa === */
+
+/* Flyout container base */
+.category-item {
+    position: relative;
+    /* Loại bỏ padding và margin mặc định của li để dễ tính toán vị trí top */
+    padding: 0;
+    margin-bottom: 0 !important;
+    line-height: 1.5; /* Giãn dòng vừa phải */
+}
+
+.col-md-3 .list-unstyled a {
+    /* Đảm bảo link luôn chiếm hết không gian cho hover */
+    padding: 0.3rem 0;
+    display: block;
+    transition: color 0.2s ease;
+}
+
+
+/* === FLYOUT MENU STYLES === */
+
+.flyout-box {
+    display: none;
+    position: absolute;
+    /* Căn chỉnh lại: Dịch sang 1px để không bị overlap với viền card */
+    top: -1px;
+    left: 100%;
+    z-index: 1000;
+    width: 650px; /* Tăng nhẹ chiều rộng */
+    min-height: 250px;
+    /* Đồng bộ với màu nền và viền của Card danh mục */
+    background-color: #fffaf0; /* Nền kem trắng */
+    border: 1px solid var(--bs-primary); /* Viền màu chủ đạo */
+    border-radius: 0.75rem; /* Bo tròn góc đồng bộ */
+
+    padding: 1rem 1.5rem; /* Tăng padding */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25); /* Bóng đổ mạnh và đẹp hơn */
+    /* Tối ưu hiệu ứng trượt */
+    transform: translateX(10px);
+    opacity: 0; /* Ẩn mờ */
+    transition: transform 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67), opacity 0.2s ease-in-out;
+}
+
+/* KÍCH HOẠT HIỆU ỨNG KHI DI CHUỘT */
+.category-item:hover > .flyout-box {
+    display: block;
+    transform: translateX(0);
+    opacity: 1; /* Hiển thị hoàn toàn */
+}
+
+/* Tiêu đề nhóm lọc (Socket, Giá) */
+.flyout-box h6 {
+    /* Sử dụng màu chủ đạo */
+    color: var(--bs-primary);
+    font-size: 0.9rem;
+    font-weight: 700; /* In đậm hơn */
+    /* Thiết kế vintage hơn */
+    border-bottom: 2px solid rgba(141, 107, 75, 0.3);
+    padding-bottom: 0.4rem;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase; /* Viết hoa để tạo điểm nhấn */
+}
+
+/* Các link chi tiết bên trong Flyout */
+.flyout-box ul {
+    margin-top: 0;
+    line-height: 1.5;
+}
+
+    .flyout-box ul a {
+        /* Màu chữ tương phản */
+        color: var(--bs-body-color);
+        padding: 2px 0;
+        display: block;
+        font-size: 0.9rem;
+    }
+
+        .flyout-box ul a:hover {
+            color: var(--bs-danger); /* Đổi màu đỏ gạch khi hover */
+            text-decoration: none;
+            font-weight: 600;
+        }
+    }

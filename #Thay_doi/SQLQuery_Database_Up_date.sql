@@ -211,3 +211,33 @@ CREATE TABLE ProductAttributes (
     FOREIGN KEY (ProductID) REFERENCES Products(ProductID) ON DELETE CASCADE
 );
 GO
+
+-- 15. Bảng Khoảng giá lọc (PriceRanges)
+-- (Bảng này dùng để cấu hình UI lọc giá)
+-- ===============================
+CREATE TABLE PriceRanges (
+    RangeID INT IDENTITY(1,1) PRIMARY KEY,
+    
+    -- ID dùng cho JavaScript (VD: 'ssd-lt-500k', 'global-lt-5m')
+    Identifier NVARCHAR(50) UNIQUE NOT NULL, 
+    
+    -- Tên hiển thị cho người dùng (VD: 'Dưới 500k')
+    DisplayName NVARCHAR(100) NOT NULL,    
+    
+    MinPrice DECIMAL(18,2) NOT NULL,
+    
+    -- Dùng NULL để đại diện cho 'Vô cực' (Infinity)
+    MaxPrice DECIMAL(18,2) NULL,           
+    
+    -- Thứ tự sắp xếp khi hiển thị
+    SortOrder INT DEFAULT 0,
+    
+    -- Khóa ngoại liên kết đến Danh mục
+    -- NẾU NULL: Đây là bộ lọc "Toàn cục", áp dụng cho mọi danh mục.
+    -- NẾU CÓ GIÁ TRỊ: Chỉ áp dụng cho danh mục cụ thể đó.
+    CategoryID INT NULL,
+    
+    -- Tạo khóa ngoại
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
+);
+GO

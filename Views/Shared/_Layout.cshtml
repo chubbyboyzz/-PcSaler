@@ -11,7 +11,7 @@
 
     @RenderSection("Styles", required: false)
 </head>
-<body>
+<body class="d-flex flex-column vh-100">
 
     <header class="bg-white shadow-sm sticky-top">
 
@@ -49,19 +49,7 @@
                         Danh mục
                     </button>
 
-                    <ul class="dropdown-menu" aria-labelledby="categoryDropdownMenu">
-                        @if (ViewBag.Categories != null)
-                        {
-                            @foreach (var cat in ViewBag.Categories)
-                            {
-                                <li>
-                                    <a class="dropdown-item" href="@Url.Action("Category", "Product", new { id = cat.CategoryID })">
-                                        @cat.CategoryName
-                                    </a>
-                                </li>
-                            }
-                        }
-                    </ul>
+                    @await Component.InvokeAsync("CategoryMenu")
                 </div>
 
                 <a href="@Url.Action("Index", "PcBuild")" class="btn btn-primary fw-semibold mt-1 mt-md-0 ms-auto">
@@ -74,8 +62,7 @@
     <div class="container mt-4">
         @RenderBody()
     </div>
-
-    <footer class="bg-light mt-5 py-4">
+    <footer class="bg-light mt-auto py-4">
         <div class="container text-center">
             <small>© @DateTime.Now.Year PCShop — Demo</small>
         </div>
