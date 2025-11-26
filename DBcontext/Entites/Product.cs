@@ -17,7 +17,8 @@ namespace PcSaler.DBcontext.Entites
         public int WarrantyMonths { get; set; } = 12;
         public DateTime? ReleaseDate { get; set; }
 
-        public Category Category { get; set; }
+        public Categories Category { get; set; }
+        public virtual ICollection<ProductAttribute> Attributes { get; set; }
 
         //public bool IsAvailable { get; set; } = true;
     }

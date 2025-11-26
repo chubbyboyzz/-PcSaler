@@ -1,31 +1,678 @@
+﻿/* =========================================
+   1. IMPORT FONTS (Hỗ trợ Tiếng Việt tuyệt đối)
+   - Merriweather: Cho tiêu đề (Vẻ đẹp cổ điển)
+   - Inter: Cho văn bản (Hiện đại, dễ đọc thông số kỹ thuật)
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Merriweather:wght@400;700;900&display=swap');
+
+/* =========================================
+   2. GLOBAL RESET & VARIABLES
+   ========================================= */
+/* Thay thế toàn bộ đoạn :root cũ bằng đoạn này */
+:root {
+    /* Xanh dương công nghệ (Intel Style) */
+    --primary-color: #0984e3; /* Xanh dương tươi */
+    --primary-hover: #006266; /* Xanh đậm khi hover */
+
+    --accent-color: #d63031; /* Đỏ tươi (Dùng cho Sale/Badge) */
+
+    --bg-color: #f1f2f6; /* Xám xanh cực nhạt (Cool Grey) - Nhìn hiện đại hơn màu kem */
+    --white: #ffffff;
+    --text-main: #2d3436; /* Đen than chì */
+    --text-muted: #636e72;
+    --border-color: #dfe6e9;
+}
 html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    height: 100%; /* Bắt buộc phải có để Footer luôn nằm đáy */
 }
 
 body {
-  margin-bottom: 60px;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    line-height: 1.6;
+    color: var(--text-main);
+    /* --- BẮT ĐẦU NỀN HEXAGON --- */
+    background-color: #f5f6fa;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23cbd5e0' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-7.5l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-attachment: fixed;
+    /* --- KẾT THÚC --- */
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+    body > .container {
+        background-color: rgba(255, 255, 255, 0.85); /* Nền trắng mờ */
+        backdrop-filter: blur(5px); /* Làm mờ họa tiết nền phía sau */
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.05); /* Bóng tỏa nhẹ */
+    }
+
+/* Các thẻ tiêu đề dùng font có chân (Serif) để tạo nét Vintage */
+h1, h2, h3, h4, h5, h6, .navbar-brand, .vintage-font {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    color: #3e2723; /* Màu nâu đen sang trọng */
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+    a:hover {
+        color: var(--primary-hover);
+    }
+
+/* =========================================
+   3. HEADER & NAVBAR (Professional Look)
+   ========================================= */
+header {
+    background-color: var(--white);
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05); /* Bóng đổ mịn */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    color: var(--primary-color) !important;
+    letter-spacing: -0.5px;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    color: var(--text-main) !important;
+    padding: 0.5rem 1rem;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: var(--primary-color) !important;
+    }
+
+/* Thanh tìm kiếm hiện đại */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1rem;
+    font-size: 0.95rem;
+}
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(141, 110, 99, 0.15); /* Highlight màu nâu nhạt */
+    }
+
+/* =========================================
+   4. BUTTONS (Custom Style)
+   ========================================= */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+}
+
+    .btn-primary:hover, .btn-primary:active, .btn-primary:focus {
+        background-color: var(--primary-hover) !important;
+        border-color: var(--primary-hover) !important;
+    }
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+/* =========================================
+   5. LAYOUT & CARDS (Bố cục)
+   ========================================= */
+.container {
+    max-width: 1200px; /* Mở rộng chiều ngang cho thoáng */
+}
+
+/* Card sản phẩm: Sạch, đẹp, có hiệu ứng nổi */
+.card {
+    border: none;
+    border-radius: 8px;
+    background-color: var(--white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+    .card:hover {
+        transform: translateY(-5px); /* Bay lên nhẹ khi hover */
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    }
+
+.card-title {
+    font-family: 'Inter', sans-serif; /* Tên sản phẩm dùng sans-serif để dễ đọc */
+    font-weight: 600;
+    font-size: 1rem;
+    height: 2.4em; /* Giới hạn 2 dòng */
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.text-price {
+    color: #c0392b; /* Màu đỏ đô cho giá */
+    font-weight: 700;
+    font-family: 'Merriweather', serif;
+}
+
+/* Danh mục bên trái */
+.category-sidebar h6 {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.category-item a {
+    display: block;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: var(--text-main);
+}
+
+    .category-item a:hover {
+        background-color: #efebe9; /* Nền xám nâu nhạt */
+        color: var(--primary-hover);
+        font-weight: 600;
+    }
+
+    .category-item a.fw-bold {
+        background-color: var(--primary-color);
+        color: white !important;
+    }
+
+/* =========================================
+   6. FOOTER (SỬA LỖI HOÀN TOÀN)
+   ========================================= */
+footer {
+    /* Reset các thuộc tính absolute cũ */
+    position: relative;
+    width: 100%;
+    margin-top: auto; /* Flexbox đẩy footer xuống đáy */
+
+    background-color: #2d2a26; /* Màu nền tối (Dark Vintage) */
+    color: #d7ccc8; /* Màu chữ kem nhạt */
+    padding: 2rem 0;
+    border-top: 4px solid var(--primary-color); /* Viền màu chủ đạo */
+}
+
+    footer small {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+/* =========================================
+   7. FLYOUT MENU (Menu bay ra)
+   ========================================= */
+.flyout-box {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    z-index: 1000;
+    width: 700px;
+    min-height: 300px;
+    background-color: var(--white);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--primary-color);
+    border-radius: 0 8px 8px 8px;
+    box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-left: 5px;
+}
+
+.category-item:hover .flyout-box {
+    display: block;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Scrollbar đẹp hơn cho Chrome/Edge */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #bcaaa4;
+    border-radius: 4px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #8d6e63;
+    }
+
+.btn:active,
+.dropdown-item:active,
+.nav-link:active {
+    transform: scale(0.96); /* Thu nhỏ lại 4% tạo cảm giác nhấn thật */
+    transition: transform 0.1s ease-out; /* Phản hồi tức thì */
+}
+
+/* ------------------------------------------------------
+   B. Hiệu ứng Hover Link (Underline Animation)
+   Gạch chân chạy từ trái sang phải khi di chuột vào menu
+   ------------------------------------------------------ */
+.navbar-nav .nav-link {
+    position: relative;
+}
+
+    .navbar-nav .nav-link::after {
+        content: '';
+        position: absolute;
+        width: 0;
+        height: 2px;
+        bottom: 5px; /* Cách chữ một chút */
+        left: 50%;
+        background-color: var(--primary-color); /* Màu nâu chủ đạo */
+        transition: all 0.3s ease-in-out;
+        transform: translateX(-50%); /* Căn giữa */
+    }
+
+    .navbar-nav .nav-link:hover::after {
+        width: 80%; /* Khi hover thì dài ra 80% */
+    }
+
+/* ------------------------------------------------------
+   C. Hiệu ứng Load trang (Fade In)
+   Trang web sẽ hiện dần ra thay vì hiện "bụp" một cái
+   ------------------------------------------------------ */
+body {
+    animation: fadeInPage 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes fadeInPage {
+    from {
+        opacity: 0;
+        transform: translateY(10px); /* Trượt nhẹ từ dưới lên */
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ------------------------------------------------------
+   D. Hiệu ứng Focus Input (Glow Effect)
+   Làm nổi bật ô nhập liệu khi đang gõ
+   ------------------------------------------------------ */
+.form-control:focus {
+    /* Tạo vùng sáng tỏa ra màu nâu nhạt */
+    box-shadow: 0 0 0 4px rgba(141, 110, 99, 0.2);
+    border-color: var(--primary-color);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* ------------------------------------------------------
+   E. Hiệu ứng Card sản phẩm (Micro-interaction)
+   ------------------------------------------------------ */
+/* Nút "Chi tiết" trong Card chỉ hiện rõ khi hover vào Card */
+.card .btn-outline-primary {
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.card:hover .btn-outline-primary {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 10px rgba(141, 110, 99, 0.3);
+}
+
+/* Ảnh sản phẩm zoom nhẹ khi hover */
+.card-img-top {
+    transition: transform 0.5s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05); /* Phóng to ảnh 5% */
+}
+
+
+.card-badge {
+    position: absolute;
+    top: 15px;
+    left: -8px; /* Thò ra ngoài bên trái một chút */
+    z-index: 10;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: white;
+    /* Tạo hình mũi tên đuôi cá */
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 10% 50%);
+    padding-left: 15px; /* Bù lại phần bị cắt */
+
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    font-family: 'Inter', sans-serif;
+}
+
+    /* Hiệu ứng gập góc (3D Fold) */
+    .card-badge::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 8px;
+        height: 8px;
+        background-color: #004e52; /* Màu tối hơn của badge để làm bóng đổ gập */
+        clip-path: polygon(0 0, 100% 0, 100% 100%);
+    }
+
+.badge-new {
+    background-color: var(--primary-color); /* Màu nâu */
+    color: white;
+}
+
+.badge-sale {
+    background-color: #c0392b; /* Màu đỏ */
+    color: white;
+}
+
+.badge-out {
+    background-color: #95a5a6; /* Màu xám */
+    color: white;
+}
+
+/* B. PRICE TAG (Hiển thị giá tiền sang trọng) */
+.price-tag {
+    font-family: 'Merriweather', serif;
+    color: #c0392b;
+    font-weight: 900;
+    font-size: 1.1rem;
+    display: inline-block;
+}
+
+.badge-warning {
+    background-color: #f39c12; /* Màu cam */
+    color: white;
+}
+
+
+.currency-symbol {
+    font-size: 0.7em;
+    vertical-align: top;
+    text-decoration: underline;
+    margin-left: 2px;
+    opacity: 0.8;
+}
+
+/* C. EMPTY STATE (Trạng thái khi không có sản phẩm) */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background-color: var(--white);
+    border-radius: 8px;
+    border: 2px dashed var(--border-color);
+    margin: 1rem 0;
+}
+
+.empty-state-icon {
+    font-size: 3.5rem;
+    color: #d7ccc8; /* Màu nâu rất nhạt */
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+}
+
+* 1. Nút bấm có màu chuyển sắc (Gradient) */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    border: none; /* Bỏ viền để gradient đẹp hơn */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Bóng đổ màu nhẹ */
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-hover), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* 2. Header nổi lên khỏi nền */
+header {
+    background: rgba(255, 255, 255, 0.95); /* Hơi trong suốt */
+    backdrop-filter: blur(10px); /* Hiệu ứng mờ kính (Glassmorphism) */
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 3. Card sản phẩm nổi khối rõ rệt */
+.card {
+    border: 1px solid var(--bg-color); /* Viền rất mờ */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); /* Bóng đổ xịn mịn */
+}
+
+    .card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); /* Nổi hẳn lên khi hover */
+        border-color: var(--primary-color); /* Viền đổi màu theo theme */
+    }
+
+/* 4. Footer màu đậm đà hơn */
+footer {
+    background: var(--text-main) !important; /* Dùng màu chữ chính làm nền footer */
+    color: var(--white);
+    border-top: none;
+}
+
+    footer small {
+        opacity: 0.6;
+    }
+
+/* 5. Giá tiền nổi bật hơn nữa */
+.price-tag {
+    color: var(--accent-color) !important; /* Dùng màu Accent (Đỏ/Cam/Teal) cho giá */
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.1); /* Bóng nhẹ cho chữ */
+}
+
+/* 1. KHUNG CHỨA CHÍNH (MAIN CONTAINER) 
+   Tạo viền mờ và hiệu ứng kính cho khung nội dung giữa trang */
+body > .container {
+    background-color: rgba(255, 255, 255, 0.9); /* Nền trắng đục */
+    backdrop-filter: blur(10px);
+    /* Viền xanh mảnh */
+    border: 1px solid rgba(9, 132, 227, 0.3);
+    border-radius: 12px;
+    /* Bóng tỏa màu xanh nhẹ */
+    box-shadow: 0 0 20px rgba(9, 132, 227, 0.1);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+/* 2. CARD SẢN PHẨM (Viền & Hiệu ứng Hover) */
+.card {
+    /* Viền mặc định: Xanh rất nhạt */
+    border: 1px solid rgba(9, 132, 227, 0.2);
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+    .card:hover {
+        /* Khi di chuột: Viền xanh đậm + Phát sáng (Glow) */
+        border-color: var(--primary-color);
+        box-shadow: 0 0 15px rgba(9, 132, 227, 0.4);
+        transform: translateY(-5px);
+    }
+
+/* 3. CÁC NÚT BẤM (BUTTONS) */
+.btn-outline-primary {
+    /* Viền xanh, Chữ xanh */
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+    .btn-outline-primary:hover {
+        /* Hover: Nền xanh, Chữ trắng, Phát sáng */
+        background-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 0 10px var(--primary-color);
+    }
+
+.btn-primary {
+    /* Nút chính: Nền xanh */
+    background-color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    box-shadow: 0 4px 6px rgba(9, 132, 227, 0.3);
+}
+
+    .btn-primary:hover {
+        box-shadow: 0 0 15px var(--primary-color); /* Hiệu ứng Neon khi hover */
+    }
+
+/* 4. Ô NHẬP LIỆU (INPUTS) */
+.form-control:focus {
+    /* Khi bấm vào ô tìm kiếm: Viền xanh + Glow xanh */
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(9, 132, 227, 0.2);
+}
+
+/* 5. CÁC KHUNG KHÁC (Flyout Menu, Empty State) */
+.flyout-box {
+    border: 1px solid var(--primary-color); /* Viền xanh rõ */
+    border-left: 5px solid var(--primary-color); /* Cạnh trái dày hơn */
+}
+
+.empty-state {
+    /* Viền nét đứt màu xanh */
+    border: 2px dashed rgba(9, 132, 227, 0.4);
+    background-color: rgba(9, 132, 227, 0.05); /* Nền xanh cực nhạt */
+}
+
+/* 6. THANH DANH MỤC (Category Sidebar) */
+.category-sidebar h6 {
+    /* Gạch chân màu xanh */
+    border-bottom: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.category-item a.fw-bold {
+    /* Mục đang chọn: Nền xanh, Chữ trắng */
+    background-color: var(--primary-color);
+    color: white !important;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(9, 132, 227, 0.3);
+}
+
+/* Chiều rộng thanh cuộn */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Nền của rãnh cuộn (Track) */
+::-webkit-scrollbar-track {
+    background: #f1f2f6;
+    border-left: 1px solid var(--border-color);
+}
+
+/* Tay nắm cuộn (Thumb) */
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary-color), #00cec9); /* Gradient Xanh -> Teal */
+    border-radius: 5px;
+    border: 2px solid #f1f2f6; /* Tạo viền trắng xung quanh tay nắm */
+}
+
+    /* Khi di chuột vào tay nắm */
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-hover);
+    }
+
+
+/* Áp dụng cho Logo và các thẻ H5 tiêu đề danh mục */
+.navbar-brand, h5.fw-bold {
+    text-shadow: 0 0 2px rgba(9, 132, 227, 0.2); /* Bóng mờ nhẹ */
+    transition: text-shadow 0.3s ease;
+}
+
+    /* Khi hover vào thì sáng rực lên */
+    .navbar-brand:hover, h5.fw-bold:hover {
+        color: var(--primary-color);
+        text-shadow: 0 0 10px rgba(9, 132, 227, 0.6), 0 0 20px rgba(9, 132, 227, 0.4);
+        cursor: default; /* Giữ chuột bình thường */
+    }
+
+/* Tạo hiệu ứng bóng sáng quét qua ảnh (Shine Effect) */
+.carousel-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px; /* Bo góc cho khớp với theme */
+}
+
+    /* Lớp phủ gradient làm ảnh trông "điện ảnh" hơn */
+    .carousel-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 0%, rgba(9, 132, 227, 0.1) 100%);
+        pointer-events: none;
+    }
+
+/* Hiệu ứng quét sáng khi hover vào banner */
+.carousel-inner:hover .carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -75%;
+    z-index: 2;
+    display: block;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 100%);
+    transform: skewX(-25deg);
+    animation: shine 0.75s;
+}
+
+@keyframes shine {
+    100% {
+        left: 125%;
+    }
+}
+
+.banner-img {
+    width: 100%;
+    height: 500px; 
+    object-fit: cover;
+    object-position: center; 
+}
+
+/* Responsive: Trên điện thoại thì giảm chiều cao xuống cho đỡ choán màn hình */
+@media (max-width: 768px) {
+    .banner-img {
+        height: 300px;
+    }
 }

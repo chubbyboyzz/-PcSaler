@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema; // Cần thiết cho [Foreig
 
 namespace PcSaler.DBcontext.Entites
 {
-    public class Category
+    public class Categories
     {
         [Key]
         public int CategoryID { get; set; }
@@ -30,10 +30,10 @@ namespace PcSaler.DBcontext.Entites
 
         // Thuộc tính điều hướng cho Category cha
         [ForeignKey("ParentCategoryID")]
-        public Category? ParentCategory { get; set; }
+        public Categories? ParentCategory { get; set; }
 
         // Thuộc tính điều hướng cho các Category con
-        public ICollection<Category>? Children { get; set; }
+        public ICollection<Categories>? Children { get; set; }
 
         // --- Quan hệ 1-n với Product ---
 

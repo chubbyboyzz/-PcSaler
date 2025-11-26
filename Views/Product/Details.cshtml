@@ -15,7 +15,13 @@
         <p class="text-muted">@Model.CategoryName</p>
 
         <h4 class="text-danger">@Model.Price.ToString("N0") ₫</h4>
-        <button class="btn btn-primary">Thêm vào giỏ</button>
+        <form id="addToCartForm">
+            <input type="hidden" name="ItemID" value="@Model.ProductID" />
+            <input type="hidden" name="Quantity" value="1" />
+            <input type="hidden" name="ItemType" value="PRODUCT" /> <button type="submit" class="btn btn-primary" id="addToCartButton">
+                Thêm vào giỏ
+            </button>
+        </form>
         <h5 class="mt-4">Cấu hình chi tiết</h5>
         <table class="table table-sm mt-3">
             <tbody>
@@ -28,3 +34,114 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // 1. Lấy trạng thái đăng nhập từ Server render ra
+        const isAuthenticated = @(User.Identity.IsAuthenticated.ToString().ToLower());
+
+        document.getElementById('addToCartForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Lấy dữ liệu từ form
+            const formData = new FormData(e.target);
+            const data = {};
+            formData.forEach((value, key) => (data[key] = value));
+            // Chuyển Quantity và ItemID sang số để tránh lỗi logic sau này
+            data.ItemID = parseInt(data.ItemID);
+            data.Quantity = parseInt(data.Quantity);
+
+            const button = document.getElementById('addToCartButton');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = 'Đang xử lý...';
+
+                    if (isAuthenticated) {
+            // === ĐÃ ĐĂNG NHẬP ===
+            fetch('/api/APICart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)})
+            .then(response => {
+                if (response.ok) {
+                    alert('Đã thêm sản phẩm thành công!');
+
+                    // --> THÊM DÒNG NÀY ĐỂ CẬP NHẬT HEADER:
+                    updateHeaderCartCount();
+                }
+                // ...
+            });
+        } else {
+            // === KHÁCH VÃNG LAI ===
+            addToLocalStorage(data);
+
+            // --> THÊM DÒNG NÀY ĐỂ CẬP NHẬT HEADER:
+            updateHeaderCartCount();
+        }
+        });
+
+                function addToLocalStorage(newItem) {
+            let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+
+            // Lấy thêm thông tin chi tiết từ giao diện để lưu
+            // (Vì LocalStorage không truy vấn DB được, phải lưu luôn tên/ảnh/giá)
+            const productName = document.querySelector('h3').innerText;
+            const priceText = document.querySelector('.text-danger').innerText.replace(/[^\d]/g, ''); // Bỏ chữ 'đ', dấu chấm
+            const price = parseInt(priceText);
+            const imageUrl = document.querySelector('.img-fluid').getAttribute('src');
+
+            const existingItemIndex = cart.findIndex(item => item.ItemID === newItem.ItemID && item.ItemType === newItem.ItemType);
+
+            if (existingItemIndex > -1) {
+                cart[existingItemIndex].Quantity += newItem.Quantity;
+            } else {
+                // Thêm các trường hiển thị vào object
+                newItem.ProductName = productName;
+                newItem.Price = price;
+                newItem.ImageURL = imageUrl;
+                cart.push(newItem);
+            }
+
+            localStorage.setItem('guest_cart', JSON.stringify(cart));
+
+            // Cập nhật số trên menu
+            if (typeof updateHeaderCartCount === "function") {
+                updateHeaderCartCount();
+            }
+
+            alert('Đã thêm vào giỏ hàng (Máy khách)!');
+        }
+
+        // Hàm xử lý gọi API (Thành viên) - Code cũ của bạn tách ra đây
+        function addToDatabase(data, button, originalText) {
+            fetch('/api/APICart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Đã thêm sản phẩm vào giỏ hàng (Đã đồng bộ Database)!');
+                } else if (response.status === 401) {
+                    alert('Phiên đăng nhập hết hạn.');
+                } else {
+                    return response.json().then(errorData => {
+                        alert('Lỗi: ' + (errorData.message || 'Có lỗi xảy ra.'));
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi:', error);
+                alert('Lỗi kết nối.');
+            })
+            .finally(() => {
+                button.disabled = false;
+                button.textContent = originalText;
+            });
+        }
+    </script>
+}

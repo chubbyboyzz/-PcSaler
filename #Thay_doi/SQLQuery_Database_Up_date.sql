@@ -2,7 +2,7 @@
 -- 1. TẠO DATABASE VÀ SỬ DỤNG
 -- (Lưu ý: Nếu DB đã tồn tại, lệnh này sẽ báo lỗi trừ khi bạn xóa thủ công)
 -- ===================================
-CREATE DATABASE PCShopDBtest;
+CREATE DATABASE PCShopDBtest1;
 GO
 USE PCShopDBtest;
 GO
@@ -197,5 +197,47 @@ CREATE TABLE Payments (
     PaymentDate DATETIME DEFAULT GETDATE(),
     Note NVARCHAR(255),
     FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE ProductAttributes (
+    AttributeID INT IDENTITY(1,1) PRIMARY KEY,
+    ProductID INT NOT NULL,
+    AttributeName NVARCHAR(100) NOT NULL, -- Tên thuộc tính (VD: 'Chipset', 'Socket', 'Dung lượng')
+    AttributeValue NVARCHAR(255) NOT NULL, -- Giá trị thuộc tính (VD: 'Z790', 'LGA1700', '16GB')
+    
+    -- Tạo khóa ngoại liên kết tới bảng Products
+    -- ON DELETE CASCADE nghĩa là nếu bạn xóa 1 sản phẩm, tất cả thuộc tính của nó cũng tự động bị xóa.
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID) ON DELETE CASCADE
+);
+GO
+
+-- 15. Bảng Khoảng giá lọc (PriceRanges)
+-- (Bảng này dùng để cấu hình UI lọc giá)
+-- ===============================
+CREATE TABLE PriceRanges (
+    RangeID INT IDENTITY(1,1) PRIMARY KEY,
+    
+    -- ID dùng cho JavaScript (VD: 'ssd-lt-500k', 'global-lt-5m')
+    Identifier NVARCHAR(50) UNIQUE NOT NULL, 
+    
+    -- Tên hiển thị cho người dùng (VD: 'Dưới 500k')
+    DisplayName NVARCHAR(100) NOT NULL,    
+    
+    MinPrice DECIMAL(18,2) NOT NULL,
+    
+    -- Dùng NULL để đại diện cho 'Vô cực' (Infinity)
+    MaxPrice DECIMAL(18,2) NULL,           
+    
+    -- Thứ tự sắp xếp khi hiển thị
+    SortOrder INT DEFAULT 0,
+    
+    -- Khóa ngoại liên kết đến Danh mục
+    -- NẾU NULL: Đây là bộ lọc "Toàn cục", áp dụng cho mọi danh mục.
+    -- NẾU CÓ GIÁ TRỊ: Chỉ áp dụng cho danh mục cụ thể đó.
+    CategoryID INT NULL,
+    
+    -- Tạo khóa ngoại
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
 );
 GO

@@ -14,7 +14,7 @@ namespace PcSaler.Services
         {
             _categoryService = categoryService;
         }
-        public async Task<List<Category>> GetAllCategories()
+        public async Task<List<Categories>> GetAllCategories()
         {
             return await _categoryService.GetAllCategories();
         }

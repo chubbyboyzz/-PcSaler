@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PcSaler.DBcontext.Entites;
 
 namespace PcSaler.DBcontext
@@ -8,18 +9,16 @@ namespace PcSaler.DBcontext
         public PCShopContext(DbContextOptions<PCShopContext> options) : base(options) { }
 
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Categories> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
-
+        public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<PCBuild> PCBuilds { get; set; }
         public DbSet<PCBuildDetail> PCBuildDetails { get; set; }
 
         public DbSet<CustomPC> CustomPCs { get; set; }
         public DbSet<CustomPCDetail> CustomPCDetails { get; set; }
-
-        // **THAY ĐỔI 1: Tên DbSet phản ánh Carts (số nhiều) và CartItem**
         public DbSet<Carts> Carts { get; set; }
-        public DbSet<CartItem> CartItems { get; set; } // THÊM MỚI
+        public DbSet<CartItem> CartItems { get; set; } 
 
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
@@ -29,14 +28,17 @@ namespace PcSaler.DBcontext
 
         public DbSet<Payment> Payments { get; set; }
 
+        public DbSet<PriceRange> PriceRanges { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // Bảng tương ứng với tên SQL đã tạo
             modelBuilder.Entity<Customer>().ToTable("Customers");
-            modelBuilder.Entity<Category>().ToTable("Categories");
+            modelBuilder.Entity<Categories>().ToTable("Categories");
             modelBuilder.Entity<Product>().ToTable("Products");
+            modelBuilder.Entity<ProductAttribute>().ToTable("ProductAttributes");
 
             modelBuilder.Entity<PCBuild>().ToTable("PCBuild");
             modelBuilder.Entity<PCBuildDetail>().ToTable("PCBuildDetails");
@@ -56,6 +58,7 @@ namespace PcSaler.DBcontext
 
             modelBuilder.Entity<Payment>().ToTable("Payments");
 
+            modelBuilder.Entity<PriceRange>().ToTable("PriceRanges");
 
             // ----------------------------------------------------
             // Thiết lập RÀNG BUỘC VÀ QUAN HỆ (Fluent API)
@@ -75,7 +78,7 @@ namespace PcSaler.DBcontext
                 .OnDelete(DeleteBehavior.Cascade);
 
             // 3. Cấu hình Quan hệ Phân cấp Category (Self-Referencing)
-            modelBuilder.Entity<Category>()
+            modelBuilder.Entity<Categories>()
                 .HasOne(c => c.ParentCategory)      // Category có một ParentCategory
                 .WithMany(c => c.Children)          // ParentCategory có nhiều Children
                 .HasForeignKey(c => c.ParentCategoryID)
@@ -121,9 +124,27 @@ namespace PcSaler.DBcontext
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Thiết lập Unique cho ComponentType trong Category
-            modelBuilder.Entity<Category>()
-                .HasIndex(c => c.ComponentType)
+            modelBuilder.Entity<Categories>()
+                 .HasIndex(c => c.ComponentType)
+                 .IsUnique();
+
+
+            // --- THÊM MỚI (2/2) ---
+            // 6. Cấu hình Bảng PriceRanges
+
+            // Thiết lập Unique cho cột Identifier
+            modelBuilder.Entity<PriceRange>()
+                .HasIndex(pr => pr.Identifier)
                 .IsUnique();
+
+            // Thiết lập khóa ngoại CategoryID (cho phép NULL)
+            modelBuilder.Entity<PriceRange>()
+                .HasOne(pr => pr.Category) // PriceRange có 1 Category (hoặc null)
+                .WithMany()                // Một Category có thể có nhiều PriceRanges (hoặc không cần trỏ ngược)
+                .HasForeignKey(pr => pr.CategoryID)
+                .IsRequired(false) // Quan trọng: Đánh dấu là không bắt buộc (cho phép NULL)
+                .OnDelete(DeleteBehavior.Restrict); // Không cho xóa Category nếu đang được PriceRange tham chiếu
+            // -----------------------
         }
     }
 }

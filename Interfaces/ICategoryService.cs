@@ -5,7 +5,7 @@ namespace PcSaler.Interfaces
 {
     public interface ICategoryService
     {
-        Task<List<Category>> GetAllCategories();
+        Task<List<Categories>> GetAllCategories();
         Task<List<CategoryProductViewModel>> GetCategoryProducts(int? categoryId, string? query);
         // alone?
 

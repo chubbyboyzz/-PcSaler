@@ -15,7 +15,7 @@ namespace PcSaler.Repository
             _db = db;
         }
 
-        public async Task<List<Category>> GetAllCategories()
+        public async Task<List<Categories>> GetAllCategories()
         {
             // Tạm thời giữ nguyên, nhưng nên dùng AsNoTracking() và ToListAsync()
             return await _db.Categories
@@ -25,7 +25,7 @@ namespace PcSaler.Repository
 
         public async Task<List<CategoryProductViewModel>> GetCategoryProducts(int? categoryId, string? query)
         {
-            IQueryable<Category> queryable = _db.Categories.Include(c => c.Products);
+            IQueryable<Categories> queryable = _db.Categories.Include(c => c.Products);
 
             if (categoryId.HasValue && categoryId.Value > 0)
                 queryable = queryable.Where(c => c.CategoryID == categoryId.Value);
@@ -48,7 +48,9 @@ namespace PcSaler.Repository
                         ProductID = p.ProductID,
                         ProductName = p.ProductName,
                         Price = p.Price,
+                        Stock = p.Stock,
                         ImageURL = p.ImageURL
+
                     }).ToList()
             }).ToListAsync(); // Sửa ToList() thành ToListAsync() để tuân thủ async
         }
