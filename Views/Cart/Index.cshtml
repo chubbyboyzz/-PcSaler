@@ -1,0 +1,224 @@
+﻿@{
+    ViewData["Title"] = "Giỏ hàng của bạn";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">🛒 Giỏ hàng của bạn</h2>
+
+    <div class="row">
+        <!-- Cột Danh sách sản phẩm -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th scope="col" class="ps-4">Sản phẩm</th>
+                                    <th scope="col" class="text-center">Đơn giá</th>
+                                    <th scope="col" class="text-center">Số lượng</th>
+                                    <th scope="col" class="text-end pe-4">Thành tiền</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-body">
+                                <!-- Dữ liệu sẽ được render bằng JS tại đây -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trạng thái trống -->
+            <div id="empty-cart-msg" class="text-center py-5 d-none">
+                <img src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" width="120" alt="Empty" class="mb-3 opacity-50">
+                <h5>Giỏ hàng đang trống</h5>
+                <a href="/" class="btn btn-outline-primary mt-2">Tiếp tục mua sắm</a>
+            </div>
+        </div>
+
+        <!-- Cột Tổng tiền & Thanh toán -->
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Tóm tắt đơn hàng</h5>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Tạm tính:</span>
+                        <span class="fw-bold" id="sub-total">0 ₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Giảm giá:</span>
+                        <span class="text-success">0 ₫</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="h5">Tổng cộng:</span>
+                        <span class="h5 text-primary" id="final-total">0 ₫</span>
+                    </div>
+
+                    <button class="btn btn-primary w-100 py-2 fw-bold mb-2">
+                        Tiến hành thanh toán
+                    </button>
+                    <a href="/" class="btn btn-outline-secondary w-100">Mua thêm sản phẩm khác</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Lấy trạng thái đăng nhập từ Server
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCartData();
+        });
+
+                function loadCartData() {
+            if (isUserLoggedIn) {
+                // === CASE 1: ĐÃ ĐĂNG NHẬP ===
+                fetch('/api/APICart/my-cart')
+                    .then(res => {
+                        if (!res.ok) {
+                            throw new Error(`Server lỗi: ${res.status}`);
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        // Kiểm tra kỹ xem data có phải là mảng không
+                        if (Array.isArray(data)) {
+                            renderCartTable(data);
+                        } else {
+                            console.error("Dữ liệu trả về không phải là mảng:", data);
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Lỗi tải giỏ hàng:", err);
+                        // Hiển thị thông báo lỗi ra giao diện thay vì console
+                        document.getElementById('cart-body').innerHTML =
+                            `<tr><td colspan="6" class="text-center text-danger">Có lỗi xảy ra: ${err.message}</td></tr>`;
+                    });
+            } else {
+                // === CASE 2: KHÁCH VÃNG LAI ===
+                const cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+                renderCartTable(cart);
+            }
+        }
+
+        // Hàm render chung cho cả 2 trường hợp
+        function renderCartTable(items) {
+            const tbody = document.getElementById('cart-body');
+            const emptyMsg = document.getElementById('empty-cart-msg');
+            const tableContainer = document.querySelector('.table-responsive');
+
+            tbody.innerHTML = '';
+            let totalAmount = 0;
+
+            if (!items || items.length === 0) {
+                emptyMsg.classList.remove('d-none');
+                tableContainer.classList.add('d-none');
+                updateTotalDisplay(0);
+                return;
+            }
+
+            emptyMsg.classList.add('d-none');
+            tableContainer.classList.remove('d-none');
+
+            items.forEach((item, index) => {
+                // Tính thành tiền từng món
+                // Lưu ý: Tên trường dữ liệu (ProductName, Price...) phải khớp với Model hoặc LocalStorage
+                        // ...
+        // Lưu ý: item.quantity, item.price, item.productName...
+        const lineTotal = item.price * item.quantity;
+
+        const row = `
+            <tr>
+                <td class="ps-4">
+                    <div class="d-flex align-items-center">
+                        <img src="${item.imageURL || '/images/no-image.png'}"
+                             class="rounded border me-3"
+                             style="width: 60px; height: 60px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0 text-truncate" style="max-width: 200px;">
+                                <a href="/Details/${item.itemID}" class="text-decoration-none text-dark">${item.productName}</a>
+                            </h6>
+                            <small class="text-muted">Mã: ${item.itemID}</small>
+                        </div>
+                    </div>
+                </td>
+                <td class="text-center align-middle">${formatCurrency(item.price)}</td>
+                <td class="text-center align-middle">
+                    <div class="input-group input-group-sm mx-auto" style="width: 100px;">
+                        <button class="btn btn-outline-secondary" onclick="changeQty(${item.itemID}, -1, '${item.itemType}')">-</button>
+                        <input type="text" class="form-control text-center" value="${item.quantity}" readonly>
+                        <button class="btn btn-outline-secondary" onclick="changeQty(${item.itemID}, 1, '${item.itemType}')">+</button>
+                    </div>
+                </td>
+                <td class="text-end pe-4 align-middle fw-bold text-primary">
+                    ${formatCurrency(lineTotal)}
+                </td>
+                <td class="align-middle">
+                    <button class="btn btn-link text-danger p-0" onclick="removeItem(${item.itemID}, '${item.itemType}')">
+                        🗑
+                    </button>
+                </td>
+            </tr>
+        `;
+        // ...
+                tbody.innerHTML += row;
+            });
+
+            updateTotalDisplay(totalAmount);
+        }
+
+        function updateTotalDisplay(amount) {
+            const formatted = formatCurrency(amount);
+            document.getElementById('sub-total').innerText = formatted;
+            document.getElementById('final-total').innerText = formatted;
+        }
+
+        function formatCurrency(number) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+        }
+
+        // === CÁC HÀM TƯƠNG TÁC (Tăng/Giảm/Xóa) ===
+
+        function changeQty(id, delta, type) {
+            if (isUserLoggedIn) {
+                // Gọi API update (Bạn cần tự viết API này ở Backend)
+                // fetch('/api/APICart/update-quantity', ...)
+                alert("Tính năng đang phát triển cho User Logged in");
+            } else {
+                // Xử lý LocalStorage
+                let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+                const index = cart.findIndex(x => x.ItemID === id && x.ItemType === type);
+
+                if (index > -1) {
+                    cart[index].Quantity += delta;
+                    if (cart[index].Quantity <= 0) {
+                         if (!confirm("Bạn muốn xóa sản phẩm này?")) return;
+                        cart.splice(index, 1); // Xóa nếu số lượng về 0
+                    }
+                    localStorage.setItem('guest_cart', JSON.stringify(cart));
+                    loadCartData(); // Render lại
+                    updateHeaderCartCount(); // Update số trên menu (Hàm global ở _Layout)
+                }
+            }
+        }
+
+        function removeItem(id, type) {
+            if (!confirm("Bạn muốn xóa sản phẩm này?")) return;
+
+            if (isUserLoggedIn) {
+                // Gọi API Remove
+                alert("Tính năng đang phát triển cho User Logged in");
+            } else {
+                let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+                cart = cart.filter(x => !(x.ItemID === id && x.ItemType === type));
+                localStorage.setItem('guest_cart', JSON.stringify(cart));
+                loadCartData();
+                updateHeaderCartCount();
+            }
+        }
+    </script>
+}
