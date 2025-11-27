@@ -48,6 +48,7 @@ namespace PcSaler
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
 
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

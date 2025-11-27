@@ -8,5 +8,8 @@ namespace PcSaler.Interfaces
     {
         // Lấy danh sách đơn hàng của một khách
         Task<List<OrderHistoryViewModel>> GetOrdersByCustomerIdAsync(int customerId);
+
+        // Thêm hàm này vào Interface
+        Task<bool> PlaceOrder(int customerId, CheckoutViewModel model);
     }
 }

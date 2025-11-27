@@ -28,7 +28,7 @@ namespace PcSaler.Services
                     Email = c.Email,
                     Phone = c.Phone,
                     Address = c.Address,
-                    //CreatedAt = c.CreatedAt ?? DateTime.MinValue
+                    CreatedAt = c.CreatedAt 
                 })
                 .FirstOrDefaultAsync();
 
