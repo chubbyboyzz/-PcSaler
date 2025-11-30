@@ -17,7 +17,7 @@ namespace PcSaler.Repository
 
         public async Task<List<Categories>> GetAllCategories()
         {
-            // Tạm thời giữ nguyên, nhưng nên dùng AsNoTracking() và ToListAsync()
+            // Tạm thời giữ nguyên, 
             return await _db.Categories
                 .OrderBy(c => c.CategoryName)
                 .ToListAsync();

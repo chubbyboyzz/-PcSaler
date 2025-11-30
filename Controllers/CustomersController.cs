@@ -1,56 +1,117 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PcSaler.DBcontext;
 using PcSaler.Interfaces;
 using PcSaler.Models;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using PcSaler.Services;
 
 namespace PcSaler.Controllers
 {
-    // Bắt buộc phải đăng nhập mới vào được controller này
     [Authorize]
     public class CustomersController : Controller
     {
         private readonly ICustomerService _customerService;
         private readonly IOrderService _orderService;
+        private readonly PCShopContext _context;
 
-        // Inject 2 Service đã tạo vào
-        public CustomersController(ICustomerService customerService, IOrderService orderService)
+        public CustomersController(ICustomerService customerService, IOrderService orderService, PCShopContext context)
         {
             _customerService = customerService;
             _orderService = orderService;
+            _context = context;
         }
 
-        // Action hiển thị trang Hồ sơ
+        // 1. Trang Hồ sơ (Profile)
+        [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            // 1. Lấy CustomerID từ Cookie đăng nhập (ClaimTypes.NameIdentifier)
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int customerId))
+            var userIdClaim = User.FindFirst("id")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim)) return RedirectToAction("Login", "Account");
+
+            int userId = int.Parse(userIdClaim);
+
+            var profile = await _customerService.GetProfileByIdAsync(userId);
+            if (profile == null) return NotFound();
+
+            // Lấy danh sách đơn hàng
+            profile.Orders = await _orderService.GetOrdersByCustomerIdAsync(userId);
+
+            return View(profile);
+        }
+
+        // 2. API Cập nhật thông tin 
+        [HttpPost]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileViewModel model)
+        {
+            var userIdClaim = User.FindFirst("id")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+            int userId = int.Parse(userIdClaim);
+
+            if (!ModelState.IsValid)
             {
-                // Nếu không tìm thấy ID (lỗi hy hữu), đá về trang chủ hoặc đăng nhập lại
-                return RedirectToAction("Index", "Home");
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { message = string.Join(", ", errors) });
             }
 
-            // 2. Gọi Service lấy thông tin khách hàng
-            var customerInfo = await _customerService.GetProfileByIdAsync(customerId);
-            if (customerInfo == null)
-            {
-                return NotFound("Không tìm thấy thông tin khách hàng.");
-            }
+            var customer = await _context.Customers.FindAsync(userId);
 
-            // 3. Gọi Service lấy lịch sử đơn hàng
-            var orderHistory = await _orderService.GetOrdersByCustomerIdAsync(customerId);
+            if (customer == null) return NotFound(new { message = "Không tìm thấy khách hàng" });
 
-            // 4. Đóng gói vào ViewModel tổng
-            var viewModel = new ProfilePageViewModel
+            customer.FullName = model.FullName;
+            customer.Phone = model.Phone;
+            customer.Address = model.Address;
+
+            _context.Customers.Update(customer);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Cập nhật thành công!" });
+        }
+
+        // 3. API Lấy chi tiết đơn hàng (Đã sửa logic lấy địa chỉ)
+        [HttpGet]
+        public async Task<IActionResult> GetOrderDetails(int orderId)
+        {
+            var userIdClaim = User.FindFirst("id")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+            int userId = int.Parse(userIdClaim);
+
+            // Tìm đơn hàng kèm theo các bảng liên quan
+            var order = await _context.Orders
+                .Include(o => o.OrderDetails)
+                .ThenInclude(od => od.Product)
+                .Include(o => o.Customer)
+                .Include(o => o.CurrentStatus) // [FIX]: Thêm cái này để lấy tên trạng thái
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.OrderID == orderId && o.CustomerID == userId);
+
+            if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng" });
+
+            // [LOGIC MỚI]: Ưu tiên lấy ShippingAddress từ đơn hàng.
+            // Nếu null (đơn cũ) thì lấy từ bảng Customer.
+            var finalAddress = order.ShippingAddress ?? order.Customer.Address;
+
+            var result = new
             {
-                CustomerInfo = customerInfo,
-                OrderHistory = orderHistory
+                orderId = order.OrderID,
+                orderDate = order.OrderDate.ToString("dd/MM/yyyy HH:mm"),
+                totalAmount = order.TotalAmount,
+                status = order.CurrentStatus?.StatusName ?? "Đang xử lý",
+
+                customerName = order.Customer.FullName, // Tên người nhận
+                shippingAddress = finalAddress,         // Địa chỉ giao hàng chuẩn
+
+                items = order.OrderDetails.Select(od => new
+                {
+                    productName = od.Product.ProductName,
+                    image = od.Product.ImageURL,
+                    price = od.UnitPrice,
+                    quantity = od.Quantity,
+                    total = od.UnitPrice * od.Quantity
+                }).ToList()
             };
 
-            // 5. Trả về View
-            return View(viewModel);
+            return Ok(result);
         }
     }
 }

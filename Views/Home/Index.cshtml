@@ -129,7 +129,7 @@
                             </div>
 
                             <a href="@Url.Action("Details", "Product", new { id = p.ProductID })">
-                                <img src="@(string.IsNullOrWhiteSpace(p.ImageURL) ? "/images/no-image.png" : p.ImageURL)"
+                                <img src="@(string.IsNullOrWhiteSpace(p.ImageURL) ? "/images/cpu/images.jpg" : p.ImageURL)" @*thay ảnh để test *@
                                      class="card-img-top p-2"
                                      style="height:140px; object-fit:contain;"
                                      alt="@p.ProductName" />

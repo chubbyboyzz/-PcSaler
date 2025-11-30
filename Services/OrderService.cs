@@ -46,7 +46,8 @@ namespace PcSaler.Services
                     CustomerID = customerId,
                     OrderDate = DateTime.Now,
                     TotalAmount = cartItems.Sum(x => x.Price * x.Quantity),
-                    CurrentStatusID = pendingStatus.StatusID
+                    CurrentStatusID = pendingStatus.StatusID,
+                    ShippingAddress = model.Address
                 };
 
                 _context.Orders.Add(order);
@@ -73,7 +74,7 @@ namespace PcSaler.Services
                     Amount = order.TotalAmount,
                     PaymentMethod = model.PaymentMethod,
                     PaymentDate = DateTime.Now,
-                    Note = $"Giao đến: {model.Address}, SĐT: {model.Phone}, Email: {model.Email}. Ghi chú: {model.Note}"
+                    Note = $"SĐT: {model.Phone}, Email: {model.Email}. Ghi chú: {model.Note}"
                 };
                 _context.Payments.Add(payment);
 

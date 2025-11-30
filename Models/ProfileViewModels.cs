@@ -13,6 +13,8 @@ namespace PcSaler.Models
         public string Phone { get; set; }
         public string Address { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public List<OrderHistoryViewModel> Orders { get; set; } = new List<OrderHistoryViewModel>();
     }
 
     // 2. ViewModel cho từng dòng lịch sử đơn hàng

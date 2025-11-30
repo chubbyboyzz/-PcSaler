@@ -318,6 +318,8 @@ function selectComponent(btn) {
 // =====================
 document.addEventListener('DOMContentLoaded', () => {
 
+    document.body.appendChild(dom.modal);
+
     bsModal = new bootstrap.Modal(dom.modal);
 
     // BƯỚC 4: NẠP DATA TỪ SERVER (BẮT BUỘC)
