@@ -39,7 +39,18 @@
                     <hr>
                     <div class="text-start px-3">
                         <div class="mb-2"><span class="fw-bold text-secondary">Email:</span> <span class="float-end text-dark">@Model.Email</span></div>
-                        <div class="mb-2"><span class="fw-bold text-secondary">Số điện thoại:</span> <span class="float-end text-dark">@Model.Phone</span></div>
+                        <div class="mb-2">
+                            <span class="fw-bold text-secondary">Số điện thoại:</span> <span class="float-end text-dark">
+                                @{
+                                    // Logic: Nếu có sdt và dài hơn 3 ký tự -> ẩn đi, ngược lại thì hiện nguyên
+                                    var phone = Model.Phone;
+                                    var displayPhone = (!string.IsNullOrEmpty(phone) && phone.Length > 3)
+                                    ? "**** *** " + phone.Substring(phone.Length - 3)
+                                    : phone;
+                                }
+                                @displayPhone
+                            </span>
+                        </div>
                         <div class="mb-3"><span class="fw-bold text-secondary d-block mb-1">Địa chỉ:</span> <p class="text-dark bg-light p-2 rounded small mb-0">@Model.Address</p></div>
                         <div class="mb-3"><span class="fw-bold text-secondary">Ngày tham gia:</span> <span class="float-end text-dark">@Model.CreatedAt.ToString("dd/MM/yyyy")</span></div>
                     </div>
@@ -187,7 +198,7 @@
                 address: document.getElementById('editAddress').value
             };
 
-            if (!data.fullName || !data.phone || !data.address) {
+            if (!data.fullName || !data.phone) {
                 Swal.fire('Lỗi', 'Vui lòng điền đầy đủ thông tin!', 'warning');
                 return;
             }

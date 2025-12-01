@@ -8,6 +8,8 @@ namespace PcSaler.Interfaces
         Task<Customer?> GetUsersByUsername(string Username);
         Task addAsync(Customer user);
         Task SaveChangeAsync();
+        //logic tìm kiếm theo Email
+        Task<Customer?> GetUsersByEmail(string email);
 
     }
 }

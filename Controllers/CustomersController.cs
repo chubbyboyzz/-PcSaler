@@ -26,10 +26,13 @@ namespace PcSaler.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            var userIdClaim = User.FindFirst("id")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim)) return RedirectToAction("Login", "Account");
+            // SỬA: Chỉ lấy ID nội bộ Database
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            int userId = int.Parse(userIdClaim);
+            // SỬA: Chuyển hướng về đúng Login/Index nếu chưa có ID
+            if (string.IsNullOrEmpty(userIdClaim)) return RedirectToAction("Index", "Login");
+
+            int userId = int.Parse(userIdClaim); // Parse ngon lành
 
             var profile = await _customerService.GetProfileByIdAsync(userId);
             if (profile == null) return NotFound();
@@ -44,8 +47,9 @@ namespace PcSaler.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileViewModel model)
         {
-            var userIdClaim = User.FindFirst("id")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+
             int userId = int.Parse(userIdClaim);
 
             if (!ModelState.IsValid)
@@ -68,27 +72,24 @@ namespace PcSaler.Controllers
             return Ok(new { message = "Cập nhật thành công!" });
         }
 
-        // 3. API Lấy chi tiết đơn hàng (Đã sửa logic lấy địa chỉ)
+        // 3. API Lấy chi tiết đơn hàng
         [HttpGet]
         public async Task<IActionResult> GetOrderDetails(int orderId)
         {
-            var userIdClaim = User.FindFirst("id")?.Value ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+
             int userId = int.Parse(userIdClaim);
 
-            // Tìm đơn hàng kèm theo các bảng liên quan
             var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Product)
+                .Include(o => o.OrderDetails).ThenInclude(od => od.Product)
                 .Include(o => o.Customer)
-                .Include(o => o.CurrentStatus) // [FIX]: Thêm cái này để lấy tên trạng thái
+                .Include(o => o.CurrentStatus)
                 .Include(o => o.Payments)
                 .FirstOrDefaultAsync(o => o.OrderID == orderId && o.CustomerID == userId);
 
             if (order == null) return NotFound(new { message = "Không tìm thấy đơn hàng" });
 
-            // [LOGIC MỚI]: Ưu tiên lấy ShippingAddress từ đơn hàng.
-            // Nếu null (đơn cũ) thì lấy từ bảng Customer.
             var finalAddress = order.ShippingAddress ?? order.Customer.Address;
 
             var result = new
@@ -97,10 +98,8 @@ namespace PcSaler.Controllers
                 orderDate = order.OrderDate.ToString("dd/MM/yyyy HH:mm"),
                 totalAmount = order.TotalAmount,
                 status = order.CurrentStatus?.StatusName ?? "Đang xử lý",
-
-                customerName = order.Customer.FullName, // Tên người nhận
-                shippingAddress = finalAddress,         // Địa chỉ giao hàng chuẩn
-
+                customerName = order.Customer.FullName,
+                shippingAddress = finalAddress,
                 items = order.OrderDetails.Select(od => new
                 {
                     productName = od.Product.ProductName,

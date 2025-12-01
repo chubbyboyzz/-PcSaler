@@ -130,13 +130,12 @@
     </footer>
 
     <!-- ========================================== -->
-    <!-- MODAL ĐĂNG NHẬP (Box hiển thị ra ngoài) -->
+    <!-- MODAL ĐĂNG NHẬP (đã cập thật chức năng đăng nhập bằng google) -->
     <!-- ========================================== -->
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
 
-                <!-- Header Modal -->
                 <div class="modal-header login-modal-header border-0">
                     <div>
                         <h5 class="modal-title fw-bold" id="loginModalLabel">CHÀO MỪNG TRỞ LẠI</h5>
@@ -145,11 +144,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <!-- Body Modal: Chứa Form -->
                 <div class="modal-body p-4">
-                    <!-- Form post về Login/Index -->
                     <form method="post" action="@Url.Action("Index", "Login")">
-                        <!-- Để redirect quay lại trang hiện tại, ta có thể dùng JS để set value cho input này, hoặc mặc định về Home -->
                         <input type="hidden" name="returnUrl" value="/" />
 
                         <div class="form-floating mb-3">
@@ -170,15 +166,30 @@
                             <a href="#" class="text-decoration-none text-primary">Quên mật khẩu?</a>
                         </div>
 
-                        <div class="d-grid">
+                        <div class="d-grid mb-3">
                             <button type="submit" class="btn btn-custom-login py-2 rounded-pill">ĐĂNG NHẬP</button>
+                        </div>
+
+                        <div class="text-center position-relative my-4">
+                            <hr class="text-muted">
+                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">
+                                Hoặc đăng nhập bằng
+                            </span>
+                        </div>
+
+                        <div class="d-grid">
+                            <a href="@Url.Action("LoginByGoogle", "Login")" class="btn btn-outline-danger py-2 rounded-pill fw-bold">
+                                <i class="fa-brands fa-google me-2"></i> Google
+                            </a>
                         </div>
                     </form>
                 </div>
 
-                <!-- Footer Modal -->
                 <div class="modal-footer justify-content-center bg-light border-0">
-                    <small>Chưa có tài khoản? <a href="#" class="fw-bold text-decoration-none" style="color: #5563DE">Đăng ký ngay</a></small>
+                    <small>
+                        Chưa có tài khoản?
+                        <a asp-controller="Account" asp-action="Register" class="fw-bold text-decoration-none" style="color: #5563DE">Đăng ký ngay</a>
+                    </small>
                 </div>
             </div>
         </div>

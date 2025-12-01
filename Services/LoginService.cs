@@ -1,47 +1,59 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using PcSaler.DBcontext;
-using PcSaler.DBcontext.Entites;
+﻿using PcSaler.DBcontext.Entites;
 using PcSaler.Interfaces;
 
 namespace PcSaler.Services
 {
-    public class LoginService 
+    public class LoginService
     {
-        private readonly ILoginService login;
-        public LoginService(ILoginService login)
+        private readonly ILoginService _repo;
+        private readonly IPasswordHasher _hasher;
+
+        public LoginService(ILoginService repo, IPasswordHasher hasher)
         {
-            this.login = login;
+            _repo = repo;
+            _hasher = hasher;
         }
+
+        // --- 1. LOGIC ĐĂNG NHẬP CHÍNH (Giữ nguyên của ông) ---
         public async Task<Customer?> LoginUserAsync(string username, string password)
         {
-            var user = await login.GetUsersByUsername(username);
+            var user = await _repo.GetUsersByUsername(username);
             if (user == null) return null;
 
-            if (!string.IsNullOrEmpty(user.PasswordHash))
+            // Nếu phát hiện đây là tài khoản Google (dựa vào chuỗi đặc biệt này)
+            // Thì TỪ CHỐI NGAY LẬP TỨC, không cần gọi BCrypt 
+            if (user.PasswordHash == "GOOGLE_AUTH_NO_PASSWORD" || string.IsNullOrEmpty(user.PasswordHash))
             {
-                var hasher = new PasswordHasher<Customer>();
-
-                if (user.PasswordHash.StartsWith("AQAAAA") || user.PasswordHash.StartsWith("$2"))
-                {
-                    try
-                    {
-                        var result = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
-                        if (result == PasswordVerificationResult.Success)
-                        {
-                            return user;
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-                if (user.PasswordHash == password)
-                {
-                    return user;
-                }
+                return null; // Bắt buộc phải đăng nhập bằng nút Google
             }
+            // Nếu user Google (không có pass) thì chặn login bằng mật khẩu
+            if (string.IsNullOrEmpty(user.PasswordHash)) return null;
+
+            // Check pass
+            if (_hasher.VerifyPassword(password, user.PasswordHash))
+            {
+                return user;
+            }
+
             return null;
+        }
+
+        // Hàm tìm User bằng Email (Dùng cho Google Login)
+        public async Task<Customer?> GetUsersByEmail(string email)
+        {
+            return await _repo.GetUsersByEmail(email);
+        }
+
+        // Hàm thêm mới User (Dùng khi Auto Register)
+        public async Task addAsync(Customer user)
+        {
+            await _repo.addAsync(user);
+        }
+
+        // Hàm lưu vào DB
+        public async Task SaveChangeAsync()
+        {
+            await _repo.SaveChangeAsync();
         }
     }
 }

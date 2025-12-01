@@ -30,6 +30,11 @@ namespace PcSaler.Repository
         {
             await _connection.SaveChangesAsync();
         }
+        // Hàm tìm kiếm theo Email 
+        public async Task<Customer?> GetUsersByEmail(string email)
+        {
+            return await _connection.Customers.FirstOrDefaultAsync(u => u.Email == email);
+        }
     }
      
 }

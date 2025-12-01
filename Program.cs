@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PcSaler.DBcontext;
 using PcSaler.Interfaces;
@@ -11,38 +10,69 @@ namespace PcSaler
     public class Program
     {
         public static void Main(string[] args)
-      {
+        {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add Database
-            builder.Services.AddDbContext<PCShopContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
+            // =========================================================
+            // 1. CẤU HÌNH DATABASE
+            // =========================================================
+            builder.Services.AddDbContext<PCShopContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
+
+            // =========================================================
+            // 2. CẤU HÌNH XÁC THỰC (AUTHENTICATION) - GỘP CHUNG TẠI ĐÂY
+            // =========================================================
+
+            // Lấy cấu hình Google từ appsettings.json
+            var googleConfig = builder.Configuration.GetSection("GoogleKeys");
+
+            builder.Services.AddAuthentication(options =>
+            {
+                // Thiết lập mặc định là dùng Cookie
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options => // Cấu hình Cookie
+            {
+                options.LoginPath = "/Login/Index";      // Chưa đăng nhập thì về đây
+                options.AccessDeniedPath = "/Home/AccessDenied"; // Không có quyền thì về đây
+                options.ExpireTimeSpan = TimeSpan.FromDays(3);
+                options.Cookie.HttpOnly = true;
+            })
+            .AddGoogle(options => // Cấu hình Google (Nối đuôi ngay sau Cookie)
+            {
+                options.ClientId = googleConfig["ClientId"];
+                options.ClientSecret = googleConfig["ClientSecret"];
+                //link đã đăng kí trên cloud google
+                options.CallbackPath = "/signin-google"; 
+            });
+
+            // =========================================================
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            //add cookie
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options =>
-            {
-                options.LoginPath = "/Login/Index"; // Chuyển hướng về đây nếu chưa đăng nhập
-                options.AccessDeniedPath = "/Home/AccessDenied"; // Chuyển hướng nếu không có quyền
-                options.ExpireTimeSpan = TimeSpan.FromDays(7); // Cookie tồn tại 7 ngày
-                options.Cookie.HttpOnly = true;
-            });
-            builder.Services.AddDistributedMemoryCache(); // Bắt buộc phải có Cache để dùng Session
+            // Cấu hình Session (Giữ nguyên của ông)
+            builder.Services.AddDistributedMemoryCache();
             builder.Services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(30); // Session tồn tại 30 phút
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-            // Register service and repository
+
+            // Register service and repository (Giữ nguyên)
             builder.Services.AddScoped<ICategoryService, Repository_Category>();
             builder.Services.AddScoped<CategoryService>();
             builder.Services.AddScoped<IProductService, Repository_Product>();
             builder.Services.AddScoped<ProductService>();
+
+            // Service Hash & Login
+            builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>(); // Nhớ đảm bảo class này đã có constructor nhận IConfiguration nếu dùng Pepper
             builder.Services.AddScoped<ILoginService, Repository_Login>();
             builder.Services.AddScoped<LoginService>();
+
             builder.Services.AddScoped<ICartService, Repository_Cart>();
             builder.Services.AddScoped<CartService>();
             builder.Services.AddScoped<ICustomerService, CustomerService>();
@@ -55,17 +85,16 @@ namespace PcSaler
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseRouting();
 
+            // Thứ tự quan trọng: Session -> AuthN -> AuthZ
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseSession();
-
 
             app.MapStaticAssets();
             app.MapControllerRoute(
