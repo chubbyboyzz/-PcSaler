@@ -1,403 +1,336 @@
 ﻿// =====================
-// CONFIG - Sẽ được nạp từ Server
-// =====================
-
-// QUAN TRỌNG: Hai biến này bây giờ sẽ trống.
-// Chúng sẽ được nạp từ file .cshtml (xem BƯỚC 4 ở cuối)
-
-// =====================
-// STATE
+// STATE QUẢN LÝ
 // =====================
 let currentBuild = {};
+// mySlots và pcCategories đã được nạp từ View
 
-// State của Modal đã thay đổi RẤT NHIỀU
 const modalState = {
-    // Không còn allProducts hay filteredProducts
-    // Chỉ lưu trạng thái hiện tại
-    products: [],      // Chỉ 10 sản phẩm của trang hiện tại
-    currentPage: 1,
-    productsPerPage: 10,
-    totalProducts: 0,  // Tổng số sản phẩm (để tính phân trang)
-    category: '',      // CategoryID/ComponentType (VD: 'CPU')
-    currentFilters: {} // Lưu các bộ lọc đang chọn (VD: { Brand: 'Intel', Socket: 'LGA1700' })
+    products: [], currentPage: 1, productsPerPage: 10, totalProducts: 0,
+    category: '', currentFilters: {}
 };
 
-// =====================
-// DOM CACHE (Giữ nguyên)
-// =====================
 const dom = {
+    // UI Chính
+    slotButtons: document.querySelectorAll('.slot-btn'),
+    slotIdInput: document.getElementById('current-slot-id'),
     buildList: document.getElementById('build-pc-categories'),
     totalPrice: document.getElementById('build-total-price'),
     addBtn: document.getElementById('add-build-to-cart-btn'),
 
+    // UI Modal
     modal: document.getElementById('product-modal'),
     title: document.getElementById('modal-title'),
     list: document.getElementById('modal-product-list'),
-    filters: document.getElementById('modal-filter-options'), // Sẽ chứa các bộ lọc động
+    filters: document.getElementById('modal-filter-options'),
     priceFilters: document.getElementById('modal-price-filter-options'),
     search: document.getElementById('modal-search-input'),
     pagination: document.getElementById('modal-pagination')
 };
 
 let bsModal = null;
+const formatCurrency = num => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num);
 
 // =====================
-// UTILS (Giữ nguyên)
+// 1. LOGIC KHỞI ĐỘNG
 // =====================
-const formatCurrency = num =>
-    Number.isFinite(num)
-        ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(num)
-        : '';
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.appendChild(dom.modal);
+    bsModal = new bootstrap.Modal(dom.modal);
 
-// =====================
-// FETCH PRODUCTS (Logic thay đổi hoàn toàn)
-// =====================
-
-// Hàm này giờ là trung tâm, nó sẽ gọi API mỗi khi lọc hoặc phân trang
-async function loadData() {
-    // 1. Thu thập tất cả các bộ lọc
-    const filters = getFilters();
-
-    // 2. Tạo chuỗi query (VD: &Brand=Intel&Socket=AM5)
-    // Lưu ý: Code này hiện tại chỉ hỗ trợ 1 giá trị/nhóm (sẽ cần nâng cấp nếu muốn chọn nhiều brand)
-    let dynamicFilterQuery = Object.entries(filters.dynamic)
-        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-        .join('&');
-
-    // 3. Xây dựng URL API
-    const url = new URL('/api/products/search', window.location.origin);
-    url.searchParams.append('category', modalState.category); // 'category' này là ComponentType, VD: 'CPU'
-    url.searchParams.append('page', modalState.currentPage);
-    url.searchParams.append('pageSize', modalState.productsPerPage);
-    url.searchParams.append('search', filters.search);
-    url.searchParams.append('minPrice', filters.price.min);
-    if (isFinite(filters.price.max)) { // Chỉ gửi maxPrice nếu nó không phải Infinity
-        url.searchParams.append('maxPrice', filters.price.max);
+    if (typeof mySlots !== 'undefined' && mySlots.length > 0) {
+        selectSlot(mySlots[0].pcBuildID);
+    } else {
+        renderBuildPC();
     }
 
-    // Nối chuỗi query động vào
-    let fullUrl = url.toString();
-    if (dynamicFilterQuery) {
-        fullUrl += `&${dynamicFilterQuery}`;
-    }
+    setupEventListeners();
+});
 
-    // 4. Gọi API
+// =====================
+// [MỚI] HÀM RELOAD DỮ LIỆU TỪ SERVER
+// =====================
+async function reloadGlobalData() {
     try {
-        dom.list.innerHTML = '<p class="text-center text-secondary py-5">Đang tải...</p>'; // Thêm trạng thái loading
-        const res = await fetch(fullUrl);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        // 1. Gọi API lấy dữ liệu mới nhất
+        const res = await fetch('/api/pcbuild/my-slots');
+        if (!res.ok) return;
 
-        // API mới trả về object { products, totalCount, dynamicFilters, priceRanges }
-        const data = await res.json();
+        // 2. Cập nhật biến toàn cục mySlots
+        mySlots = await res.json();
 
-        // 5. Cập nhật State
-        modalState.products = data.products.map(p => ({ // Ánh xạ dữ liệu trả về
-            id: p.productID,
-            name: p.productName,
-            brand: p.brand,
-            price: p.price,
-            img: p.imageURL
-        }));
-        modalState.totalProducts = data.totalCount;
+        // 3. Cập nhật giao diện Nút bấm (Giá tiền mới)
+        mySlots.forEach(slot => {
+            const btn = document.querySelector(`.slot-btn[data-id="${slot.pcBuildID}"]`);
+            if (btn) {
+                const smallTag = btn.querySelector('small');
+                if (smallTag) smallTag.textContent = `(${formatCurrency(slot.totalPrice)})`;
+            }
+        });
 
-        // 6. Render
-        // Chỉ render bộ lọc động *lần đầu tiên* tải category (khi page=1)
-        if (modalState.currentPage === 1) {
-            // API trả về luôn cả priceRanges và dynamicFilters cho category này
-            renderPriceFilters(data.priceRanges); // Render lọc giá động
-            renderDynamicFilters(data.dynamicFilters); // Render lọc thuộc tính động
+        // 4. Render lại cấu hình đang chọn
+        const currentId = parseInt(dom.slotIdInput.value);
+        if (currentId) {
+            selectSlot(currentId);
         }
-        renderProductPage(); // Render 10 sản phẩm
-        renderPagination();  // Render phân trang dựa trên totalCount
 
-    } catch (err) {
-        console.error("Fetch lỗi:", err);
-        dom.list.innerHTML = '<p class="text-danger text-center py-5">Lỗi khi tải sản phẩm. Vui lòng thử lại.</p>';
+    } catch (e) {
+        console.error("Lỗi reload data:", e);
     }
 }
 
 // =====================
-// FILTERS (Logic thay đổi hoàn toàn)
+// 2. LOGIC CHỌN SLOT & RENDER
 // =====================
-function getFilters() {
-    // Lấy các bộ lọc động (Brand, Socket, Chipset...)
-    const dynamicFilters = {};
-    document.querySelectorAll('.modal-filter-checkbox:checked').forEach(cb => {
-        const group = cb.dataset.group; // VD: 'Brand'
-        const value = cb.value;         // VD: 'Intel'
-        // TODO: Nâng cấp để hỗ trợ chọn nhiều giá trị (VD: Brand=Intel,AMD)
-        dynamicFilters[group] = value;
+function selectSlot(slotId) {
+    if (dom.slotIdInput) dom.slotIdInput.value = slotId;
+
+    // Tìm dữ liệu mới nhất trong mySlots (vừa được reload)
+    const slot = mySlots.find(s => s.pcBuildID === slotId);
+    if (!slot) return;
+
+    // Highlight nút
+    dom.slotButtons.forEach(btn => {
+        if (parseInt(btn.dataset.id) === slotId) {
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-primary');
+        } else {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline-secondary');
+        }
     });
 
-    // Lấy giá trị radio được chọn
-    const selectedPriceRangeId = document.querySelector('.modal-price-filter-radio:checked')?.value || 'all';
-    // Tìm object priceRange tương ứng (lưu ý: priceRanges giờ nằm trong data trả về từ API)
-    const priceRange = priceRanges.find(r => r.id === selectedPriceRangeId) || { id: 'all', min: 0, max: Infinity };
-
-    return {
-        search: dom.search.value.toLowerCase(),
-        price: priceRange,
-        dynamic: dynamicFilters // Trả về object các filter động
-    };
-}
-
-// Hàm updateProductList cũ đã bị xóa.
-// Thay vào đó, ta gọi loadData() mỗi khi có thay đổi
-function handleFilterChange() {
-    modalState.currentPage = 1; // Luôn reset về trang 1 khi lọc
-    loadData(); // Gọi API với bộ lọc mới
-}
-
-
-// =====================
-// RENDER FILTERS (Logic thay đổi hoàn toàn)
-// =====================
-
-// Hàm này render bộ lọc TĨNH (Khoảng giá)
-// Nó sẽ được gọi MỖI KHI tải modal, vì khoảng giá giờ đã ĐỘNG
-function renderPriceFilters(ranges) {
-    // Cập nhật biến global 'priceRanges' để hàm getFilters() có thể dùng
-    priceRanges = (ranges || []).map(r => ({ ...r, max: r.max === null ? Infinity : r.max }));
-
-    dom.priceFilters.innerHTML = priceRanges.map(r => `
-        <div class="form-check">
-            <input type="radio" name="price-range" class="form-check-input modal-price-filter-radio"
-                   value="${r.id}" ${r.id === 'all' ? 'checked' : ''}>
-            <label class="form-check-label">${r.name}</label>
-        </div>
-    `).join('');
-
-    // Đảm bảo radio 'all' luôn được chọn nếu không có gì khác
-    if (!document.querySelector('.modal-price-filter-radio:checked')) {
-        const allRadio = document.querySelector('.modal-price-filter-radio[value="all"]');
-        if (allRadio) allRadio.checked = true;
+    // Map dữ liệu
+    currentBuild = {};
+    if (slot.components) {
+        slot.components.forEach(c => {
+            currentBuild[c.componentType] = {
+                id: c.productID,
+                name: c.productName,
+                price: c.unitPrice,
+                img: c.imageURL,
+                quantity: c.quantity
+            };
+        });
     }
+
+    renderBuildPC();
 }
 
-// Hàm này render các bộ lọc ĐỘNG (từ API)
-// VD: { name: "Socket", values: ["LGA1700", "AM5"] }
-function renderDynamicFilters(filters) {
-    dom.filters.innerHTML = (filters || []).map(group => `
-        <h6 class="fw-semibold mt-3">${group.name}</h6>
-        ${group.values.map(val => `
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input modal-filter-checkbox" 
-                       value="${val}" data-group="${group.name}">
-                <label class="form-check-label">${val}</label>
-            </div>
-        `).join('')}
-    `).join('');
-}
-
-
-// =====================
-// RENDER PRODUCTS (Logic thay đổi nhỏ)
-// =====================
-function renderProductPage() {
-    // Không cần 'slice' nữa, vì server đã trả về đúng số sản phẩm
-    const items = modalState.products;
-
-    dom.list.innerHTML = items.length === 0
-        ? `<p class="text-secondary text-center py-5">Không tìm thấy sản phẩm.</p>`
-        : items.map(p => `
-            <div class="card p-2 mb-2 shadow-sm">
-                <div class="d-flex justify-content-between">
-                    <div class="d-flex">
-                        <img src="${p.img || '/images/placeholder.png'}" class="me-3 rounded" style="width:60px;height:60px;object-fit:cover;">
-                        <div>
-                            <h6 class="fw-semibold mb-0">${p.name}</h6>
-                            <span class="text-danger fw-bold">${formatCurrency(p.price)}</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-sm select-component-btn"
-                        data-id="${p.id}" data-category="${modalState.category}"
-                        data-name="${p.name}" data-price="${p.price}" data-img="${p.img || '/images/placeholder.png'}">
-                        Chọn
-                    </button>
-                </div>
-            </div>
-        `).join(''); // Cập nhật: Thêm data- attributes cho nút chọn
-}
-
-// =====================
-// PAGINATION (Logic thay đổi)
-// =====================
-function renderPagination() {
-    // Tính tổng số trang dựa trên 'totalProducts' từ server
-    const total = Math.ceil(modalState.totalProducts / modalState.productsPerPage);
-    if (total <= 1) return dom.pagination.innerHTML = '';
-
-    // Code render HTML giữ nguyên, chỉ thay đổi logic tính 'total'
-    let html = `
-        <nav><ul class="pagination justify-content-center">
-            <li class="page-item ${modalState.currentPage === 1 ? 'disabled' : ''}">
-                <button class="page-link modal-page-btn" data-page="${modalState.currentPage - 1}">&laquo;</button>
-            </li>
-    `;
-    // Logic render số trang (tối ưu hơn để không render quá nhiều số)
-    // ... (Tạm thời giữ logic cũ, render tất cả)
-    for (let i = 1; i <= total; i++) {
-        html += `
-            <li class="page-item ${i === modalState.currentPage ? 'active' : ''}">
-                <button class="page-link modal-page-btn" data-page="${i}">${i}</button>
-            </li>
-        `;
-    }
-    html += `
-            <li class="page-item ${modalState.currentPage === total ? 'disabled' : ''}">
-                <button class="page-link modal-page-btn" data-page="${modalState.currentPage + 1}">&raquo;</button>
-            </li>
-        </ul></nav>
-    `;
-    dom.pagination.innerHTML = html;
-}
-
-// =====================
-// BUILD PC VIEW (Thay đổi nhỏ)
-// =====================
 function renderBuildPC() {
     let total = 0;
-    // Quan trọng: Phải đảm bảo 'pcCategories' đã được tải
-    if (!pcCategories || pcCategories.length === 0) {
-        console.warn("pcCategories chưa được tải!");
-        return;
-    }
+    if (!pcCategories) return;
 
     dom.buildList.innerHTML = pcCategories.map(cat => {
-        const comp = currentBuild[cat.id]; // Dùng cat.id (VD: 'CPU')
-        if (comp) total += comp.price;
+        const comp = currentBuild[cat.id];
+        if (comp) total += comp.price * (comp.quantity || 1);
 
         return `
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
                 <div class="d-flex align-items-center">
-                    <span class="badge bg-secondary rounded-pill me-3">${cat.id}</span>
+                    <span class="badge bg-secondary rounded-pill me-3" style="min-width:60px">${cat.id}</span>
                     <span class="fw-semibold">${cat.name}</span>
                 </div>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center justify-content-end" style="flex:1">
                     ${comp ? `
-                        <img src="${comp.img}" class="me-3 rounded" style="width:50px;height:50px;">
-                        <div class="me-4">
-                            <h6 class="text-primary fw-semibold mb-0">${comp.name}</h6>
-                            <span class="text-danger fw-bold">${formatCurrency(comp.price)}</span>
+                        <div class="d-flex align-items-center me-3">
+                            <img src="${comp.img}" class="rounded border me-2" style="width:40px;height:40px;object-fit:cover;">
+                            <div class="text-end">
+                                <div class="fw-bold text-primary text-truncate" style="max-width:200px">${comp.name}</div>
+                                <div class="text-danger small fw-bold">${formatCurrency(comp.price)}</div>
+                            </div>
                         </div>
-                        <button class="btn btn-warning btn-sm open-modal-btn me-2" data-category="${cat.id}">Thay đổi</button>
-                        <button class="btn btn-outline-danger btn-sm remove-component-btn" data-category="${cat.id}">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
+                        <button class="btn btn-sm btn-outline-warning open-modal-btn me-2" data-category="${cat.id}"><i class="bi bi-arrow-repeat"></i></button>
+                        <button class="btn btn-sm btn-outline-danger remove-component-btn" data-category="${cat.id}"><i class="bi bi-x-lg"></i></button>
                     ` : `
-                        <button class="btn btn-success open-modal-btn" data-category="${cat.id}">Chọn</button>
+                        <button class="btn btn-sm btn-outline-success fw-bold open-modal-btn" data-category="${cat.id}"><i class="bi bi-plus-lg"></i> Chọn</button>
                     `}
                 </div>
             </li>
         `;
     }).join('');
+
     dom.totalPrice.textContent = formatCurrency(total);
     dom.addBtn.disabled = total === 0;
 }
 
 // =====================
-// EVENT HANDLERS (Thay đổi)
+// 3. AUTO-SAVE & UPDATE (ĐÃ THÊM RELOAD)
 // =====================
-function selectComponent(btn) {
-    // Lấy data từ attributes của nút, không cần tìm trong mảng state
-    const comp = {
-        id: +btn.dataset.id,
-        name: btn.dataset.name,
-        price: +btn.dataset.price,
-        img: btn.dataset.img
-    };
-    const category = btn.dataset.category;
 
-    if (comp) currentBuild[category] = comp;
-    bsModal.hide();
-    renderBuildPC();
+async function selectComponentAutoSave(btn) {
+    const slotId = dom.slotIdInput.value;
+    const type = btn.dataset.category;
+    const prodId = btn.dataset.id;
+
+    if (!slotId || slotId === '0') { alert("Vui lòng chọn cấu hình trước!"); return; }
+
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
+    btn.disabled = true;
+
+    try {
+        const formData = new FormData();
+        formData.append('slotId', slotId);
+        formData.append('type', type);
+        formData.append('productId', prodId);
+
+        const res = await fetch('/api/pcbuild/update-item', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            bsModal.hide();
+
+            // [THAY ĐỔI] Thay vì update tay, gọi reload để lấy dữ liệu chuẩn từ Server
+            await reloadGlobalData();
+
+        } else {
+            alert('Lỗi: ' + (data.message || 'Không thể lưu'));
+        }
+    } catch (e) {
+        console.error(e);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+async function removeComponentServer(type) {
+    if (!confirm('Xóa linh kiện này?')) return;
+    const slotId = dom.slotIdInput.value;
+
+    const formData = new FormData();
+    formData.append('slotId', slotId);
+    formData.append('type', type);
+
+    const res = await fetch('/api/pcbuild/remove-item', { method: 'POST', body: formData });
+
+    if (res.ok) {
+        // [THAY ĐỔI] Reload lại dữ liệu từ Server
+        await reloadGlobalData();
+    }
 }
 
 // =====================
-// STARTUP
+// 4. LOGIC MODAL & FETCH PRODUCT (Giữ nguyên)
 // =====================
-document.addEventListener('DOMContentLoaded', () => {
+async function loadData() {
+    const filters = getFilters();
+    let dynamicFilterQuery = Object.entries(filters.dynamic)
+        .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+        .join('&');
 
-    bsModal = new bootstrap.Modal(dom.modal);
+    const url = new URL('/api/pcbuild/search', window.location.origin);
+    url.searchParams.append('category', modalState.category);
+    url.searchParams.append('page', modalState.currentPage);
+    url.searchParams.append('pageSize', modalState.productsPerPage);
+    url.searchParams.append('search', filters.search);
+    url.searchParams.append('minPrice', filters.price.min);
+    if (isFinite(filters.price.max)) url.searchParams.append('maxPrice', filters.price.max);
 
-    // BƯỚC 4: NẠP DATA TỪ SERVER (BẮT BUỘC)
-    // File .cshtml của bạn phải có đoạn script này, NẰM TRƯỚC khi
-    // bạn gọi file .js này, để 2 biến 'pcCategories' được gán giá trị
-    /*
-    <script>
-        // Dữ liệu được "in" ra từ Controller (ViewBag/ViewModel)
-        pcCategories = @Html.Raw(Json.Serialize(ViewBag.Categories));
-        
-        // Chúng ta không cần nạp priceRanges ở đây nữa, 
-        // vì API 'loadData()' sẽ tự động nạp nó theo đúng category.
-    </script>
-    */
+    let fullUrl = url.toString();
+    if (dynamicFilterQuery) fullUrl += `&${dynamicFilterQuery}`;
 
-    // Khởi tạo giao diện lần đầu
-    renderBuildPC(); // Render danh sách build pc (dùng pcCategories từ server)
+    try {
+        dom.list.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div></div>';
+        const res = await fetch(fullUrl);
+        if (!res.ok) throw new Error('Err');
+        const data = await res.json();
 
-    // --- EVENT DELEGATION ---
-    document.addEventListener('click', e => {
-        const btn = e.target.closest('.open-modal-btn');
-        if (btn) {
-            modalState.category = btn.dataset.category;
-            modalState.currentPage = 1; // Luôn reset khi mở modal
-            modalState.currentFilters = {}; // Reset bộ lọc
+        modalState.products = data.products.map(p => ({
+            id: p.productID, name: p.productName, brand: p.brand, price: p.price, img: p.imageURL
+        }));
+        modalState.totalProducts = data.totalCount;
 
+        if (modalState.currentPage === 1) {
+            renderPriceFilters(data.priceRanges);
+            renderDynamicFilters(data.dynamicFilters);
+        }
+        renderProductPage();
+        renderPagination();
+    } catch (err) { console.error(err); }
+}
+
+// ... Helper Functions (getFilters, renderPriceFilters... Giữ nguyên không đổi) ...
+function getFilters() {
+    const dynamicFilters = {};
+    document.querySelectorAll('.modal-filter-checkbox:checked').forEach(cb => {
+        dynamicFilters[cb.dataset.group] = cb.value;
+    });
+    const selectedPriceRangeId = document.querySelector('.modal-price-filter-radio:checked')?.value || 'all';
+    const priceRange = priceRanges.find(r => r.id === selectedPriceRangeId) || { id: 'all', min: 0, max: Infinity };
+    return { search: dom.search.value.toLowerCase(), price: priceRange, dynamic: dynamicFilters };
+}
+function handleFilterChange() { modalState.currentPage = 1; loadData(); }
+function renderPriceFilters(ranges) {
+    priceRanges = (ranges || []).map(r => ({ ...r, max: r.max === null ? Infinity : r.max }));
+    dom.priceFilters.innerHTML = priceRanges.map(r => `<div class="form-check"><input type="radio" name="pr" class="form-check-input modal-price-filter-radio" value="${r.id}" ${r.id === 'all' ? 'checked' : ''}><label class="form-check-label">${r.name}</label></div>`).join('');
+}
+function renderDynamicFilters(filters) {
+    dom.filters.innerHTML = (filters || []).map(g => `<h6 class="fw-bold mt-2">${g.name}</h6>` + g.values.map(v => `<div class="form-check"><input type="checkbox" class="form-check-input modal-filter-checkbox" value="${v}" data-group="${g.name}"><label class="form-check-label">${v}</label></div>`).join('')).join('');
+}
+function renderProductPage() {
+    const items = modalState.products;
+    dom.list.innerHTML = items.length === 0 ? '<p class="text-center p-3">Không có sản phẩm</p>' : items.map(p => `
+        <div class="card p-2 mb-2 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <img src="${p.img || '/images/no-img.png'}" class="me-3 rounded" style="width:50px;height:50px;object-fit:cover;">
+                    <div><h6 class="mb-0 small fw-bold">${p.name}</h6><span class="text-danger fw-bold small">${formatCurrency(p.price)}</span></div>
+                </div>
+                <button class="btn btn-primary btn-sm select-component-btn" data-id="${p.id}" data-category="${modalState.category}" data-name="${p.name}" data-price="${p.price}" data-img="${p.img || '/images/no-img.png'}">Chọn</button>
+            </div>
+        </div>
+    `).join('');
+}
+function renderPagination() {
+    const total = Math.ceil(modalState.totalProducts / modalState.productsPerPage);
+    if (total <= 1) return dom.pagination.innerHTML = '';
+    let html = `<nav><ul class="pagination justify-content-center pagination-sm">`;
+    for (let i = 1; i <= total; i++) html += `<li class="page-item ${i === modalState.currentPage ? 'active' : ''}"><button class="page-link modal-page-btn" data-page="${i}">${i}</button></li>`;
+    html += `</ul></nav>`;
+    dom.pagination.innerHTML = html;
+}
+
+// =====================
+// 5. EVENT HANDLERS
+// =====================
+function setupEventListeners() {
+    dom.buildList.addEventListener('click', e => {
+        const openBtn = e.target.closest('.open-modal-btn');
+        if (openBtn) {
+            modalState.category = openBtn.dataset.category;
+            modalState.currentPage = 1;
             dom.title.textContent = "Chọn " + (pcCategories.find(c => c.id === modalState.category)?.name || modalState.category);
+            dom.filters.innerHTML = ""; dom.priceFilters.innerHTML = ""; dom.list.innerHTML = ""; dom.pagination.innerHTML = "";
             dom.search.value = "";
-
-            // Xóa bộ lọc cũ trước khi gọi API
-            dom.filters.innerHTML = "";
-            dom.priceFilters.innerHTML = "";
-            dom.list.innerHTML = "";
-            dom.pagination.innerHTML = "";
-
             bsModal.show();
-            loadData(); // Tải dữ liệu trang 1
+            loadData();
         }
-
-        const remove = e.target.closest('.remove-component-btn');
-        if (remove) {
-            delete currentBuild[remove.dataset.category];
-            renderBuildPC();
-        }
-
-        const select = e.target.closest('.select-component-btn');
-        if (select) {
-            selectComponent(select); // Truyền cả cái nút vào
-        }
-
-        const page = e.target.closest('.modal-page-btn');
-        if (page) {
-            const newPage = Number(page.dataset.page);
-            if (newPage > 0 && newPage !== modalState.currentPage) {
-                // Không cần kiểm tra 'max' ở đây vì nút 'disabled' đã xử lý
-                modalState.currentPage = newPage;
-                loadData(); // Tải trang mới
-            }
-        }
+        const removeBtn = e.target.closest('.remove-component-btn');
+        if (removeBtn) removeComponentServer(removeBtn.dataset.category);
     });
 
-    // Các event listener cho lọc
-    // Giờ tất cả đều gọi hàm handleFilterChange()
+    dom.list.addEventListener('click', e => {
+        const select = e.target.closest('.select-component-btn');
+        if (select) selectComponentAutoSave(select);
+    });
+
     dom.filters.addEventListener('change', handleFilterChange);
     dom.priceFilters.addEventListener('change', handleFilterChange);
-
-    // Thêm 'debounce' để không gọi API liên tục khi gõ
     let searchTimeout;
-    dom.search.addEventListener('input', () => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            handleFilterChange();
-        }, 300); // Chờ 300ms sau khi người dùng ngừng gõ
-    });
+    dom.search.addEventListener('input', () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(handleFilterChange, 300); });
+    dom.pagination.addEventListener('click', e => { const btn = e.target.closest('.modal-page-btn'); if (btn) { modalState.currentPage = parseInt(btn.dataset.page); loadData(); } });
 
-    // Nút "Add to Cart" (Giữ nguyên)
-    dom.addBtn.addEventListener('click', () => {
-        let total = Object.values(currentBuild).reduce((s, c) => s + c.price, 0);
-        alert(`Đã lưu cấu hình trị giá ${formatCurrency(total)}! (Demo)`);
-        // Logic thật: Gửi 'currentBuild' về server
-        // Ví dụ: post('/api/custompc/save', currentBuild)
+    dom.addBtn.addEventListener('click', async () => {
+        if (!confirm('Thêm vào giỏ hàng?')) return;
+        const slotId = dom.slotIdInput.value;
+        const formData = new FormData();
+        formData.append('slotId', slotId);
+
+        // Sau khi thêm vào giỏ thành công -> Reload data để thấy slot trống
+        const res = await fetch('/api/pcbuild/add-to-cart', { method: 'POST', body: formData });
+        if (res.ok) {
+            window.location.href = '/Cart';
+        }
     });
-});
+}

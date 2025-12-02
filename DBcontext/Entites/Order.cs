@@ -11,6 +11,8 @@ namespace PcSaler.DBcontext.Entites
         public DateTime OrderDate { get; set; } = DateTime.Now;
         public decimal TotalAmount { get; set; } = 0;
 
+        public string? ShippingAddress { get; set; }
+
         // **PHẦN BỔ SUNG QUAN TRỌNG**
         public int CurrentStatusID { get; set; } // Khóa ngoại
         [ForeignKey("CurrentStatusID")]

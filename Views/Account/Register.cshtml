@@ -1,0 +1,86 @@
+﻿@model PcSaler.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký thành viên";
+}
+
+<div class="row justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="col-md-5">
+
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-uppercase" style="color: var(--primary-color); letter-spacing: 1px;">
+                Tạo Tài Khoản
+            </h2>
+            <p class="text-muted">Tham gia cộng đồng PCShop ngay hôm nay</p>
+        </div>
+
+        <div class="card p-4 border-0">
+            <div class="card-body">
+                <form asp-action="Register" method="post">
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Username" class="form-control" placeholder="Tên đăng nhập" />
+                        <label asp-for="Username"><i class="fa-solid fa-user me-2 text-secondary"></i>Tên đăng nhập</label>
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="FullName" class="form-control" placeholder="Họ và tên" />
+                        <label asp-for="FullName"><i class="fa-solid fa-id-card me-2 text-secondary"></i>Họ và tên</label>
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Email" class="form-control" placeholder="Email" />
+                        <label asp-for="Email"><i class="fa-solid fa-envelope me-2 text-secondary"></i>Email</label>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-2 mb-4">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Mật khẩu" />
+                                <label asp-for="Password"><i class="fa-solid fa-lock me-2 text-secondary"></i>Mật khẩu</label>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Nhập lại" />
+                                <label asp-for="ConfirmPassword"><i class="fa-solid fa-check-double me-2 text-secondary"></i>Xác nhận</label>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg text-uppercase fw-bold py-3" style="font-size: 0.9rem;">
+                            <i class="fa-solid fa-user-plus me-2"></i> Đăng Ký Ngay
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Bạn đã có tài khoản?
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" class="fw-bold text-decoration-none" style="color: var(--primary-color);">
+                                Đăng nhập tại đây
+                            </a>
+                        </small>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <small class="text-muted" style="font-size: 0.8rem;">
+                Bằng việc đăng ký, bạn đồng ý với <a href="#" class="text-decoration-none">Điều khoản dịch vụ</a> & <a href="#" class="text-decoration-none">Chính sách bảo mật</a> của PCShop.
+            </small>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

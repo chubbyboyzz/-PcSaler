@@ -20,5 +20,16 @@ public class ProductService
     {
         return await _productService.GetProductsByCategory(categoryId);
     }
-
+    public async Task<List<ProductListViewModel>> GetProductQuery(string? query)
+    {
+        return await _productService.GetProductQuery(query);
+    }
+    public async Task<string?> GetCategoryType(int categoryId)
+    {
+        return await _productService.GetCategoryType(categoryId);
+    }
+    public async Task<ProductSearchResultViewModel> SearchProductsAsync(ProductSearchInputViewModel input)
+    {
+        return await _productService.SearchProductsAsync(input);
+    }
 }

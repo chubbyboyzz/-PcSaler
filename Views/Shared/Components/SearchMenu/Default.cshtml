@@ -1,0 +1,86 @@
+﻿@model string
+
+<div class="position-relative w-100">
+    <form class="d-flex" method="get" action="@Url.Action("Index", "Home")">
+        <input class="form-control me-2" 
+               id="search-input"
+               name="q" 
+               type="search" 
+               placeholder="Tìm PC, linh kiện..." 
+               value="@Model" 
+               autocomplete="off" /> <button class="btn btn-outline-primary" type="submit">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+    </form>
+
+    <div id="suggestion-box" class="list-group position-absolute w-100 shadow-lg mt-1" style="z-index: 1000; display: none;">
+        </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const suggestBox = document.getElementById('suggestion-box');
+        let timeoutId = null;
+
+        // Hàm format tiền tệ VNĐ
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        };
+
+        // Bắt sự kiện khi người dùng gõ
+        searchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            // Xóa timeout cũ nếu người dùng gõ tiếp (Kỹ thuật Debounce)
+            clearTimeout(timeoutId);
+
+            if (query.length < 2) { // Chỉ tìm khi gõ trên 2 ký tự
+                suggestBox.style.display = 'none';
+                return;
+            }
+
+            // Đợi 300ms sau khi ngừng gõ mới gọi API
+            timeoutId = setTimeout(() => {
+                fetch(`/api/product/search-suggestions?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestBox.innerHTML = ''; // Xóa kết quả cũ
+
+                        if (data.length > 0) {
+                            data.forEach(item => {
+                                // Tạo thẻ a trỏ đến trang chi tiết
+                                const link = document.createElement('a');
+                                link.href = `/Product/Details/${item.productID}`; // Sửa URL theo route thật của bạn
+                                link.className = 'list-group-item list-group-item-action d-flex align-items-center suggestion-item';
+                                
+                                // Nội dung HTML của 1 dòng
+                                link.innerHTML = `
+                                    <img src="${item.imageURL || '/images/no-img.png'}" width="40" height="40" class="me-3 rounded object-fit-cover">
+                                    <div>
+                                        <div class="fw-bold text-dark">${item.productName}</div>
+                                        <div class="suggestion-price">${formatCurrency(item.price)}</div>
+                                    </div>
+                                `;
+                                suggestBox.appendChild(link);
+                            });
+                            suggestBox.style.display = 'block';
+                        } else {
+                            // Không tìm thấy
+                            suggestBox.innerHTML = '<div class="list-group-item text-muted text-center">Không tìm thấy sản phẩm nào</div>';
+                            suggestBox.style.display = 'block';
+                        }
+                    })
+                    .catch(err => console.error(err));
+            }, 300);
+        });
+
+        // Ẩn bảng gợi ý khi click ra ngoài
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !suggestBox.contains(e.target)) {
+                suggestBox.style.display = 'none';
+            }
+        });
+    });
+</script>

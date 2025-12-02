@@ -1,0 +1,296 @@
+﻿@model PcSaler.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4 text-center fw-bold text-uppercase">Thanh toán đơn hàng</h2>
+
+    <form asp-action="PlaceOrder" method="post" id="checkoutForm" novalidate>
+        <div class="row">
+            <div class="col-md-7">
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 text-primary"><i class="fas fa-map-marker-alt me-2"></i>Thông tin giao hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold required-star">Họ và tên người nhận</label>
+                            <input asp-for="FullName" class="form-control" id="inputName" placeholder="Ví dụ: Nguyễn Văn A" />
+                            <div class="invalid-feedback">Vui lòng nhập họ và tên.</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold required-star">Số điện thoại</label>
+                                <input asp-for="Phone" class="form-control" id="inputPhone" placeholder="09xxxx..." maxlength="10" />
+                                <div class="invalid-feedback">SĐT không hợp lệ (Phải là 10 số, đầu VN).</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Email</label>
+                                <input asp-for="Email" class="form-control bg-light" id="inputEmail" readonly />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold required-star">Địa chỉ nhận hàng</label>
+                            <textarea asp-for="Address" class="form-control" id="inputAddress" rows="2" placeholder="Số nhà, đường, phường/xã, quận/huyện..."></textarea>
+                            <div class="invalid-feedback">Vui lòng nhập địa chỉ chi tiết (tối thiểu 10 ký tự).</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Ghi chú (Tùy chọn)</label>
+                            <textarea asp-for="Note" class="form-control" rows="2" placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi giao..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mt-3">
+                    <div class="card-header bg-white py-3">
+                        <h5 class="mb-0 text-primary"><i class="fas fa-credit-card me-2"></i>Phương thức thanh toán</h5>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="payment-option mb-2">
+                            <div class="form-check p-3 border rounded cursor-pointer payment-header" onclick="selectPayment('COD')">
+                                <input class="form-check-input mt-1" type="radio" asp-for="PaymentMethod" value="COD" id="pm_cod" checked>
+                                <label class="form-check-label w-100 cursor-pointer fw-bold" for="pm_cod">
+                                    <i class="fas fa-truck text-success me-2"></i> Thanh toán khi nhận hàng (COD)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="payment-option mb-2">
+                            <div class="form-check p-3 border rounded cursor-pointer payment-header" onclick="selectPayment('MOMO')">
+                                <input class="form-check-input mt-1" type="radio" asp-for="PaymentMethod" value="MOMO" id="pm_momo">
+                                <label class="form-check-label w-100 cursor-pointer fw-bold" for="pm_momo">
+                                    <i class="fas fa-qrcode text-danger me-2"></i> Ví điện tử Momo / VNPAY
+                                </label>
+                            </div>
+                            <div id="collapse_MOMO" class="payment-details border-start border-end border-bottom p-4 bg-light text-center" style="display:none;">
+                                <p class="mb-2 text-muted fw-bold">Quét mã để thanh toán ngay:</p>
+                                <img src="https://img.vietqr.io/image/MB-0985532053-compact2.png?amount=@(Model.TotalAmount)&addInfo=PCShop Payment&accountName=PC SHOP"
+                                     width="200" class="rounded border shadow-sm bg-white p-2">
+                            </div>
+                        </div>
+
+                        <div class="payment-option mb-2">
+                            <div class="form-check p-3 border rounded cursor-pointer payment-header" onclick="selectPayment('VISA')">
+                                <input class="form-check-input mt-1" type="radio" asp-for="PaymentMethod" value="VISA" id="pm_visa">
+                                <label class="form-check-label w-100 cursor-pointer fw-bold" for="pm_visa">
+                                    <i class="fab fa-cc-visa text-primary me-2"></i> Thẻ Tín dụng / Ghi nợ
+                                </label>
+                            </div>
+                            <div id="collapse_VISA" class="payment-details border-start border-end border-bottom p-3 bg-light" style="display:none;">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Số thẻ</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="far fa-credit-card"></i></span>
+                                        <input type="text" asp-for="CardNumber" class="form-control" placeholder="0000 0000 0000 0000" maxlength="19" id="cc-number">
+                                    </div>
+                                    <div class="invalid-feedback">Số thẻ không hợp lệ.</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Tên chủ thẻ</label>
+                                    <input type="text" asp-for="CardHolderName" class="form-control text-uppercase" placeholder="NGUYEN VAN A" id="cc-name">
+                                    <div class="invalid-feedback">Vui lòng nhập tên chủ thẻ.</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold">Hết hạn (MM/YY)</label>
+                                        <input type="text" asp-for="CardExpiry" class="form-control" placeholder="MM/YY" maxlength="5" id="cc-expiry">
+                                        <div class="invalid-feedback">Sai định dạng.</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold">CVV</label>
+                                        <input type="password" asp-for="CardCVV" class="form-control" placeholder="123" maxlength="3" id="cc-cvv">
+                                        <div class="invalid-feedback">Nhập 3 số.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card shadow-sm border-primary">
+                    <div class="card-header bg-primary text-white py-3">
+                        <h5 class="mb-0">Đơn hàng của bạn (@Model.CartItems.Count món)</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                            @foreach (var item in Model.CartItems)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-2 position-relative">
+                                            <span class="badge bg-secondary position-absolute top-0 start-100 translate-middle rounded-pill">
+                                                @item.Quantity
+                                            </span>
+                                            <img src="@item.ImageURL" width="50" class="rounded border">
+                                        </div>
+                                        <div class="ms-2">
+                                            <h6 class="my-0 text-truncate small" style="max-width: 150px;">@item.ProductName</h6>
+                                            <small class="text-muted">@item.Price.ToString("N0") ₫</small>
+                                        </div>
+                                    </div>
+                                    <span class="fw-bold small">@((item.Price * item.Quantity).ToString("N0")) ₫</span>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white p-3">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Tạm tính:</span>
+                            <span>@Model.TotalAmount.ToString("N0") ₫</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Vận chuyển:</span>
+                            <span class="text-success fw-bold">Miễn phí</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="h5 mb-0">Tổng cộng:</strong>
+                            <strong class="h4 text-danger mb-0">@Model.TotalAmount.ToString("N0") ₫</strong>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fs-5 fw-bold shadow hover-scale">
+                            ĐẶT HÀNG NGAY
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // --- 1. HÀM CHECK LỖI INPUT ---
+        function validateInput(input, isValid) {
+            if (isValid) {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+                return true;
+            } else {
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+                return false;
+            }
+        }
+
+        // --- 2. XỬ LÝ SỰ KIỆN SUBMIT FORM ---
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            let hasError = false;
+
+            // --- VALIDATE THÔNG TIN GIAO HÀNG ---
+
+            // 2.1. Họ tên (Không để trống)
+            const name = document.getElementById('inputName');
+            if (!validateInput(name, name.value.trim() !== '')) hasError = true;
+
+            // 2.2. Số điện thoại (Regex VN: 10 số, bắt đầu bằng 03,05,07,08,09)
+            const phone = document.getElementById('inputPhone');
+            const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
+            if (!validateInput(phone, phoneRegex.test(phone.value))) hasError = true;
+
+            // 2.3. Địa chỉ (Ít nhất 10 ký tự)
+            const address = document.getElementById('inputAddress');
+            if (!validateInput(address, address.value.trim().length > 10)) hasError = true;
+
+            // --- VALIDATE PHƯƠNG THỨC THANH TOÁN (Nếu chọn VISA) ---
+            const method = document.querySelector('input[name="PaymentMethod"]:checked').value;
+
+            if (method === 'VISA') {
+                const ccNum = document.getElementById('cc-number');
+                const ccName = document.getElementById('cc-name');
+                const ccExp = document.getElementById('cc-expiry');
+                const ccCvv = document.getElementById('cc-cvv');
+
+                // Check Thẻ (16 số, bỏ khoảng trắng)
+                if (!validateInput(ccNum, ccNum.value.replace(/\s/g, '').length === 16)) hasError = true;
+                // Check Tên (Không trống)
+                if (!validateInput(ccName, ccName.value.trim() !== '')) hasError = true;
+                // Check Ngày (Đủ 5 ký tự MM/YY)
+                if (!validateInput(ccExp, ccExp.value.length === 5)) hasError = true;
+                // Check CVV (Đủ 3 số)
+                if (!validateInput(ccCvv, ccCvv.value.length === 3)) hasError = true;
+            }
+
+            // --- KẾT QUẢ ---
+            if (hasError) {
+                e.preventDefault(); // Chặn submit
+                // Cuộn lên đầu để user thấy lỗi
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Thông tin chưa chính xác',
+                    text: 'Vui lòng kiểm tra lại các trường báo đỏ!',
+                    confirmButtonColor: '#d33'
+                });
+            }
+            // Nếu không lỗi -> Form tự submit
+        });
+
+        // --- 3. CÁC HÀM HỖ TRỢ GIAO DIỆN ---
+
+        function selectPayment(method) {
+            document.querySelector(`input[value="${method}"]`).checked = true;
+            document.querySelectorAll('.payment-details').forEach(el => $(el).slideUp(200));
+            const details = document.getElementById(`collapse_${method}`);
+            if (details) $(details).slideDown(200);
+        }
+
+        // Tự động format nhập liệu thẻ
+        document.getElementById('cc-number')?.addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '').substring(0, 16);
+            value = value != '' ? value.match(/.{1,4}/g).join(' ') : '';
+            e.target.value = value;
+            // Xóa lỗi khi user bắt đầu nhập lại
+            if(value.length > 0) this.classList.remove('is-invalid');
+        });
+
+        // Xóa lỗi khi user nhập vào các ô khác
+        ['inputName', 'inputPhone', 'inputAddress'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                if(this.value.trim() !== '') this.classList.remove('is-invalid');
+            });
+        });
+
+    </script>
+
+    <style>
+        .required-star::after {
+            content: " *";
+            color: red;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .payment-header:hover {
+            background-color: #f8f9fa;
+        }
+
+        .form-check-input:checked + label {
+            color: #0d6efd;
+        }
+
+        .payment-option input:checked ~ .payment-header {
+            border-color: #0d6efd !important;
+            background-color: #f0f7ff;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+            transition: 0.3s;
+        }
+    </style>
+}

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PcSaler.Models
 {
-    public class CategoryProductViewModel
+    public class CategoryViewModel
     {
         public int CategoryID { get; set; }
         [Required]

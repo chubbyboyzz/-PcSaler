@@ -2,7 +2,7 @@
 
 namespace PcSaler.Models
 {
-    public class PcBuild
+    public class PcBuildViewModel
     {
         [Key]
         public int Id { get; set; }

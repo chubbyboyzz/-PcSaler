@@ -1,0 +1,320 @@
+﻿@model PcSaler.Models.CustomerProfileViewModel
+@{
+    ViewData["Title"] = "Hồ sơ của tôi";
+}
+
+<style>
+    .modal-backdrop {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    .modal-content {
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        border: 1px solid #ddd;
+    }
+    /* Style riêng cho phần thông tin giao hàng trong Modal */
+    .shipping-info-box {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        border: 1px dashed #ced4da;
+    }
+</style>
+
+<div class="container py-5">
+    <h2 class="fw-bold text-primary mb-4">Hồ sơ của tôi</h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body text-center">
+                    <h5 class="card-title fw-bold mb-3">🪪 Thông tin cá nhân</h5>
+                    <div class="mb-3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Avatar" class="rounded-circle border p-1" width="100" height="100">
+                    </div>
+                    <h4 class="fw-bold">@Model.FullName</h4>
+                    <p class="text-muted">@Model.Username</p>
+                    <hr>
+                    <div class="text-start px-3">
+                        <div class="mb-2"><span class="fw-bold text-secondary">Email:</span> <span class="float-end text-dark">@Model.Email</span></div>
+                        <div class="mb-2">
+                            <span class="fw-bold text-secondary">Số điện thoại:</span> <span class="float-end text-dark">
+                                @{
+                                    // Logic: Nếu có sdt và dài hơn 3 ký tự -> ẩn đi, ngược lại thì hiện nguyên
+                                    var phone = Model.Phone;
+                                    var displayPhone = (!string.IsNullOrEmpty(phone) && phone.Length > 3)
+                                    ? "**** *** " + phone.Substring(phone.Length - 3)
+                                    : phone;
+                                }
+                                @displayPhone
+                            </span>
+                        </div>
+                        <div class="mb-3"><span class="fw-bold text-secondary d-block mb-1">Địa chỉ:</span> <p class="text-dark bg-light p-2 rounded small mb-0">@Model.Address</p></div>
+                        <div class="mb-3"><span class="fw-bold text-secondary">Ngày tham gia:</span> <span class="float-end text-dark">@Model.CreatedAt.ToString("dd/MM/yyyy")</span></div>
+                    </div>
+                    <button class="btn btn-outline-primary w-100 mt-2 fw-bold" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit me-2"></i> Chỉnh sửa thông tin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold mb-0">⏱ Lịch sử đơn hàng</h5>
+                        <span class="badge bg-primary">@Model.Orders.Count đơn hàng</span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Mã đơn</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Tổng tiền</th>
+                                    <th>Trạng thái</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var order in Model.Orders)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">#@order.OrderID</td>
+                                        <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="text-danger fw-bold">@order.TotalAmount.ToString("N0")₫</td>
+                                        <td><span class="badge @order.StatusColorClass">@order.StatusName</span></td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-secondary" onclick="showOrderDetails(@order.OrderID)">
+                                                <i class="fas fa-eye"></i> Chi tiết
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @if (!Model.Orders.Any())
+                        {
+                            <div class="text-center py-4 text-muted"><i class="fas fa-box-open fa-2x mb-2"></i><p>Bạn chưa có đơn hàng nào.</p></div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Cập nhật hồ sơ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateProfileForm">
+                    <div class="mb-3"><label class="form-label fw-bold">Họ và tên</label><input type="text" class="form-control" id="editFullName" value="@Model.FullName"></div>
+                    <div class="mb-3"><label class="form-label fw-bold">Số điện thoại</label><input type="text" class="form-control" id="editPhone" value="@Model.Phone"></div>
+                    <div class="mb-3"><label class="form-label fw-bold">Địa chỉ</label><textarea class="form-control" id="editAddress" rows="3">@Model.Address</textarea></div>
+                    <div class="mb-3"><label class="form-label fw-bold text-muted">Email (Không thể thay đổi)</label><input type="text" class="form-control bg-light" value="@Model.Email" readonly></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="submitUpdateProfile()">Lưu thay đổi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="orderDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold">
+                    📄 Đơn hàng #<span id="detailOrderId">...</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-primary">Thông tin đơn hàng</h6>
+                        <p class="mb-1 small">Ngày đặt: <strong id="detailOrderDate">...</strong></p>
+                        <p class="mb-1 small">Trạng thái: <span id="detailOrderStatus" class="badge bg-secondary">Loading...</span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="shipping-info-box h-100">
+                            <h6 class="fw-bold text-success mb-2"><i class="fas fa-truck me-1"></i> Thông tin nhận hàng</h6>
+                            <p class="mb-1 small">Người nhận: <strong id="detailCustomerName">...</strong></p>
+                            <p class="mb-0 small text-muted" style="white-space: pre-line;" id="detailShippingInfo">...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="bg-light">
+                            <tr><th>Sản phẩm</th><th class="text-center">Đơn giá</th><th class="text-center">SL</th><th class="text-end">Thành tiền</th></tr>
+                        </thead>
+                        <tbody id="orderDetailBody"></tbody>
+                        <tfoot class="border-top-2">
+                            <tr><td colspan="3" class="text-end fw-bold">Tổng cộng:</td><td class="text-end fw-bold text-danger fs-5" id="detailTotalAmount">...</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // --- 1. CONFIG MODAL (Fix lỗi màn đen) ---
+        document.addEventListener('DOMContentLoaded', function() {
+            ['editProfileModal', 'orderDetailModal'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) document.body.appendChild(el);
+            });
+        });
+
+        // --- 2. HÀM FORMAT TIỀN (QUAN TRỌNG: Đã thêm lại hàm này) ---
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        }
+
+        // --- 3. LOGIC CẬP NHẬT PROFILE ---
+        function submitUpdateProfile() {
+            const data = {
+                fullName: document.getElementById('editFullName').value,
+                phone: document.getElementById('editPhone').value,
+                address: document.getElementById('editAddress').value
+            };
+
+            if (!data.fullName || !data.phone) {
+                Swal.fire('Lỗi', 'Vui lòng điền đầy đủ thông tin!', 'warning');
+                return;
+            }
+
+            const btn = document.querySelector('button[onclick="submitUpdateProfile()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+            btn.disabled = true;
+
+            fetch('/Customers/UpdateProfile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: 'Thông tin đã được cập nhật!',
+                        timer: 500,
+                        showConfirmButton: false
+                    }).then(() => location.reload());
+                } else {
+                    return res.json().then(err => { throw new Error(err.message || "Lỗi server"); });
+                }
+            })
+            .catch(err => {
+                Swal.fire('Thất bại', err.message, 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        }
+
+        // --- 4. LOGIC CHI TIẾT ĐƠN HÀNG (Full Fix) ---
+        function showOrderDetails(orderId) {
+            const tbody = document.getElementById('orderDetailBody');
+
+            // Reset trạng thái loading
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary"></div><p class="mt-2">Đang tải dữ liệu...</p></td></tr>';
+
+            // Reset Badge trạng thái
+            const statusBadge = document.getElementById('detailOrderStatus');
+            statusBadge.innerText = 'Loading...';
+            statusBadge.className = 'badge bg-secondary';
+
+            // Reset thông tin người nhận
+            document.getElementById('detailCustomerName').innerText = '...';
+            document.getElementById('detailShippingInfo').innerText = '...';
+
+            // Mở Modal
+            const modalElement = document.getElementById('orderDetailModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+
+            // Gọi API
+            fetch(`/Customers/GetOrderDetails?orderId=${orderId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Không thể tải đơn hàng");
+                    return res.json();
+                })
+                .then(data => {
+                    // Điền dữ liệu chung
+                    document.getElementById('detailOrderId').innerText = data.orderId;
+                    document.getElementById('detailOrderDate').innerText = data.orderDate;
+                    document.getElementById('detailTotalAmount').innerText = formatCurrency(data.totalAmount);
+
+                    // Điền thông tin người nhận
+                    document.getElementById('detailCustomerName').innerText = data.customerName;
+                    document.getElementById('detailShippingInfo').innerText = data.shippingAddress;
+
+                    // Cập nhật trạng thái và màu sắc
+                    statusBadge.innerText = data.status;
+                    statusBadge.className = 'badge'; // Reset class
+                    switch (data.status) {
+                        case 'Pending':
+                            statusBadge.classList.add('bg-warning', 'text-dark'); break;
+                        case 'Confirmed':
+                        case 'Processing':
+                            statusBadge.classList.add('bg-info', 'text-dark'); break;
+                        case 'Shipped':
+                            statusBadge.classList.add('bg-primary'); break;
+                        case 'Completed':
+                        case 'Delivered':
+                            statusBadge.classList.add('bg-success'); break;
+                        case 'Cancelled':
+                            statusBadge.classList.add('bg-danger'); break;
+                        default:
+                            statusBadge.classList.add('bg-secondary');
+                    }
+
+                    // Render danh sách sản phẩm
+                    let html = '';
+                    data.items.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img src="${item.image || '/images/no-image.png'}"
+                                             class="rounded border me-2" style="width:50px;height:50px;object-fit:cover;">
+                                        <div>
+                                            <h6 class="mb-0 small text-truncate" style="max-width:200px;">${item.productName}</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">${formatCurrency(item.price)}</td>
+                                <td class="text-center fw-bold">x${item.quantity}</td>
+                                <td class="text-end fw-bold text-primary">${formatCurrency(item.total)}</td>
+                            </tr>
+                        `;
+                    });
+                    tbody.innerHTML = html;
+                })
+                .catch(err => {
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger py-3">Lỗi: ${err.message}</td></tr>`;
+                });
+        }
+    </script>
+}

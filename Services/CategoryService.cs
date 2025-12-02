@@ -18,7 +18,7 @@ namespace PcSaler.Services
         {
             return await _categoryService.GetAllCategories();
         }
-        public async Task<List<CategoryProductViewModel>> GetCategoryProducts(int? categoryId, string? query)
+        public async Task<List<CategoryViewModel>> GetCategoryProducts(int? categoryId, string? query)
         {
             return await _categoryService.GetCategoryProducts(categoryId, query);
         }

@@ -1,33 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PcSaler.DBcontext;
-using PcSaler.Models;
+using PcSaler.Interfaces;
 
 namespace PcSaler.Controllers
 {
     public class PcBuildController : Controller
     {
-        private readonly PCShopContext _context;
+        // Inject Service (Interface)
+        private readonly IPcBuildService _service;
 
-        public PcBuildController(PCShopContext context)
+        public PcBuildController(IPcBuildService service)
         {
-            _context = context;
+            _service = service;
         }
-        public IActionResult Index()
-        {
-            var categories = _context.Categories
-                // 1. Sửa "ParentCategoryID == 1" thành "IsRequiredForBuild == true"
-                .Where(c => c.IsRequiredForBuild == true)
-                .Select(c => new {
-                    id = c.ComponentType,
-                    // 2. Sửa "CategoryName" thành "Description" để lấy tên đúng
-                    name = c.Description
-                })
-                .ToList();
 
-            ViewBag.Categories = categories;
-            return View();
+        // Trang danh sách PC Bộ (Pre-built)
+        public async Task<IActionResult> Index()
+        {
+            var builds = await _service.GetAllPCBuild();
+            return View(builds);
+        }
+
+        // Trang chi tiết 1 bộ PC
+        public async Task<IActionResult> Details(int id)
+        {
+            var detail = await _service.GetPCBuildDetails(id);
+
+            if (detail == null) return NotFound();
+
+            return View(detail);
         }
     }
-
 }

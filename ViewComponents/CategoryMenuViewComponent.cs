@@ -23,7 +23,6 @@ namespace PcSaler.ViewComponents // Thay đổi namespace nếu cần
         {
             // Lấy danh mục menu từ DB (Lấy các trường cần thiết)
             var categories = await _context.Categories
-                .Where(c => c.ParentCategoryID == 1) // Hoặc logic lọc menu của bạn
                 .Select(c => new
                 {
                     CategoryID = c.CategoryID,

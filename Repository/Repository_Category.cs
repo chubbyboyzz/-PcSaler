@@ -23,7 +23,7 @@ namespace PcSaler.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<CategoryProductViewModel>> GetCategoryProducts(int? categoryId, string? query)
+        public async Task<List<CategoryViewModel>> GetCategoryProducts(int? categoryId, string? query)
         {
             IQueryable<Categories> queryable = _db.Categories.Include(c => c.Products);
 
@@ -33,7 +33,7 @@ namespace PcSaler.Repository
             if (!string.IsNullOrWhiteSpace(query))
                 queryable = queryable.Where(c => c.Products.Any(p => p.ProductName.Contains(query)));
 
-            return await queryable.Select(c => new CategoryProductViewModel
+            return await queryable.Select(c => new CategoryViewModel
             {
                 CategoryID = c.CategoryID,
                 CategoryName = c.CategoryName,

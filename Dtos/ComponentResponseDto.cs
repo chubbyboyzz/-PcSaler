@@ -4,7 +4,7 @@
     {
         public required List<ProductDto> Products { get; set; }
         public required List<string> AvailableBrands { get; set; }
-        public required List<Models.PriceRangeViewModel> AvailablePriceRanges { get; set; }
+        public required List<Models.ProductSearchResultViewModel> AvailablePriceRanges { get; set; }
         public required PaginationDto Pagination { get; set; }
     }
 }

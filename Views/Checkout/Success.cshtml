@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Đặt hàng thành công";
+    var method = ViewBag.PaymentMethod as string;
+    var amount = ViewBag.Amount as decimal?;
+}
+
+<div class="container text-center py-5">
+
+    <div class="mb-4">
+        <img src="https://cdn-icons-png.flaticon.com/512/148/148767.png" width="100" alt="Success" />
+    </div>
+
+    <h1 class="text-success mb-3 fw-bold">Đặt hàng thành công!</h1>
+
+    @if (method == "MOMO" || method == "VISA" || method == "PAYPAL")
+    {
+        <p class="lead">Giao dịch qua <strong>@method</strong> đã được hệ thống ghi nhận.</p>
+        <p class="text-muted">Chúng tôi đã nhận được thanh toán của bạn.</p>
+    }
+    else
+    {
+        <p class="lead">Cảm ơn bạn đã mua sắm tại PCShop.</p>
+        <p class="text-muted">Đơn hàng COD của bạn đang được xử lý.</p>
+    }
+
+    <div class="card shadow-sm mx-auto mt-4 p-3 bg-light" style="max-width: 500px;">
+        <p class="mb-1">Mã đơn hàng: <strong class="text-primary">#@DateTime.Now.ToString("HHmmss")</strong></p>
+        <p class="mb-0">Tổng thanh toán: <strong class="text-danger fs-5">@amount?.ToString("N0") ₫</strong></p>
+    </div>
+
+    <div class="mt-5 border-top pt-4">
+        <a href="/" class="btn btn-primary btn-lg px-5 shadow-sm rounded-pill me-2">
+            <i class="fas fa-shopping-bag me-2"></i> Tiếp tục mua sắm
+        </a>
+        <a asp-controller="Customers" asp-action="Profile" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
+            Xem lịch sử
+        </a>
+    </div>
+</div>
