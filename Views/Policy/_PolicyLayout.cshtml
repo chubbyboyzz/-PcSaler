@@ -1,0 +1,81 @@
+﻿@{
+    Layout = "_Layout";  // vẫn dùng header/footer chung của bạn
+    var heading = (string?)ViewData["Heading"] ?? "Chính sách";
+    var subheading = (string?)ViewData["Subheading"] ?? "";
+}
+
+<section class="policy-hero border rounded-4 shadow-sm">
+    <div class="container">
+        <div class="d-flex align-items-center gap-3">
+            <span class="policy-hero-icon p-3 rounded-3">
+                <i class="bi bi-stars fs-3"></i>
+            </span>
+            <div>
+                <h1 class="h3 h2-md mb-1">@heading</h1>
+                @if (!string.IsNullOrWhiteSpace(subheading))
+                {
+                    <p class="text-secondary mb-0">@subheading</p>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<nav class="container mt-3" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@heading</li>
+    </ol>
+</nav>
+
+<div class="container my-4">
+    <div class="row g-4">
+        <aside class="col-lg-3">
+            <partial name="_PolicySidebar" />
+            <div class="card border-0 shadow-sm rounded-3 mt-3">
+                <div class="card-body">
+                    <h6 class="fw-semibold mb-2"><i class="bi bi-headset"></i> Hỗ trợ nhanh</h6>
+                    <p class="mb-2 small text-secondary">Cần tư vấn về bảo hành/đơn hàng?</p>
+                    <a href="tel:19009999" class="btn btn-primary w-100 mb-2"><i class="bi bi-telephone"></i> 1900 9999</a>
+                    <a href="mailto:support@pcshop.vn" class="btn btn-outline-primary w-100"><i class="bi bi-envelope"></i> support@pcshop.vn</a>
+                </div>
+            </div>
+        </aside>
+
+        <main class="col-lg-9">
+            <div class="card border-0 shadow policy-glass">
+                <div class="card-body p-4 p-md-5">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<button id="backToTop" class="btn btn-primary rounded-circle shadow-lg">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+@section Scripts {
+    <script>
+        // Back-to-top
+        const btt = document.getElementById('backToTop');
+        const onScroll = () => {
+            if (window.scrollY > 400) { btt.classList.add('show'); } else { btt.classList.remove('show'); }
+        };
+        window.addEventListener('scroll', onScroll);
+        btt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Smooth anchor scroll for headings with id
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', e => {
+                const target = document.querySelector(a.getAttribute('href'));
+                if (target) {
+                    e.preventDefault();
+                    const y = target.getBoundingClientRect().top + window.scrollY - 90;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+}

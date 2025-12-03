@@ -1,0 +1,43 @@
+﻿@{
+    Layout = "_PolicyLayout";
+    ViewData["Title"] = "Chính sách bảo hành";
+}
+
+<h5 class="mb-3">Thời gian bảo hành theo nhóm sản phẩm</h5>
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light">
+            <tr><th>Sản phẩm</th><th>Thời gian</th><th>Ghi chú</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Mainboard, CPU, RAM</td><td><span class="badge text-bg-success">36 tháng</span></td><td>Hàng chính hãng, tem nguyên vẹn</td></tr>
+            <tr><td>VGA, PSU, SSD</td><td><span class="badge text-bg-primary">24 tháng</span></td><td>Đổi mới 30 ngày nếu lỗi NSX</td></tr>
+            <tr><td>Chuột, bàn phím, tai nghe</td><td><span class="badge text-bg-secondary">12 tháng</span></td><td>Không áp dụng quà tặng/clearance</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-md-6">
+        <div class="p-3 border rounded-3 h-100">
+            <h6 class="mb-2"><i class="bi bi-check-circle"></i> Điều kiện bảo hành</h6>
+            <ul class="mb-0">
+                <li>Tem PCShop/NSX còn nguyên, serial trùng khớp.</li>
+                <li>Không rơi vỡ, vô nước, can thiệp phần cứng.</li>
+                <li>Có hóa đơn hoặc mã đơn hàng.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="p-3 border rounded-3 h-100">
+            <h6 class="mb-2"><i class="bi bi-x-circle"></i> Từ chối bảo hành</h6>
+            <ul class="mb-0">
+                <li>Tự ý sửa chữa/thay linh kiện.</li>
+                <li>Hư do nguồn điện/ sử dụng sai mục đích.</li>
+                <li>Tem rách/mờ/tẩy xóa.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-info mt-4"><i class="bi bi-info-circle"></i> Thời gian bảo hành tính từ ngày trên hóa đơn.</div>

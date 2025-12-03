@@ -1,0 +1,26 @@
+﻿@{
+    var path = Context?.Request?.Path.Value?.ToLower() ?? "";
+    Func<string, string> active = href => path == href.ToLower() ? "active" : "";
+}
+
+<div class="card border-0 shadow-sm rounded-3 sticky-lg-top" style="top: 88px;">
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush policy-list">
+            <a class="list-group-item list-group-item-action d-flex align-items-center gap-2 @active("/chinh-sach-bao-hanh")"
+               href="@Url.RouteUrl("Policy_Warranty")">
+                <i class="bi bi-shield-check"></i> Bảo hành
+                <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+            </a>
+            <a class="list-group-item list-group-item-action d-flex align-items-center gap-2 @active("/chinh-sach-van-chuyen")"
+               href="@Url.RouteUrl("Policy_Shipping")">
+                <i class="bi bi-truck"></i> Vận chuyển
+                <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+            </a>
+            <a class="list-group-item list-group-item-action d-flex align-items-center gap-2 @active("/chinh-sach-dieu-khoan")"
+               href="@Url.RouteUrl("Policy_General")">
+                <i class="bi bi-file-earmark-text"></i> Điều khoản
+                <i class="bi bi-chevron-right ms-auto opacity-50"></i>
+            </a>
+        </div>
+    </div>
+</div>
