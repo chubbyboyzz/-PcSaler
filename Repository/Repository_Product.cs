@@ -40,6 +40,7 @@ namespace PcSaler.Repository
                     Model = p.Model,
                     Price = p.Price,
                     ImageURL = p.ImageURL,
+                    Stock = p.Stock,
                 })
                 .ToListAsync();
         }

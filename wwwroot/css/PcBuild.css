@@ -1,23 +1,100 @@
-﻿/* File: wwwroot/css/PcBuild.css */
-
-/* ... (các style khác) ... */
-
-/* Đảm bảo phần cha (col-md-9) có chiều cao đầy đủ */
-.modal-body .row {
-    height: 100%;
+﻿/* Nút Slot (Cấu hình 1, 2, 3...) - Style Tab công nghệ */
+.slot-btn {
+    background: rgba(255, 255, 255, 0.8); /* Nền kính mờ */
+    border: 1px solid rgba(9, 132, 227, 0.3); /* Viền xanh nhạt */
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    padding: 12px;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* KHU VỰC QUAN TRỌNG: Cố định Chiều cao và cho phép cuộn */
-#modal-product-list {
-    /* Đặt chiều cao cố định (fix cứng) - Ví dụ: 60vh */
-    height: 60vh;
-    /* Tự động thêm thanh cuộn dọc khi nội dung tràn */
-    overflow-y: auto;
-    /* Đảm bảo vùng này vẫn chiếm không gian còn lại trong cột Flex */
-    flex-grow: 1 !important;
-    /* Thêm padding nhẹ */
-    padding-right: 10px;
-    /* Dùng background mờ để dễ thấy box khi không có sản phẩm */
-    background-color: #f7f7f7;
-    border-radius: 0.25rem;
+    /* Hiệu ứng hover: Sáng lên và nổi nhẹ */
+    .slot-btn:hover:not(.active) {
+        background: white;
+        border-color: var(--primary-color);
+        box-shadow: 0 5px 15px rgba(9, 132, 227, 0.2); /* Glow xanh */
+        color: var(--primary-color);
+        transform: translateY(-2px);
+    }
+
+    /* Trạng thái đang chọn (Active): Gradient nổi bật */
+    .slot-btn.active {
+        background: linear-gradient(135deg, var(--primary-color), #00cec9); /* Gradient Xanh-Teal */
+        color: white;
+        border: none;
+        box-shadow: 0 8px 20px rgba(9, 132, 227, 0.4); /* Glow mạnh */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+
+    /* Hiệu ứng khi bấm chuột xuống */
+    .slot-btn:active {
+        transform: scale(0.98); /* Thu nhỏ nhẹ tạo cảm giác bấm */
+        box-shadow: 0 2px 5px rgba(9, 132, 227, 0.3);
+    }
+
+* =========================================================
+NÚT SỬA & XÓA (Hành động trên linh kiện đã chọn)
+========================================================= */
+/* Style chung cho nút hành động nhỏ */
+.build-action-btn {
+    border-radius: 8px; /* Bo góc mềm mại */
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem; /* Chữ nhỏ gọn */
+    padding: 6px 14px;
+    border: none; /* Bỏ viền mặc định */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white !important; /* Chữ màu trắng */
+    text-transform: uppercase; /* Chữ in hoa cho mạnh mẽ */
+    letter-spacing: 0.5px;
 }
+
+/* Hiệu ứng icon bên trong (nếu có) */
+.build-action-btn i {
+    margin-right: 6px;
+    font-size: 0.9rem;
+}
+
+/* Hiệu ứng khi di chuột chung */
+.build-action-btn:hover {
+    transform: translateY(-2px); /* Nổi lên nhẹ */
+}
+
+/* Hiệu ứng khi bấm xuống chung */
+.build-action-btn:active {
+    transform: scale(0.95); /* Thu nhỏ lại */
+}
+
+/* --- Nút Sửa (Edit) - Gradient Cam Vàng Cao Cấp --- */
+.btn-build-edit {
+    /* Gradient từ cam sáng sang vàng mật ong */
+    background: linear-gradient(135deg, #f0932b, #ffbe76);
+    box-shadow: 0 4px 10px rgba(240, 147, 43, 0.3); /* Bóng màu cam */
+}
+
+    .btn-build-edit:hover {
+        /* Đảo chiều gradient và tăng độ sáng */
+        background: linear-gradient(135deg, #ffbe76, #f0932b);
+        box-shadow: 0 6px 15px rgba(240, 147, 43, 0.5); /* Glow mạnh hơn */
+    }
+
+/* --- Nút Xóa (Delete) - Gradient Đỏ Công Nghệ --- */
+.btn-build-delete {
+    /* Gradient từ đỏ tươi sang đỏ đậm */
+    background: linear-gradient(135deg, #eb4d4b, #c0392b);
+    box-shadow: 0 4px 10px rgba(235, 77, 75, 0.3); /* Bóng màu đỏ */
+}
+
+    .btn-build-delete:hover {
+        /* Đảo chiều gradient */
+        background: linear-gradient(135deg, #c0392b, #eb4d4b);
+        box-shadow: 0 6px 15px rgba(235, 77, 75, 0.5); /* Glow đỏ mạnh */
+    }

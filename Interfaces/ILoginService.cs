@@ -9,5 +9,9 @@ namespace PcSaler.Interfaces
         Task addAsync(Customer user);
         Task SaveChangeAsync();
         Task<Customer?> GetUsersByEmail(string email);
+        Task<string> CreateOtpAsync(string email);
+        Task<bool> VerifyOtpAsync(string email, string otp);
+        Task UpdatePasswordAsync(string email, string newPasswordHash);
+
     }
 }

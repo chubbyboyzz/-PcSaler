@@ -48,7 +48,8 @@ namespace PcSaler.Repository
                         ProductID = p.ProductID,
                         ProductName = p.ProductName,
                         Price = p.Price,
-                        ImageURL = p.ImageURL
+                        ImageURL = p.ImageURL,
+                        Stock = p.Stock
                     }).ToList()
             }).ToListAsync(); // Sửa ToList() thành ToListAsync() để tuân thủ async
         }

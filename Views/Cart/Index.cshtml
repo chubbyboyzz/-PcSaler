@@ -75,54 +75,41 @@
             loadCartData();
         });
 
-        // === [FIX]: THÔNG BÁO XỊN XÒ KHI CHECKOUT ===
+        // === HANDLE CHECKOUT ===
         function handleCheckout() {
-            // 1. Check giỏ hàng trống
             if (!currentCartData || currentCartData.length === 0) {
-                // Thay alert() bằng Swal.fire
                 Swal.fire({
                     icon: 'info',
                     title: 'Giỏ hàng đang trống',
                     text: 'Hãy dạo một vòng và thêm vài món đồ xịn xò nhé!',
                     confirmButtonText: 'OK luôn',
-                    confirmButtonColor: '#0d6efd' // Màu xanh Primary của Bootstrap
+                    confirmButtonColor: '#0d6efd'
                 });
                 return;
             }
 
-            // 2. Check đăng nhập
             if (isUserLoggedIn) {
                 window.location.href = '/Checkout';
             } else {
-                // Bật Modal đăng nhập (Code cũ)
-                const modalElement = document.getElementById('loginModal');
-                if (modalElement) {
-                    try {
-                        const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-                        modal.show();
-                    } catch (e) {
-                        $('#loginModal').modal('show');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Bạn chưa đăng nhập',
+                    text: 'Vui lòng đăng nhập để tiến hành thanh toán!',
+                    confirmButtonText: 'Đăng nhập ngay',
+                    confirmButtonColor: '#0d6efd'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Account/Login?ReturnUrl=/Cart';
                     }
-                } else {
-                    // Nếu lỗi không bật được modal thì báo đẹp
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Bạn chưa đăng nhập',
-                        text: 'Vui lòng đăng nhập để tiến hành thanh toán!',
-                        confirmButtonText: 'Đăng nhập ngay',
-                         confirmButtonColor: '#0d6efd'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.location.href = '/Account/Login?ReturnUrl=/Checkout';
-                        }
-                    });
-                }
+                });
             }
         }
 
-        // === LOAD DATA ===
+      
+        // === LOAD DATA (FIXED) ===
         function loadCartData() {
             if (isUserLoggedIn) {
+                // --- USER ĐÃ LOGIN ---
                 fetch('/api/APICart/my-cart')
                     .then(res => {
                         if (!res.ok) throw new Error(`Server lỗi: ${res.status}`);
@@ -132,13 +119,41 @@
                         if (Array.isArray(data)) {
                             currentCartData = data;
                             renderCartTable(data);
+                            // [THÊM DÒNG NÀY]: Cập nhật số trên Header ngay khi có dữ liệu
+                            updateHeaderCartCount();
                         }
                     })
                     .catch(err => console.error("Lỗi tải giỏ:", err));
             } else {
-                const cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
-                currentCartData = cart;
-                renderCartTable(cart);
+                // --- KHÁCH VÃNG LAI ---
+                const localCart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+
+                if (localCart.length === 0) {
+                    currentCartData = [];
+                    renderCartTable([]);
+                    updateHeaderCartCount(); 
+                    return;
+                }
+
+                fetch('/api/APICart/guest-cart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(localCart)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Lỗi lấy thông tin giỏ hàng khách");
+                    return res.json();
+                })
+                .then(data => {
+                    currentCartData = data;
+                    renderCartTable(data);                  
+                    updateHeaderCartCount();
+                })
+                .catch(err => {
+                    console.error(err);
+                    renderCartTable(localCart);
+                    updateHeaderCartCount(); 
+                });
             }
         }
 
@@ -162,9 +177,10 @@
             tableContainer.classList.remove('d-none');
 
             items.forEach((item) => {
+                // Fallback giá trị để tránh lỗi null
                 const price = item.Price || item.price || 0;
                 const quantity = item.Quantity || item.quantity || 0;
-                const productName = item.ProductName || item.productName || "Sản phẩm";
+                const productName = item.ProductName || item.productName || "Sản phẩm (Đang cập nhật)";
                 const imageURL = item.ImageURL || item.imageURL || '/images/no-image.png';
                 const itemID = item.ItemID || item.itemID;
                 const itemType = item.ItemType || item.itemType;
@@ -221,6 +237,7 @@
 
         // === UPDATE QUANTITY ===
         function changeQty(id, delta, type) {
+            // Tìm item trong mảng local (để tránh lỗi undefined)
             const currentItem = currentCartData.find(x => (x.ItemID || x.itemID) === id && (x.ItemType || x.itemType) === type);
             if (!currentItem) return;
 
@@ -228,54 +245,63 @@
             const newQuantity = currentQty + delta;
 
             if (newQuantity <= 0) {
-                confirmRemove(id, type); // Chuyển sang hàm xóa có xác nhận xịn
+                confirmRemove(id, type);
                 return;
             }
 
             executeChangeQty(id, type, newQuantity);
         }
 
-        // Hàm thực thi update (Tách ra để tái sử dụng)
         function executeChangeQty(id, type, newQuantity) {
             if (isUserLoggedIn) {
                 fetch('/api/APICart/update-quantity', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ItemID: id, ItemType: type, Quantity: newQuantity })
-                }).then(res => { if (res.ok) loadCartData(); });
+                }).then(res => {
+                    if (res.ok) {
+                        loadCartData();
+                        updateHeaderCartCount(); // Hàm này nằm ở Layout hoặc Component khác
+                    }
+                });
             } else {
                 let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
                 const index = cart.findIndex(x => (x.ItemID || x.itemID) === id && (x.ItemType || x.itemType) === type);
+
                 if (index > -1) {
+                    // Update quantity
                     if(cart[index].Quantity !== undefined) cart[index].Quantity = newQuantity;
                     else cart[index].quantity = newQuantity;
+
                     localStorage.setItem('guest_cart', JSON.stringify(cart));
-                    loadCartData();
+                    loadCartData(); // Reload sẽ gọi lại API để tính tiền lại
+
+                    // Trigger sự kiện để Header cập nhật số (nếu có script ở Header)
+                    window.dispatchEvent(new Event('storage'));
                 }
             }
         }
 
-        // === [FIX]: XÓA SẢN PHẨM VỚI CONFIRM XỊN ===
+        // === REMOVE ITEM ===
         function confirmRemove(id, type) {
-            // Thay confirm() bằng Swal.fire
             Swal.fire({
                 title: 'Bạn chắc chứ?',
                 text: "Sản phẩm này sẽ bị xóa khỏi giỏ hàng!",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#d33', // Màu đỏ cho nút xóa
-                cancelButtonColor: '#3085d6', // Màu xanh cho nút hủy
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Vâng, xóa đi!',
                 cancelButtonText: 'Thôi để lại'
             }).then((result) => {
                 if (result.isConfirmed) {
                     executeRemove(id, type);
-                    // Thông báo xóa thành công nhẹ nhàng (Toast)
+
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
                         showConfirmButton: false,
-                        timer: 500,
+                        timer: 1500,
                         timerProgressBar: true
                     });
                     Toast.fire({
@@ -292,13 +318,31 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ItemID: id, ItemType: type })
-                }).then(res => { if (res.ok) loadCartData(); });
+                }).then(res => {
+                    if (res.ok) {
+                        loadCartData();
+                        updateHeaderCartCount();
+                    }
+                });
             } else {
                 let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+                // Filter bỏ item cần xóa
                 cart = cart.filter(x => !((x.ItemID || x.itemID) === id && (x.ItemType || x.itemType) === type));
+
                 localStorage.setItem('guest_cart', JSON.stringify(cart));
                 loadCartData();
+                window.dispatchEvent(new Event('storage'));
             }
+        }
+
+        // Mock function nếu Layout chưa có
+        function updateHeaderCartCount() {
+            // Logic update badge trên header
+             try {
+                 const count = currentCartData.reduce((a, b) => a + (b.Quantity || b.quantity || 0), 0);
+                 const badge = document.getElementById('cart-count');
+                 if(badge) badge.innerText = `(${count})`;
+             } catch(e) {}
         }
     </script>
 }

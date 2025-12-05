@@ -8,9 +8,9 @@ using System.Security.Claims;
 namespace PcSaler.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")] // [controller] sẽ lấy tên class bỏ chữ "Controller" -> "APICart"
+    [Route("api/[controller]")]
     [ApiController]
-    public class APICartController : ControllerBase // <--- SỬA DÒNG NÀY (Cũ là CartController)
+    public class APICartController : ControllerBase
     {
         private readonly CartService _cartService;
 
@@ -19,12 +19,16 @@ namespace PcSaler.Controllers
             _cartService = cartService;
         }
 
-        // --- CÁC API GIỮ NGUYÊN ---
-
         [HttpGet("count")]
+        [AllowAnonymous] // Cho phép cả khách xem số lượng (nếu cần xử lý logic guest count sau này)
         public async Task<IActionResult> GetCartCount()
         {
-            try { return Ok(await _cartService.GetCartItemCount(GetCustomerId())); }
+            try
+            {
+                // Nếu chưa đăng nhập thì trả về 0 hoặc xử lý logic khác
+                if (User.Identity == null || !User.Identity.IsAuthenticated) return Ok(0);
+                return Ok(await _cartService.GetCartItemCount(GetCustomerId()));
+            }
             catch { return Ok(0); }
         }
 
@@ -33,6 +37,22 @@ namespace PcSaler.Controllers
         {
             try { return Ok(await _cartService.GetCartItems(GetCustomerId())); }
             catch (Exception ex) { return StatusCode(500, new { message = ex.Message }); }
+        }
+
+        // --- [NEW] API CHO KHÁCH VÃNG LAI ---
+        [HttpPost("guest-cart")]
+        [AllowAnonymous] // Quan trọng: Khách chưa login vẫn gọi được
+        public async Task<IActionResult> GetGuestCart([FromBody] List<CartItemViewModel> guestItems)
+        {
+            try
+            {
+                var result = await _cartService.GetGuestCartItems(guestItems);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpPost("add")]
@@ -47,9 +67,8 @@ namespace PcSaler.Controllers
         }
 
         [HttpPost("update-quantity")]
-        public async Task<IActionResult> UpdateQuantity([FromBody] UpdateCartDto dto) // Code gọn hơn hẳn
+        public async Task<IActionResult> UpdateQuantity([FromBody] UpdateCartDto dto)
         {
-            // Controller chỉ làm nhiệm vụ điều phối
             var result = await _cartService.UpdateQuantity(GetCustomerId(), dto.ItemID, dto.ItemType, dto.Quantity);
             return result ? Ok() : BadRequest(new { message = "Lỗi cập nhật" });
         }
@@ -60,6 +79,7 @@ namespace PcSaler.Controllers
             var result = await _cartService.RemoveItem(GetCustomerId(), dto.ItemID, dto.ItemType);
             return result ? Ok() : BadRequest(new { message = "Lỗi xóa" });
         }
+
         private int GetCustomerId()
         {
             var id = User.FindFirst("id")?.Value ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

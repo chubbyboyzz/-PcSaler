@@ -181,70 +181,60 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Lấy trạng thái đăng nhập từ Server
-        const isUserLoggedIn = @((User.Identity.IsAuthenticated).ToString().ToLower());
+        
+        //const isUserLoggedIn = @((User.Identity.IsAuthenticated).ToString().ToLower());
 
         // === HÀM THÊM VÀO GIỎ HÀNG ===
         function addToCart(id, type) {
-            // Tạo hiệu ứng Loading trên nút bấm
-            const btn = event.currentTarget; // Lấy chính xác nút bấm
+            const btn = event.currentTarget;
             const originalContent = btn.innerHTML;
-
-            // Khóa nút và hiện vòng xoay
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             btn.disabled = true;
 
             if (isUserLoggedIn) {
-                // === CASE 1: ĐÃ ĐĂNG NHẬP (GỌI API) ===
+                // === CASE 1: ĐÃ ĐĂNG NHẬP ===
                 fetch('/api/APICart/add', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         ItemID: id,
                         ItemType: type,
-                        Quantity: 1 // Mặc định thêm 1
+                        Quantity: 1
                     })
                 })
                 .then(res => {
                     if (res.ok) {
                         showSuccessToast();
-                        // Nếu có hàm update số lượng trên header thì gọi ở đây
-                        // updateHeaderCartCount();
+                        // ✅ FIX 1: Bỏ comment dòng này để nó cập nhật Header ngay lập tức
+                        updateHeaderCartCount();
                     } else {
                         return res.json().then(e => { throw new Error(e.message); });
                     }
                 })
                 .catch(err => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Không thể thêm sản phẩm: ' + err.message
-                    });
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: err.message });
                 })
                 .finally(() => {
-                    // Trả lại trạng thái cũ cho nút
                     btn.innerHTML = originalContent;
                     btn.disabled = false;
                 });
             } else {
-                // === CASE 2: KHÁCH VÃNG LAI (LOCAL STORAGE) ===
-                // Giả lập độ trễ 300ms cho mượt
+                // === CASE 2: KHÁCH VÃNG LAI ===
                 setTimeout(() => {
                     let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
 
-                    // Check trùng sản phẩm
+                    // Tìm sản phẩm đã có
                     const existingItem = cart.find(x => x.ItemID === id && x.ItemType === type);
 
                     if (existingItem) {
-                        // Nếu lưu guest cart kiểu PascalCase (Quantity) thì dùng cái này
-                        if(existingItem.Quantity !== undefined) existingItem.Quantity += 1;
-                        else existingItem.quantity += 1;
+                        // ✅ FIX 2: Luôn dùng 'Quantity' (Chữ Hoa) để đồng bộ với Layout
+                        // Xóa cái đoạn if else kiểm tra undefined đi, ép nó dùng Quantity luôn
+                        existingItem.Quantity = (existingItem.Quantity || 0) + 1;
                     } else {
-                        // Thêm mới
                         cart.push({
                             ItemID: id,
                             ItemType: type,
-                            Quantity: 1, // Lưu ý: Đồng bộ tên biến với logic render giỏ hàng
+                            Quantity: 1, // Chữ Hoa chuẩn
                             AddedDate: new Date()
                         });
                     }
@@ -252,11 +242,11 @@
                     localStorage.setItem('guest_cart', JSON.stringify(cart));
                     showSuccessToast();
 
-                    // Trả lại nút
                     btn.innerHTML = originalContent;
                     btn.disabled = false;
 
-                    // updateHeaderCartCount();
+                    // ✅ FIX 3: Bỏ comment dòng này
+                    updateHeaderCartCount();
                 }, 300);
             }
         }

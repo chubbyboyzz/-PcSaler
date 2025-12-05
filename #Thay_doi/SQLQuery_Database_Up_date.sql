@@ -241,3 +241,27 @@ CREATE TABLE PriceRanges (
     FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID)
 );
 GO
+
+CREATE TABLE VerificationTokens (
+    TokenID INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerID INT NOT NULL,
+    
+    -- Mã OTP (Lưu chuỗi để linh hoạt, ví dụ: '123456' hoặc 'AB123')
+    TokenCode VARCHAR(10) NOT NULL, 
+    
+    -- Loại Token (Để phân biệt sau này cậu làm xác thực email hay reset pass)
+    TokenType VARCHAR(50) NOT NULL, -- Ví dụ: 'RESET_PASSWORD'
+    
+    -- Thời gian tạo
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    
+    -- Thời gian hết hạn (Cực quan trọng)
+    ExpiresAt DATETIME NOT NULL,
+    
+    -- Trạng thái: Đã dùng hay chưa? (Để chống dùng lại mã cũ)
+    IsUsed BIT DEFAULT 0,
+    
+    -- Liên kết với bảng Customer (Nếu xóa Customer thì xóa luôn Token rác)
+    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID) ON DELETE CASCADE
+);
+GO

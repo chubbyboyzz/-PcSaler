@@ -30,6 +30,8 @@ namespace PcSaler.DBcontext
 
         public DbSet<PriceRange> PriceRanges { get; set; }
 
+        public virtual DbSet<VerificationToken> VerificationTokens { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
