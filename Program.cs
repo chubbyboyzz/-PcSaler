@@ -71,6 +71,7 @@ namespace PcSaler
             builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>(); // Nhớ đảm bảo class này đã có constructor nhận IConfiguration nếu dùng Pepper
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IPcBuildService, PcSaler.Repository.Repository_PcBuild>();
 
             // Email sender service
             builder.Services.AddTransient<IEmailSender, EmailSender>();

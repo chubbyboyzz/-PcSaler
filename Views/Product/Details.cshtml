@@ -5,9 +5,30 @@
 
 <div class="row">
     <div class="col-md-6">
-        <img src="@(Model.ImageURL ?? "/images/no-image.png")"
+        @{
+            // 1. Logic xử lý đường dẫn ảnh (Copy tư duy từ Index)
+            string finalImg = "/images/no-image.png"; // Mặc định là .png nhé
+
+            if (!string.IsNullOrEmpty(Model.ImageURL))
+            {
+                // Nếu DB lưu full path (có dấu /)
+                if (Model.ImageURL.StartsWith("/"))
+                {
+                    finalImg = Model.ImageURL;
+                }
+                // Nếu DB chỉ lưu tên file -> Tự động trỏ vào folder products
+                else
+                {
+                    finalImg = "/images/products/" + Model.ImageURL;
+                }
+            }
+        }
+
+        <img src="@finalImg"
              class="img-fluid rounded shadow-sm"
-             alt="@Model.ProductName" />
+             alt="@Model.ProductName"
+             style="width: 100%; object-fit: contain;"
+             onerror="this.onerror=null; this.src='/images/no-image.png';" />
     </div>
 
     <div class="col-md-6">

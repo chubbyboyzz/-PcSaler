@@ -69,7 +69,8 @@
     <script>
         // === KHAI BÁO BIẾN TOÀN CỤC ===
         let currentCartData = [];
-        const isUserLoggedIn = @((User.Identity.IsAuthenticated).ToString().ToLower());
+        // Fix lỗi cú pháp razor khi convert sang JS: thêm dấu ngoặc và ' '
+        const isUserLoggedIn = @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower());
 
         document.addEventListener('DOMContentLoaded', function() {
             loadCartData();
@@ -89,24 +90,52 @@
             }
 
             if (isUserLoggedIn) {
+                // Đã đăng nhập -> Sang trang thanh toán
                 window.location.href = '/Checkout';
             } else {
+                // === CHƯA ĐĂNG NHẬP: BẬT MODAL CỦA LAYOUT ===
                 Swal.fire({
                     icon: 'warning',
                     title: 'Bạn chưa đăng nhập',
                     text: 'Vui lòng đăng nhập để tiến hành thanh toán!',
                     confirmButtonText: 'Đăng nhập ngay',
-                    confirmButtonColor: '#0d6efd'
+                    confirmButtonColor: '#0d6efd',
+                    showCancelButton: true,
+                    cancelButtonText: 'Để sau'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.location.href = '/Account/Login?ReturnUrl=/Cart';
+                        openLoginModalForCheckout(); // Gọi hàm helper bên dưới
                     }
                 });
             }
         }
 
-      
-        // === LOAD DATA (FIXED) ===
+        // HELPER ĐỂ BẬT MODAL LAYOUT ===
+        function openLoginModalForCheckout() {
+            // 1. Tìm cái Input ReturnUrl trong Form Login ở Layout
+            const returnInput = document.querySelector('#ajaxLoginForm input[name="returnUrl"]');
+
+            // 2. Set giá trị đích đến là '/Checkout'
+            // (Để đăng nhập xong nó tự nhảy sang trang Thanh toán luôn cho tiện)
+            if (returnInput) {
+                returnInput.value = '/Checkout';
+            }
+
+            // 3. Gọi Bootstrap Modal lên
+            const modalElement = document.getElementById('loginModal');
+            if (modalElement) {
+                // Kiểm tra xem đã có instance chưa (để tránh lỗi duplicate backdrop)
+                let modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (!modalInstance) {
+                    modalInstance = new bootstrap.Modal(modalElement);
+                }
+                modalInstance.show();
+            } else {
+                console.error("Không tìm thấy loginModal trong Layout");
+            }
+        }
+
+        // === LOAD DATA ===
         function loadCartData() {
             if (isUserLoggedIn) {
                 // --- USER ĐÃ LOGIN ---
@@ -119,7 +148,6 @@
                         if (Array.isArray(data)) {
                             currentCartData = data;
                             renderCartTable(data);
-                            // [THÊM DÒNG NÀY]: Cập nhật số trên Header ngay khi có dữ liệu
                             updateHeaderCartCount();
                         }
                     })
@@ -131,7 +159,7 @@
                 if (localCart.length === 0) {
                     currentCartData = [];
                     renderCartTable([]);
-                    updateHeaderCartCount(); 
+                    updateHeaderCartCount();
                     return;
                 }
 
@@ -146,18 +174,41 @@
                 })
                 .then(data => {
                     currentCartData = data;
-                    renderCartTable(data);                  
+                    renderCartTable(data);
                     updateHeaderCartCount();
                 })
                 .catch(err => {
                     console.error(err);
                     renderCartTable(localCart);
-                    updateHeaderCartCount(); 
+                    updateHeaderCartCount();
                 });
             }
         }
 
-        // === RENDER TABLE ===
+        // === [HÀM MỚI] Helper xử lý đường dẫn ảnh ===
+        function getSmartImagePath(imgName, type) {
+            // 1. Nếu không có tên ảnh -> Trả về ảnh mặc định
+            if (!imgName) return '/images/no-image.png';
+
+            // 2. Nếu đã là đường dẫn full (bắt đầu bằng / hoặc http) -> Giữ nguyên
+            if (imgName.startsWith('/') || imgName.startsWith('http')) {
+                return imgName;
+            }
+
+            // 3. Nếu chỉ là tên file -> Nối thêm folder dựa theo loại sản phẩm
+            const lowerType = (type || '').toLowerCase();
+
+            // Nếu type là PC hoặc Build thì vào folder pcbuilds
+            if (lowerType.includes('pc') || lowerType.includes('build')) {
+                return `/images/pcbuilds/${imgName}`;
+            }
+            // Còn lại (linh kiện lẻ) vào folder products
+            else {
+                return `/images/products/${imgName}`;
+            }
+        }
+
+        // === RENDER TABLE (ĐÃ FIX LOGIC ẢNH) ===
         function renderCartTable(items) {
             const tbody = document.getElementById('cart-body');
             const emptyMsg = document.getElementById('empty-cart-msg');
@@ -167,23 +218,27 @@
             let totalAmount = 0;
 
             if (!items || items.length === 0) {
-                emptyMsg.classList.remove('d-none');
-                tableContainer.classList.add('d-none');
+                if(emptyMsg) emptyMsg.classList.remove('d-none');
+                if(tableContainer) tableContainer.classList.add('d-none');
                 updateTotalDisplay(0);
                 return;
             }
 
-            emptyMsg.classList.add('d-none');
-            tableContainer.classList.remove('d-none');
+            if(emptyMsg) emptyMsg.classList.add('d-none');
+            if(tableContainer) tableContainer.classList.remove('d-none');
 
             items.forEach((item) => {
                 // Fallback giá trị để tránh lỗi null
                 const price = item.Price || item.price || 0;
                 const quantity = item.Quantity || item.quantity || 0;
                 const productName = item.ProductName || item.productName || "Sản phẩm (Đang cập nhật)";
-                const imageURL = item.ImageURL || item.imageURL || '/images/no-image.png';
                 const itemID = item.ItemID || item.itemID;
                 const itemType = item.ItemType || item.itemType;
+
+                // --- GỌI HÀM XỬ LÝ ẢNH ---
+                const rawImg = item.ImageURL || item.imageURL;
+                const finalImg = getSmartImagePath(rawImg, itemType);
+                // --------------------------
 
                 const lineTotal = price * quantity;
                 totalAmount += lineTotal;
@@ -192,7 +247,10 @@
                     <tr>
                         <td class="ps-4">
                             <div class="d-flex align-items-center">
-                                <img src="${imageURL}" class="rounded border me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                <img src="${finalImg}"
+                                     class="rounded border me-3"
+                                     style="width: 60px; height: 60px; object-fit: cover;"
+                                     onerror="this.onerror=null; this.src='/images/no-image.png';">
                                 <div>
                                     <h6 class="mb-0 text-truncate" style="max-width: 200px;">
                                         <a href="/Details/${itemID}" class="text-decoration-none text-dark">${productName}</a>
@@ -227,8 +285,10 @@
 
         function updateTotalDisplay(amount) {
             const formatted = formatCurrency(amount);
-            document.getElementById('sub-total').innerText = formatted;
-            document.getElementById('final-total').innerText = formatted;
+            const subTotal = document.getElementById('sub-total');
+            const finalTotal = document.getElementById('final-total');
+            if(subTotal) subTotal.innerText = formatted;
+            if(finalTotal) finalTotal.innerText = formatted;
         }
 
         function formatCurrency(number) {
@@ -237,13 +297,11 @@
 
         // === UPDATE QUANTITY ===
         function changeQty(id, delta, type) {
-            // Tìm item trong mảng local (để tránh lỗi undefined)
             const currentItem = currentCartData.find(x => (x.ItemID || x.itemID) === id && (x.ItemType || x.itemType) === type);
             if (!currentItem) return;
 
             const currentQty = currentItem.Quantity || currentItem.quantity || 0;
             const newQuantity = currentQty + delta;
-
             if (newQuantity <= 0) {
                 confirmRemove(id, type);
                 return;
@@ -261,22 +319,18 @@
                 }).then(res => {
                     if (res.ok) {
                         loadCartData();
-                        updateHeaderCartCount(); // Hàm này nằm ở Layout hoặc Component khác
+                        updateHeaderCartCount();
                     }
                 });
             } else {
                 let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
                 const index = cart.findIndex(x => (x.ItemID || x.itemID) === id && (x.ItemType || x.itemType) === type);
-
                 if (index > -1) {
-                    // Update quantity
                     if(cart[index].Quantity !== undefined) cart[index].Quantity = newQuantity;
                     else cart[index].quantity = newQuantity;
 
                     localStorage.setItem('guest_cart', JSON.stringify(cart));
-                    loadCartData(); // Reload sẽ gọi lại API để tính tiền lại
-
-                    // Trigger sự kiện để Header cập nhật số (nếu có script ở Header)
+                    loadCartData();
                     window.dispatchEvent(new Event('storage'));
                 }
             }
@@ -296,7 +350,6 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     executeRemove(id, type);
-
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
@@ -326,9 +379,7 @@
                 });
             } else {
                 let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
-                // Filter bỏ item cần xóa
                 cart = cart.filter(x => !((x.ItemID || x.itemID) === id && (x.ItemType || x.itemType) === type));
-
                 localStorage.setItem('guest_cart', JSON.stringify(cart));
                 loadCartData();
                 window.dispatchEvent(new Event('storage'));
@@ -337,7 +388,6 @@
 
         // Mock function nếu Layout chưa có
         function updateHeaderCartCount() {
-            // Logic update badge trên header
              try {
                  const count = currentCartData.reduce((a, b) => a + (b.Quantity || b.quantity || 0), 0);
                  const badge = document.getElementById('cart-count');

@@ -5,7 +5,6 @@
 }
 
 <div class="container py-4">
-    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
@@ -15,14 +14,29 @@
     </nav>
 
     <div class="row g-5">
-        <!-- Cột Trái: Ảnh và Giá -->
         <div class="col-lg-5">
             <div class="card border-0 shadow-sm sticky-top" style="top: 90px; z-index: 1;">
                 <div class="p-3">
-                    <img src="~/images/pcbuilds/@(Model.ImageURL ?? "no-img.png")"
+                    @{
+                        string mainImg = "/images/no-image.png"; // Ảnh dự phòng chuẩn đuôi .png
+                        if (!string.IsNullOrEmpty(Model.ImageURL))
+                        {
+                            if (Model.ImageURL.StartsWith("/"))
+                            {
+                                mainImg = Model.ImageURL;
+                            }
+                            else
+                            {
+                                mainImg = $"/images/pcbuilds/{Model.ImageURL}";
+                            }
+                        }
+                    }
+                    <img src="@mainImg"
                          class="img-fluid rounded w-100 border"
-                         alt="@Model.PCBuildName">
+                         alt="@Model.PCBuildName"
+                         onerror="this.onerror=null; this.src='/images/no-image.png';">
                 </div>
+
                 <div class="card-body">
                     <h2 class="fw-bold mb-3">@Model.PCBuildName</h2>
 
@@ -49,7 +63,6 @@
             </div>
         </div>
 
-        <!-- Cột Phải: Chi tiết linh kiện -->
         <div class="col-lg-7">
             <h4 class="fw-bold border-bottom pb-2 mb-4"><i class="fa-solid fa-microchip me-2"></i>Chi tiết cấu hình</h4>
 
@@ -70,38 +83,52 @@
                             {
                                 <tr>
                                     <td class="text-center">
-                                        <!-- Icon minh họa theo loại linh kiện -->
                                         @if (comp.ComponentType == "CPU")
                                         {
                                             <i class="fa-solid fa-microchip text-primary"></i>
                                         }
                                         else if (comp.ComponentType == "VGA")
                                         {
-
                                             <i class="fa-solid fa-gamepad text-danger"></i>
                                         }
                                         else if (comp.ComponentType == "RAM")
                                         {
-
                                             <i class="fa-solid fa-memory text-success"></i>
                                         }
                                         else if (comp.ComponentType.Contains("Main"))
                                         {
-
                                             <i class="fa-solid fa-chess-board text-info"></i>
                                         }
                                         else
                                         {
-
                                             <i class="fa-solid fa-screwdriver-wrench text-secondary"></i>
                                         }
                                     </td>
                                     <td class="fw-bold text-secondary small">@comp.ComponentType</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="~/images/products/@(comp.ImageURL ?? "no-img.png")"
+                                            @{
+                                                string compImg = "/images/no-image.png";
+                                                if (!string.IsNullOrEmpty(comp.ImageURL))
+                                                {
+                                                    if (comp.ImageURL.StartsWith("/"))
+                                                    {
+                                                        compImg = comp.ImageURL;
+                                                    }
+                                                    else
+                                                    {
+                                                        // Linh kiện nằm trong folder products
+                                                        compImg = $"/images/products/{comp.ImageURL}";
+                                                    }
+                                                }
+                                            }
+
+                                            <img src="@compImg"
                                                  width="40" height="40"
-                                                 class="rounded me-2 border object-fit-cover">
+                                                 class="rounded me-2 border object-fit-cover"
+                                                 alt="@comp.ProductName"
+                                                 onerror="this.onerror=null; this.src='/images/no-image.png';">
+
                                             <a href="@Url.Action("Details", "Product", new { id = comp.ProductID })" class="text-decoration-none text-dark fw-semibold">
                                                 @comp.ProductName
                                             </a>
@@ -115,7 +142,6 @@
                 </table>
             </div>
 
-            <!-- Mô tả thêm -->
             <div class="mt-5">
                 <h4 class="fw-bold border-bottom pb-2 mb-3">Mô tả sản phẩm</h4>
                 <div class="bg-light p-4 rounded text-secondary">
@@ -134,13 +160,93 @@
 </div>
 
 @section Scripts {
-    <script>
-        function addToCart(pcId) {
-            // Gọi API thêm vào giỏ hàng (Logic bạn đã có ở các bài trước)
-            // Ví dụ này chỉ alert mô phỏng
-            // Trong thực tế, bạn gọi fetch('/api/APICart/add', ...) với ItemType = 'PCBUILD'
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            alert("Đã thêm bộ PC (ID: " + pcId + ") vào giỏ hàng!\n(Tính năng này cần backend xử lý ItemType='PCBUILD')");
+    <script>
+        // 1. Lấy danh sách linh kiện từ Model C# bắn sang JS
+        var pcComponents = @Html.Raw(Json.Serialize(Model.Components));
+        // Biến check đăng nhập
+        var isUserLoggedIn = @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+
+        // --- HÀM MUA NGAY ---
+        async function addToCart(pcId) {
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+
+            // Hiệu ứng loading
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang xử lý...';
+            btn.disabled = true;
+
+            try {
+                if (!pcComponents || pcComponents.length === 0) {
+                    throw new Error("Bộ PC này chưa có linh kiện nào!");
+                }
+
+                if (isUserLoggedIn) {
+                    // === TRƯỜNG HỢP 1: USER ĐÃ ĐĂNG NHẬP (Gọi API) ===
+                    const requests = pcComponents.map(item => {
+                        return fetch('/api/APICart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                ItemID: item.productID,
+                                ItemType: 'PRODUCT',
+                                Quantity: item.quantity
+                            })
+                        });
+                    });
+
+                    await Promise.all(requests);
+                    if (typeof updateHeaderCartCount === 'function') updateHeaderCartCount();
+
+                } else {
+                    // === TRƯỜNG HỢP 2: KHÁCH VÃNG LAI (Lưu LocalStorage) ===
+                    let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+
+                    pcComponents.forEach(item => {
+                        const existingItem = cart.find(x => x.ItemID === item.productID && x.ItemType === 'PRODUCT');
+
+                        if (existingItem) {
+                            existingItem.Quantity = (existingItem.Quantity || 0) + item.quantity;
+                        } else {
+                            cart.push({
+                                ItemID: item.productID,
+                                ItemType: 'PRODUCT',
+                                Quantity: item.quantity,
+                                AddedDate: new Date()
+                            });
+                        }
+                    });
+
+                    localStorage.setItem('guest_cart', JSON.stringify(cart));
+                    if (typeof updateHeaderCartCount === 'function') updateHeaderCartCount();
+                }
+
+                // Thông báo thành công
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công!',
+                    text: 'Đã thêm trọn bộ linh kiện vào giỏ hàng.',
+                    confirmButtonText: 'Xem giỏ hàng',
+                    showCancelButton: true,
+                    cancelButtonText: 'Mua tiếp'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Cart';
+                    }
+                });
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Có lỗi xảy ra',
+                    text: 'Không thể thêm vào giỏ hàng. Vui lòng thử lại!'
+                });
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
     </script>
 }

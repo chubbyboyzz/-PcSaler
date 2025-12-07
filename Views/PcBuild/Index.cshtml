@@ -16,18 +16,34 @@
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @if (Model != null && Model.Any())
         {
-            foreach (var item in Model)
+            @foreach (var item in Model)
             {
+                // --- KHỐI LOGIC XỬ LÝ ẢNH (Clean Code) ---
+                string finalImg = "/images/no-image.png"; // Fallback mặc định
+                if (!string.IsNullOrEmpty(item.ImageURL))
+                {
+                    // Nếu DB đã lưu full đường dẫn (bắt đầu bằng /)
+                    if (item.ImageURL.StartsWith("/"))
+                    {
+                        finalImg = item.ImageURL;
+                    }
+                    // Nếu DB chỉ lưu tên file (ví dụ: pc-gaming-01.jpg)
+                    else
+                    {
+                        finalImg = $"/images/pcbuilds/{item.ImageURL}";
+                    }
+                }
+                // -------------------------------------------
+
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0 hover-effect">
-                        <!-- Ảnh sản phẩm -->
                         <div class="position-relative overflow-hidden">
-                            <img src="~/images/pcbuilds/@(item.ImageURL ?? "no-img.png")"
+                            <img src="@finalImg"
                                  class="card-img-top object-fit-cover"
                                  alt="@item.PCBuildName"
-                                 style="height: 250px; transition: transform 0.3s;">
+                                 style="height: 250px; transition: transform 0.3s;"
+                                 onerror="this.onerror=null; this.src='/images/no-image.png';">
 
-                            <!-- Badge giảm giá hoặc Hot (Giả lập) -->
                             <span class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 m-2 rounded-pill fw-bold small">HOT</span>
                         </div>
 
@@ -37,13 +53,9 @@
                                     @item.PCBuildName
                                 </a>
                             </h5>
-
-                            <!-- Giá tiền -->
                             <p class="card-text text-danger fw-bold fs-5 mb-3">
                                 @item.TotalPrice.ToString("#,##0") đ
                             </p>
-
-                            <!-- Nút bấm (Đẩy xuống đáy card) -->
                             <div class="mt-auto d-grid gap-2">
                                 <a href="@Url.Action("Details", "PcBuild", new { id = item.PCBuildID })" class="btn btn-outline-primary fw-semibold">
                                     <i class="fa-solid fa-eye me-2"></i>Xem cấu hình chi tiết
