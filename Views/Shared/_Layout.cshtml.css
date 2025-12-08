@@ -46,3 +46,55 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Header Styles */
+header {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Nút Danh mục */
+.dropdown-toggle::after {
+    /* Chỉnh lại icon mũi tên dropdown cho đẹp nếu cần */
+}
+
+/* Hiệu ứng Menu ngang */
+.navbar-nav .nav-link {
+    color: #444;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.navbar-nav .nav-link:hover, .navbar-nav .nav-link.active {
+    color: #0d6efd; /* Màu xanh primary */
+}
+
+/* Gạch chân khi hover menu */
+.navbar-nav .nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 5px;
+    left: 50%;
+    background-color: #0d6efd;
+    transition: all 0.3s;
+    transform: translateX(-50%);
+}
+
+.navbar-nav .nav-link:hover::after {
+    width: 80%;
+}
+
+/* Nút Xây dựng PC Rung lắc nhẹ để hút mắt */
+.btn-warning:hover {
+    animation: shake 0.5s;
+    background-color: #ffca2c;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}

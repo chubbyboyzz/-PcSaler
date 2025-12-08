@@ -1,0 +1,187 @@
+﻿@model IEnumerable<PcSaler.DBcontext.Entites.Product>
+
+@{
+    ViewData["Title"] = "Phụ Kiện - PC Gear";
+    var currentType = ViewBag.CurrentType as string;
+
+    // Hàm check active theo style của site.css
+    string GetActive(string type) => currentType == type ? "fw-bold shadow-sm" : "";
+}
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="category-sidebar p-3 bg-white rounded shadow-sm border">
+            <h6 class="vintage-font"><i class="fa-solid fa-layer-group me-2"></i>Danh Mục Phụ Kiện</h6>
+            <div class="d-flex flex-column gap-2 mt-3">
+                <div class="category-item">
+                    <a href="@Url.Action("Accessories", "Product", new { type = "ALL" })" class="@GetActive("ALL")">
+                        <i class="fa-solid fa-border-all me-2"></i> Tất cả phụ kiện
+                    </a>
+                </div>
+                <div class="category-item">
+                    <a href="@Url.Action("Accessories", "Product", new { type = "MOUSE" })" class="@GetActive("MOUSE")">
+                        <i class="fa-solid fa-computer-mouse me-2"></i> Chuột (Mouse)
+                    </a>
+                </div>
+                <div class="category-item">
+                    <a href="@Url.Action("Accessories", "Product", new { type = "KEYBOARD" })" class="@GetActive("KEYBOARD")">
+                        <i class="fa-regular fa-keyboard me-2"></i> Bàn phím
+                    </a>
+                </div>
+                <div class="category-item">
+                    <a href="@Url.Action("Accessories", "Product", new { type = "HEADSET" })" class="@GetActive("HEADSET")">
+                        <i class="fa-solid fa-headphones me-2"></i> Tai nghe
+                    </a>
+                </div>
+                <div class="category-item">
+                    <a href="@Url.Action("Accessories", "Product", new { type = "MONITOR" })" class="@GetActive("MONITOR")">
+                        <i class="fa-solid fa-desktop me-2"></i> Màn hình
+                    </a>
+                </div>
+                <div class="category-item">
+                    <a href="@Url.Action("Accessories", "Product", new { type = "CHAIR" })" class="@GetActive("CHAIR")">
+                        <i class="fa-solid fa-chair me-2"></i> Ghế Gaming
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <h2 class="vintage-font text-uppercase mb-0" style="color: var(--primary-color);">
+                @if (currentType == "ALL")
+                {
+                    <text>Kho Phụ Kiện</text>
+                }
+                else
+                {
+
+                    @currentType
+                }
+            </h2>
+            <span class="text-muted">Tìm thấy @(Model?.Count() ?? 0) sản phẩm</span>
+        </div>
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-solid fa-box-open"></i></div>
+                <h5 class="fw-bold">Chưa có sản phẩm nào</h5>
+                <p class="empty-state-text">Danh mục này đang được cập nhật.</p>
+                <a href="@Url.Action("Accessories", new { type = "ALL" })" class="btn btn-outline-primary mt-3">Xem tất cả</a>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @foreach (var item in Model)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm border-0 product-card">
+
+                            @* --- LOGIC XỬ LÝ ẢNH (Copy từ Index.cshtml) --- *@
+                            @{
+                                string finalImg = "/images/no-image.png";
+                                // Lưu ý: Trong Entity Product trường này thường tên là 'Image', còn ViewModel là 'ImageURL'
+                                // Tôi dùng 'Image' cho khớp với Entity, nếu lỗi ông đổi thành ImageURL nhé
+                                string dbImage = item.ImageURL;
+
+                                if (!string.IsNullOrEmpty(dbImage))
+                                {
+                                    if (dbImage.StartsWith("/"))
+                                    {
+                                        finalImg = dbImage; // [cite: 5]
+                                    }
+                                    else
+                                    {
+                                        finalImg = "/images/products/" + System.IO.Path.GetFileName(dbImage); // [cite: 7]
+                                    }
+                                }
+                            }
+
+                            @* Badge Sale/New *@
+                            @if (item.Price > 5000000)
+                            {
+                                <div class="card-badge badge-sale">HOT DEAL</div>
+                            }
+                            else
+                            {
+
+                                <div class="card-badge badge-new">NEW</div>
+                            }
+
+                            @* Ảnh sản phẩm *@
+                            <img src="@finalImg" class="card-img-top p-3" alt="@item.ProductName"
+                                 style="height: 200px; object-fit: contain;"
+                                 [cite_start]onerror="this.onerror=null; this.src='/images/no-image.png';"> @* [cite: 9] *@
+
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate">
+                                    <a href="@Url.Action("Details", "Product", new { id = item.ProductID })" class="text-decoration-none text-dark fw-bold">
+                                        @item.ProductName
+                                    </a>
+                                </h5>
+
+                                <div class="mb-3">
+                                    <span class="price-tag">
+                                        @item.Price.ToString("#,##0") <span class="currency-symbol">đ</span>
+                                    </span>
+                                </div>
+
+                                <div class="mt-auto d-grid gap-2">
+                                    <a href="@Url.Action("Details", "Product", new { id = item.ProductID })"
+                                       class="btn btn-outline-primary btn-sm">
+                                        Xem chi tiết
+                                    </a>
+
+                                    @* Nút Thêm vào giỏ gọi hàm JS addToCart giống Index.cshtml *@
+                                    <button class="btn btn-primary btn-sm" onclick="addToCart(@item.ProductID, 'PRODUCT')">
+                                        <i class="fa-solid fa-cart-plus"></i> Thêm vào giỏ
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // --- LOGIC GIỎ HÀNG (Copy y hệt từ Index.cshtml sang để chạy đồng bộ) --- [cite: 17]
+
+        // Lấy trạng thái đăng nhập
+        var isUserLoggedIn = @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower());
+
+        function addToCart(id, type) {
+            if (isUserLoggedIn) {
+                // Đã đăng nhập: Gọi API [cite: 18]
+                fetch('/api/APICart/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ItemID: id, ItemType: type, Quantity: 1 })
+                }).then(res => {
+                    if (res.ok) {
+                        Swal.fire({icon: 'success', title: 'Thành công', text: 'Đã thêm vào giỏ', timer: 1000, showConfirmButton: false});
+                        if(typeof updateHeaderCartCount === "function") updateHeaderCartCount();
+                    }
+                });
+            } else {
+                // Chưa đăng nhập: Lưu LocalStorage [cite: 21]
+                let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+                let item = cart.find(x => x.ItemID == id && x.ItemType == type);
+
+                if(item) item.Quantity++;
+                else cart.push({ItemID: id, ItemType: type, Quantity: 1}); // [cite: 23]
+
+                localStorage.setItem('guest_cart', JSON.stringify(cart));
+                Swal.fire({icon: 'success', title: 'Thành công', text: 'Đã thêm vào giỏ (Khách)', timer: 1000, showConfirmButton: false});
+                if(typeof updateHeaderCartCount === "function") updateHeaderCartCount();
+            }
+        }
+    </script>
+}

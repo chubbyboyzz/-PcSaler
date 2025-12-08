@@ -1,0 +1,166 @@
+﻿@{
+    ViewData["Title"] = "Liên hệ & Hỗ trợ";
+}
+
+<style>
+    /* ... (Giữ các class contact-item cũ) ... */
+
+    /* STYLE CHO NÚT TÁCH BIỆT (REFINED STYLE) */
+    .social-card-item {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px; /* Khoảng cách bên trong thoáng */
+        border-radius: 12px; /* Bo góc mềm mại */
+        text-decoration: none;
+        color: white !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1); /* Bóng nhẹ mặc định */
+        height: 100%; /* Đảm bảo 2 nút cùng hàng cao bằng nhau */
+    }
+
+    /* Icon nằm trong vòng tròn mờ */
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        transition: transform 0.3s;
+    }
+
+    .social-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* Hiệu ứng Hover: Nổi lên + Bóng đậm + Icon xoay */
+    .social-card-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+
+        .social-card-item:hover .icon-wrapper {
+            transform: scale(1.1) rotate(10deg);
+            background: rgba(255,255,255,0.3);
+        }
+
+    /* Màu nền Gradient Mượt mà */
+    .btn-facebook {
+        background: linear-gradient(135deg, #1877F2, #3b5998);
+    }
+
+    .btn-youtube {
+        background: linear-gradient(135deg, #FF0000, #cc0000);
+    }
+
+    .btn-tiktok {
+        background: linear-gradient(135deg, #000000, #333333);
+    }
+
+    .btn-zalo {
+        background: linear-gradient(135deg, #0068FF, #0041a3);
+    }
+
+    /* Map Container */
+    .map-container {
+        border-radius: 15px;
+        overflow: hidden;
+        border: 4px solid white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="row g-5 align-items-start">
+    <div class="col-lg-5">
+        <h2 class="fw-bold mb-4" style="background: -webkit-linear-gradient(45deg, #0984e3, #d63031); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            Liên hệ với PCShop
+        </h2>
+        <p class="text-muted mb-5">
+            Cần hỗ trợ build PC hay tư vấn gaming gear? Đừng ngại liên hệ với chúng tôi qua các kênh dưới đây nhé!
+        </p>
+
+        <div class="d-flex flex-column gap-4">
+            <div class="d-flex align-items-center contact-item">
+                <div class="contact-icon-box me-3">
+                    <i class="fa-solid fa-map-location-dot fa-xl text-primary"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1 text-uppercase text-primary">Showroom Chính</h6>
+                    <p class="text-muted small mb-0">Tòa nhà FPT Polytechnic, Trịnh Văn Bô, HN</p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center contact-item">
+                <div class="contact-icon-box me-3">
+                    <i class="fa-solid fa-headset fa-xl text-danger"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1 text-uppercase text-danger">Hotline 24/7</h6>
+                    <p class="text-muted small mb-0">Mua hàng: <strong class="text-dark">1900 xxxx</strong></p>
+                    <p class="text-muted small mb-0">Kỹ thuật: <strong class="text-dark">1900 xxxx</strong></p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center contact-item">
+                <div class="contact-icon-box me-3">
+                    <i class="fa-solid fa-envelope-open-text fa-xl text-success"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-1 text-uppercase text-success">Email Hỗ trợ</h6>
+                    <p class="text-muted small mb-0">cskh@pcshop.edu.vn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+
+        <h5 class="fw-bold text-center text-primary mb-4 text-uppercase" style="letter-spacing: 1px;">
+            ✨ Kênh thông tin chính thức ✨
+        </h5>
+
+        <div class="row g-3 mb-4">
+
+            <div class="col-6">
+                <a href="https://facebook.com" target="_blank" class="social-card-item btn-facebook">
+                    <div class="icon-wrapper"><i class="fa-brands fa-facebook fa-2x"></i></div>
+                    <span class="social-name">Fanpage</span>
+                </a>
+            </div>
+
+            <div class="col-6">
+                <a href="https://www.youtube.com/watch?v=sDPzefoS3Zk&list=RDdUaxxQegfS0&index=8" target="_blank" class="social-card-item btn-youtube">
+                    <div class="icon-wrapper"><i class="fa-brands fa-youtube fa-2x"></i></div>
+                    <span class="social-name">Youtube</span>
+                </a>
+            </div>
+
+            <div class="col-6">
+                <a href="https://www.tiktok.com/@@bestaolang09?lang=en" target="_blank" class="social-card-item btn-tiktok">
+                    <div class="icon-wrapper"><i class="fa-brands fa-tiktok fa-2x"></i></div>
+                    <span class="social-name">TikTok</span>
+                </a>
+            </div>
+
+            <div class="col-6">
+                <a href="https://zalo.me/0582225677" target="_blank" class="social-card-item btn-zalo">
+                    <div class="icon-wrapper">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" width="32" height="32" style="filter: brightness(0) invert(1);">
+                    </div>
+                    <span class="social-name">Zalo OA</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="map-container" style="height: 380px;">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.863981044334!2d105.74459841476343!3d21.038127792835456!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313454b991d80fed%3A0xac4539827e793318!2sTr%C6%B0%E1%BB%9Dng%20Cao%20%C4%91%E1%BA%B3ng%20FPT%20Polytechnic!5e0!3m2!1svi!2s!4v1626245366431!5m2!1svi!2s"
+                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+    </div>
+</div>

@@ -70,8 +70,8 @@
                             </div>
                             <div id="collapse_MOMO" class="payment-details border-start border-end border-bottom p-4 bg-light text-center" style="display:none;">
                                 <p class="mb-2 text-muted fw-bold">Quét mã để thanh toán ngay:</p>
-                                <img src="https://img.vietqr.io/image/MB-0985532053-compact2.png?amount=@(Model.TotalAmount)&addInfo=PCShop Payment&accountName=PC SHOP"
-                                     width="200" class="rounded border shadow-sm bg-white p-2">
+                                <img src="https://img.vietqr.io/image/TCB-2202032005-compact2.png?amount=@(Model.TotalAmount)&addInfo=PCShop Payment&accountName=PC SHOP"
+                                     width="400" class="rounded border shadow-sm bg-white p-2">
                             </div>
                         </div>
 
@@ -130,8 +130,32 @@
                                             <span class="badge bg-secondary position-absolute top-0 start-100 translate-middle rounded-pill">
                                                 @item.Quantity
                                             </span>
-                                            <img src="@item.ImageURL" width="50" class="rounded border">
+
+                                            @{
+                                                string finalImg = "/images/no-image.png";
+                                                if (!string.IsNullOrEmpty(item.ImageURL))
+                                                {
+                                                    // Nếu là đường dẫn full (bắt đầu bằng / hoặc http)
+                                                    if (item.ImageURL.StartsWith("/") || item.ImageURL.Contains("http"))
+                                                    {
+                                                        finalImg = item.ImageURL;
+                                                    }
+                                                    else
+                                                    {
+                                                        // Mặc định trỏ vào folder products (Linh kiện)
+                                                        // để trỏ sang folder pcbuilds nếu cần.
+                                                        finalImg = $"/images/products/{item.ImageURL}";
+                                                    }
+                                                }
+                                            }
+
+                                            <img src="@finalImg"
+                                                 width="50" height="50"
+                                                 class="rounded border object-fit-cover"
+                                                 alt="@item.ProductName"
+                                                 onerror="this.onerror=null; this.src='/images/no-image.png';">
                                         </div>
+
                                         <div class="ms-2">
                                             <h6 class="my-0 text-truncate small" style="max-width: 150px;">@item.ProductName</h6>
                                             <small class="text-muted">@item.Price.ToString("N0") ₫</small>

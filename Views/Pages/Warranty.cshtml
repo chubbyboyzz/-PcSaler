@@ -1,0 +1,221 @@
+﻿@{
+    ViewData["Title"] = "Chính sách Bảo hành";
+}
+
+<style>
+    /* Hiệu ứng cuộn mượt */
+    html {
+        scroll-behavior: smooth;
+    }
+
+    /* Style cho Menu bên trái */
+    .warranty-sidebar .list-group-item {
+        border: none;
+        border-left: 3px solid transparent;
+        font-weight: 500;
+        color: #636e72;
+        transition: all 0.3s;
+    }
+
+        .warranty-sidebar .list-group-item:hover {
+            background-color: #f1f2f6;
+            color: var(--primary-color);
+            padding-left: 20px; /* Hiệu ứng thụt vào khi hover */
+        }
+        /* Active state giả lập (nếu cần JS phức tạp hơn thì tính sau, giờ dùng hover là đẹp rồi) */
+        .warranty-sidebar .list-group-item.active-link {
+            border-left-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: #f8f9fa;
+        }
+
+    /* Style cho Card nội dung */
+    .policy-card {
+        border: none;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        margin-bottom: 30px; /* Khoảng cách giữa các mục */
+        overflow: hidden;
+    }
+
+    .policy-header {
+        background: linear-gradient(135deg, #0984e3, #74b9ff);
+        color: white;
+        padding: 15px 20px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+</style>
+
+<div class="text-center mb-5 fade-in-up">
+    <h2 class="fw-bold text-primary mb-2">CHÍNH SÁCH BẢO HÀNH</h2>
+    <p class="text-muted">Cam kết bảo vệ quyền lợi khách hàng với dịch vụ hậu mãi chuẩn 5 sao</p>
+    <div style="width: 60px; height: 4px; background: var(--primary-color); margin: 0 auto; border-radius: 2px;"></div>
+</div>
+
+<div class="row g-5">
+    <div class="col-md-3 d-none d-md-block">
+        <div class="sticky-top warranty-sidebar" style="top: 100px; z-index: 10;">
+            <div class="list-group shadow-sm rounded-3 overflow-hidden">
+                <div class="bg-light p-3 fw-bold text-uppercase border-bottom">Mục lục</div>
+                <a href="#dieu-kien" class="list-group-item list-group-item-action py-3"><i class="fa-solid fa-clipboard-check me-2"></i> 1. Điều kiện bảo hành</a>
+                <a href="#tu-choi" class="list-group-item list-group-item-action py-3"><i class="fa-solid fa-ban me-2"></i> 2. Từ chối bảo hành</a>
+                <a href="#thoi-gian" class="list-group-item list-group-item-action py-3"><i class="fa-solid fa-clock me-2"></i> 3. Thời gian xử lý</a>
+                <a href="#doi-tra" class="list-group-item list-group-item-action py-3"><i class="fa-solid fa-rotate me-2"></i> 4. Chính sách đổi trả</a>
+                <a href="#dia-chi" class="list-group-item list-group-item-action py-3"><i class="fa-solid fa-location-dot me-2"></i> 5. Địa chỉ gửi hàng</a>
+            </div>
+
+            <div class="mt-4 p-4 rounded-3 text-white text-center shadow-sm" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">
+                <i class="fa-solid fa-headset fa-3x mb-3"></i>
+                <h5 class="fw-bold">Cần hỗ trợ gấp?</h5>
+                <p class="small mb-3">Liên hệ hotline kỹ thuật ngay</p>
+                <a href="tel:0582225677" class="btn btn-light text-primary fw-bold rounded-pill w-100">0582225677</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-9">
+
+        <div id="dieu-kien" class="policy-card">
+            <div class="policy-header"><i class="fa-solid fa-check-circle me-2"></i> 1. Điều kiện bảo hành miễn phí</div>
+            <div class="p-4">
+                <p>Sản phẩm sẽ được bảo hành miễn phí nếu đáp ứng đầy đủ các điều kiện sau:</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2 d-flex"><i class="fa-solid fa-check text-success mt-1 me-3"></i> <span>Sản phẩm còn trong thời hạn bảo hành được tính kể từ ngày giao hàng hoặc được ghi trên Phiếu Bảo Hành.</span></li>
+                    <li class="mb-2 d-flex"><i class="fa-solid fa-check text-success mt-1 me-3"></i> <span>Sản phẩm bị lỗi kỹ thuật do nhà sản xuất (Hư hỏng linh kiện, lỗi phần cứng...).</span></li>
+                    <li class="mb-2 d-flex"><i class="fa-solid fa-check text-success mt-1 me-3"></i> <span>Tem bảo hành của PCShop và tem của nhà phân phối (nếu có) phải còn nguyên vẹn, không rách rời, chắp vá, cạo sửa.</span></li>
+                    <li class="mb-2 d-flex"><i class="fa-solid fa-check text-success mt-1 me-3"></i> <span>Mã vạch, số serial, thông số kỹ thuật dán trên sản phẩm còn nguyên vẹn, rõ ràng.</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="tu-choi" class="policy-card">
+            <div class="policy-header bg-danger" style="background: linear-gradient(135deg, #d63031, #ff7675);"><i class="fa-solid fa-circle-xmark me-2"></i> 2. Trường hợp từ chối bảo hành</div>
+            <div class="p-4">
+                <div class="alert alert-warning border-0 d-flex align-items-center mb-4">
+                    <i class="fa-solid fa-triangle-exclamation fa-2x me-3 text-warning"></i>
+                    <div>
+                        <strong>Lưu ý:</strong> Những trường hợp sau đây sẽ bị coi là vi phạm điều kiện bảo hành và PCShop có quyền từ chối tiếp nhận hoặc sửa chữa có tính phí.
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="d-flex p-3 border rounded h-100 bg-light">
+                            <i class="fa-solid fa-bug text-muted fa-2x me-3"></i>
+                            <div><strong>Côn trùng xâm nhập:</strong> Sản phẩm bị côn trùng (gián, kiến, chuột...) chui vào gây chập cháy mạch.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex p-3 border rounded h-100 bg-light">
+                            <i class="fa-solid fa-water text-primary fa-2x me-3"></i>
+                            <div><strong>Chất lỏng đổ vào:</strong> Sản phẩm bị dính nước, hóa chất hoặc đặt ở nơi ẩm ướt gây rỉ sét, oxy hóa.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex p-3 border rounded h-100 bg-light">
+                            <i class="fa-solid fa-hammer text-danger fa-2x me-3"></i>
+                            <div><strong>Tác động vật lý:</strong> Sản phẩm bị rơi vỡ, móp méo, biến dạng khung vỏ, vỡ màn hình.</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex p-3 border rounded h-100 bg-light">
+                            <i class="fa-solid fa-bolt text-warning fa-2x me-3"></i>
+                            <div><strong>Sự cố điện:</strong> Sử dụng sai điện áp quy định, hoặc do thiên tai (sét đánh, lũ lụt).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="thoi-gian" class="policy-card">
+            <div class="policy-header"><i class="fa-solid fa-hourglass-half me-2"></i> 3. Thời gian xử lý dự kiến</div>
+            <div class="p-4">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="py-3">Khu vực</th>
+                                <th class="py-3">Lỗi phần mềm / Cài đặt</th>
+                                <th class="py-3">Thay thế linh kiện</th>
+                                <th class="py-3">Gửi hãng bảo hành</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold text-primary">Hà Nội / TP.HCM</td>
+                                <td><span class="badge bg-success">Trong ngày</span></td>
+                                <td>Ngay trong ngày</td>
+                                <td>7 - 14 ngày</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold text-primary">Các tỉnh khác</td>
+                                <td>Hỗ trợ Online (UltraView)</td>
+                                <td> 1, 2 Ngày (+ Vận chuyển)</td>
+                                <td>3 - 5 ngày</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted small mt-3 mb-0">* Thời gian trên không bao gồm ngày Chủ Nhật và ngày Lễ.</p>
+            </div>
+        </div>
+
+        <div id="doi-tra" class="policy-card">
+            <div class="policy-header" style="background: linear-gradient(135deg, #fdcb6e, #e17055);"><i class="fa-solid fa-rotate-right me-2"></i> 4. Chính sách đổi mới 1-1</div>
+            <div class="p-4">
+                <p class="mb-4">PCShop áp dụng chính sách đổi mới sản phẩm <strong>1 đổi 1 trong vòng 30 ngày đầu</strong> nếu phát sinh lỗi từ nhà sản xuất.</p>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border rounded p-3 h-100">
+                            <h3 class="fw-bold text-primary mb-0">30</h3>
+                            <span class="small text-muted">Ngày đầu tiên</span>
+                            <hr class="my-2">
+                            <span class="badge bg-success">Đổi mới 100%</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-3 h-100">
+                            <h3 class="fw-bold text-primary mb-0">11</h3>
+                            <span class="small text-muted">Tháng tiếp theo</span>
+                            <hr class="my-2">
+                            <span class="badge bg-info text-dark">Bảo hành hãng</span>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border rounded p-3 h-100">
+                            <h3 class="fw-bold text-primary mb-0">24/7</h3>
+                            <span class="small text-muted">Hỗ trợ Online</span>
+                            <hr class="my-2">
+                            <span class="badge bg-secondary">Trọn đời</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="dia-chi" class="policy-card">
+            <div class="policy-header" style="background: #2d3436;"><i class="fa-solid fa-truck-fast me-2"></i> 5. Địa chỉ gửi bảo hành</div>
+            <div class="p-4">
+                <p>Khách hàng ở xa có thể gửi sản phẩm qua đường bưu điện (Viettel Post, GHN...) về một trong các địa chỉ sau:</p>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <strong class="d-block text-primary mb-2">TRUNG TÂM BẢO HÀNH MIỀN BẮC</strong>
+                            <p class="small mb-1"><i class="fa-solid fa-location-arrow me-2"></i>Tòa nhà FPT Polytechnic, Trịnh Văn Bô, Nam Từ Liêm, HN</p>
+                            <p class="small mb-0"><i class="fa-solid fa-phone me-2"></i>Người nhận: Kho PCShop - 058.222.5677</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="border rounded p-3 bg-light h-100">
+                            <strong class="d-block text-primary mb-2">TRUNG TÂM BẢO HÀNH MIỀN NAM</strong>
+                            <p class="small mb-1"><i class="fa-solid fa-location-arrow me-2"></i>CV Phần mềm Quang Trung, Quận 12, TP.HCM</p>
+                            <p class="small mb-0"><i class="fa-solid fa-phone me-2"></i>Người nhận: Kho PCShop - 058.222.5677</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

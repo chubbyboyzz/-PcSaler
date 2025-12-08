@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] - PCShop</title>
@@ -7,254 +7,344 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     @RenderSection("Styles", required: false)
 
     <style>
-        .login-modal-header {
-            background: linear-gradient(135deg, #5563DE, #74ABE2);
-            color: white;
+        /* Modal Login Style */
+        .login-modal-header { background: linear-gradient(135deg, #5563DE, #74ABE2); color: white; }
+        .btn-custom-login { background: #5563DE; color: white; font-weight: 600; transition: all 0.3s; }
+        .btn-custom-login:hover { background: #3c48b5; color: white; transform: translateY(-2px); }
+        .form-control:focus { border-color: #5563DE; box-shadow: 0 0 0 0.2rem rgba(85, 99, 222, 0.25); }
+
+        /* Floating Buttons Style */
+        .floating-contact-group {
+            position: fixed; bottom: 30px; right: 20px; z-index: 99999;
+            display: flex; flex-direction: column-reverse; gap: 15px;
         }
-        .btn-custom-login {
-            background: #5563DE;
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s;
+        .contact-btn {
+            width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: all 0.3s ease; text-decoration: none; cursor: pointer; background-color: #fff;
         }
-        .btn-custom-login:hover {
-            background: #3c48b5;
-            color: white;
-            transform: translateY(-2px);
-        }
-        .form-control:focus {
-            border-color: #5563DE;
-            box-shadow: 0 0 0 0.2rem rgba(85, 99, 222, 0.25);
-        }
+        .contact-btn:hover { transform: scale(1.1); }
+        .btn-zalo { border: 2px solid #0068FF; background: #fff; overflow: hidden; }
+        .btn-mess { background: linear-gradient(45deg, #00B2FF, #006AFF); color: white; font-size: 30px; border: none; }
+        .btn-hotline { background-color: #dc3545; color: white; font-size: 24px; border: 2px solid white;  }
+
+        
+        
+        /* Header Custom */
+        .navbar-nav .nav-link { font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: #444; }
+        .navbar-nav .nav-link:hover { color: #5563DE; }
     </style>
 </head>
+
 <body class="d-flex flex-column vh-100">
 
-    <header class="bg-white shadow-sm sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-light">
-            <div class="container">
-                <a class="navbar-brand fw-bold" href="@Url.Action("Index", "Home")">PCShop</a>
+    <header class="bg-white sticky-top shadow-sm">
+        
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        <div class="container py-3">
+            <div class="row align-items-center gy-3">
+                <div class="col-6 col-lg-3">
+                    <a class="navbar-brand fw-bold fs-3 text-primary d-flex align-items-center" href="@Url.Action("Index", "Home")">
+                        <i class="fa-solid fa-computer me-2"></i>PCShop
+                    </a>
+                </div>
 
-                <div class="collapse navbar-collapse" id="navMenu">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Index", "Home")">Trang chủ</a></li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Index", "PcBuild")">Bộ PC</a>
-                        </li>
-                        <li class="nav-item"><a class="nav-link" href="#">Phụ kiện</a></li>
-                    </ul>
+                <div class="col-12 col-lg-5 order-last order-lg-0">
                     @await Component.InvokeAsync("SearchMenu", new { currentQuery = Context.Request.Query["q"].ToString() })
+                </div>
 
-                    <ul class="navbar-nav ms-3">
-                        <li class="nav-item">
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <div class="dropdown">
-                                    <a class="nav-link dropdown-toggle fw-bold text-primary" href="#" role="button" data-bs-toggle="dropdown">
-                                        <i class="fa-solid fa-user me-1"></i> @User.Identity.Name
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><a class="dropdown-item" href="@Url.Action("Profile", "Customers")">Hồ sơ</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <form method="post" action="@Url.Action("Logout", "Login")">
-                                                <button type="submit" class="dropdown-item text-danger">Đăng xuất</button>
-                                            </form>
-                                        </li>
-                                    </ul>
+                <div class="col-6 col-lg-4 d-flex justify-content-end align-items-center gap-3">
+                    
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="dropdown">
+                            <a class="btn btn-outline-light text-dark border-0 d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
+                                <div class="fs-4"><i class="fa-regular fa-circle-user"></i></div>
+                                <div class="text-start d-none d-xl-block" style="line-height: 1.2;">
+                                    <small class="text-muted" style="font-size: 11px;">Xin chào</small><br>
+                                    <span class="fw-bold small">@User.Identity.Name</span>
                                 </div>
-                            }
-                            else
-                            {
-                                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
-                                    <i class="fa-solid fa-right-to-bracket me-1"></i> Đăng nhập
-                                </a>
-                            }
-                        </li>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
+                                <li><a class="dropdown-item" href="@Url.Action("Profile", "Customers")"><i class="fa-solid fa-id-card me-2"></i>Hồ sơ</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="@Url.Action("Logout", "Login")">
+                                        <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="#" class="btn btn-outline-light text-dark border-0 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <div class="fs-4"><i class="fa-regular fa-user"></i></div>
+                            <div class="text-start d-none d-xl-block" style="line-height: 1.2;">
+                                <small class="text-muted" style="font-size: 11px;">Tài khoản</small><br>
+                                <span class="fw-bold small">Đăng nhập</span>
+                            </div>
+                        </a>
+                    }
 
+                    <div class="ms-2">
                         @await Component.InvokeAsync("CartMenu")
-                    </ul>
+                    </div>
                 </div>
             </div>
-        </nav>
+        </div>
 
         <div class="border-top">
-            <div class="container d-flex justify-content-between align-items-center py-2 flex-wrap">
-                <div class="dropdown me-3" id="category-dropdown-container">
-                    <button class="btn btn-outline-primary fw-semibold dropdown-toggle" type="button" id="categoryDropdownMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                        Danh mục
-                    </button>
-                    @await Component.InvokeAsync("CategoryMenu")
-                </div>
+            <div class="container">
+                <nav class="navbar navbar-expand-lg navbar-light p-0">
+                    
+                    <div class="dropdown me-3">
+                        <button class="btn btn-primary rounded-0 fw-bold px-4 py-2 d-flex align-items-center gap-2" 
+                                type="button" id="categoryDropdownMenu" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-bars"></i> DANH MỤC
+                        </button>
+                         <div class="dropdown-menu shadow-lg border-0 mt-0 w-100" aria-labelledby="categoryDropdownMenu">
+                             @await Component.InvokeAsync("CategoryMenu")
+                         </div>
+                    </div>
 
-                <a href="javascript:void(0)" onclick="checkLoginForPcBuild()" class="btn btn-primary fw-semibold mt-1 mt-md-0 ms-auto">
-                    <i class="fa-solid fa-screwdriver-wrench me-2"></i> 🧰 Xây dựng PC
-                </a>
+                    <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="mainNav">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link px-3 active" href="@Url.Action("Index", "Home")">Trang chủ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link px-3" href="@Url.Action("Index", "PcBuild")">Bộ PC</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link px-3" href="@Url.Action("Accessories", "Product")">Phụ kiện</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link px-3 text-danger" href="@Url.Action("Promotion", "Pages")">Khuyến mãi</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link px-3 text-danger" href="@Url.Action("Contact", "Pages")">Liên Hệ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link px-3 text-danger" href="@Url.Action("Warranty", "Pages")">Bảo Hành</a>
+                            </li>
+                        </ul>
+
+                        <div class="py-2 py-lg-0">
+                            <a href="javascript:void(0)" onclick="checkLoginForPcBuild()" class="btn btn-warning fw-bold text-dark rounded-pill px-3 shadow-sm">
+                                <i class="fa-solid fa-screwdriver-wrench me-1"></i> Xây dựng PC
+                            </a>
+                        </div>
+                    </div>
+                </nav>
             </div>
         </div>
     </header>
 
-    <div class="container mt-4">
+    <div class="container mt-4 flex-grow-1">
         @RenderBody()
+    </div>
+    
+    <footer class="bg-dark text-light pt-5 pb-3 mt-auto" style="border-top: 3px solid #0d6efd;">
+        <div class="container">
+            <div class="row g-4">
+
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="text-uppercase fw-bold text-white mb-3">
+                        <i class="fa-solid fa-computer text-primary me-2"></i>PCShop
+                    </h5>
+                    <p class="text-light small" style="line-height: 1.6; text-align: justify;">
+                        Tiên phong trong lĩnh vực cung cấp giải pháp máy tính đồ họa, Gaming Gear và Laptop High-end.
+                        PCShop cam kết mang lại trải nghiệm mua sắm an tâm tuyệt đối cho khách hàng.
+                    </p>
+                    <div class="d-flex gap-3 mt-3">
+                        <a href="https://www.facebook.com/Hieumit2005" class="text-white fs-5 hover-effect"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="https://www.youtube.com/@@hieunguyen-yf1xi" class="text-white fs-5 hover-effect"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://www.tiktok.com/@@bestaolang09?lang=en" class="text-white fs-5 hover-effect"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6">
+                    <h6 class="text-uppercase fw-bold text-white mb-4">Hệ thống Showroom</h6>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div>
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="fa-solid fa-map-location-dot text-warning me-2"></i>
+                                <strong class="text-warning">Hà Nội (Trụ sở chính)</strong>
+                            </div>
+                            <p class="text-light small mb-0 ms-4 border-start border-secondary ps-3">
+                                Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                                <strong class="text-white">TP. Hồ Chí Minh</strong>
+                            </div>
+                            <p class="text-light small mb-0 ms-4 border-start border-secondary ps-3">
+                                Tòa nhà Innovation, Công viên phần mềm Quang Trung, Q.12
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="fa-solid fa-location-dot text-primary me-2"></i>
+                                <strong class="text-white">Đà Nẵng</strong>
+                            </div>
+                            <p class="text-light small mb-0 ms-4 border-start border-secondary ps-3">
+                                137 Nguyễn Thị Thập, Phường Hòa Minh, Quận Liên Chiểu
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-12">
+                    <h6 class="text-uppercase fw-bold text-white mb-4">Tổng đài hỗ trợ</h6>
+
+                    <div class="p-3 rounded mb-3" style="background-color: rgba(255,255,255,0.08); border: 1px dashed #555;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-light small"><i class="fa-solid fa-phone-volume me-2"></i>Mua hàng:</span>
+                            <strong class="text-warning fs-5">1800 6969</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-light small"><i class="fa-solid fa-screwdriver-wrench me-2"></i>Bảo hành:</span>
+                            <strong class="text-warning fs-5">1900 6161</strong>
+                        </div>
+                    </div>
+
+                    <div class="small text-light">
+                        <p class="mb-1"><i class="fa-solid fa-envelope me-2 text-primary"></i> <strong>Email:</strong> cskh@pcshop.edu.vn</p>
+                        <p class="mb-0"><i class="fa-regular fa-clock me-2 text-primary"></i> <strong>Giờ mở cửa:</strong> 24/7</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <hr class="my-4 border-secondary opacity-50">
+
+            <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
+                <span class="text-white-50 small me-2">Chấp nhận thanh toán:</span>
+
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg"
+                     alt="Visa"
+                     class="bg-white rounded me-1"
+                     style="width: 45px; height: 30px; object-fit: contain; padding: 2px;">
+
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                     alt="Mastercard"
+                     class="bg-white rounded me-1"
+                     style="width: 45px; height: 30px; object-fit: contain; padding: 2px;">
+
+                <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png"
+                     alt="Momo"
+                     class="bg-white rounded me-1"
+                     style="width: 45px; height: 30px; object-fit: contain; padding: 2px;">
+
+                <img src="https://img.vietqr.io/image/TCB-0985532053-compact.png"
+                     alt="VietQR"
+                     class="bg-white rounded"
+                     style="width: 45px; height: 30px; object-fit: contain; padding: 2px;">
+            </div>
+        </div>
+    </footer>
+
+    <div class="floating-contact-group">
+        <a href="https://zalo.me/0985532053" target="_blank" class="contact-btn btn-zalo" title="Chat Zalo">
+            <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/01/Logo-Zalo-Arc.png" alt="Zalo" style="width: 100%; height: 100%; object-fit: cover;">
+        </a>
+        <a href="https://m.me/your_username" target="_blank" class="contact-btn btn-mess" title="Chat Facebook">
+            <i class="fa-brands fa-facebook-messenger"></i>
+        </a>
+        <a href="@Url.Action("Contact", "Pages")" class="contact-btn btn-hotline" title="Gọi ngay">
+            <i class="fa-solid fa-phone-volume"></i>
+        </a>
     </div>
 
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
-
                 <div class="modal-header login-modal-header border-0">
-                    <div>
-                        <h5 class="modal-title fw-bold" id="loginModalLabel">CHÀO MỪNG TRỞ LẠI</h5>
-                        <small class="text-white-50">Đăng nhập để tiếp tục mua sắm</small>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div><h5 class="modal-title fw-bold">CHÀO MỪNG TRỞ LẠI</h5><small class="text-white-50">Đăng nhập để tiếp tục mua sắm</small></div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-
                 <div class="modal-body p-4">
-                    <form id="ajaxLoginForm" onsubmit="handleAjaxLogin(event)">
+                     <form id="ajaxLoginForm" onsubmit="handleAjaxLogin(event)">
                         <input type="hidden" name="returnUrl" value="/" />
-
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="modalUser" name="Username" placeholder="Tên đăng nhập" required>
-                            <label for="modalUser"><i class="fa-solid fa-user me-1"></i> Tên đăng nhập</label>
+                            <input type="text" class="form-control" id="modalUser" name="Username" placeholder="Username" required>
+                            <label><i class="fa-solid fa-user me-1"></i> Tên đăng nhập</label>
                         </div>
-
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="modalPass" name="Password" placeholder="Mật khẩu" required>
-                            <label for="modalPass"><i class="fa-solid fa-lock me-1"></i> Mật khẩu</label>
+                             <input type="password" class="form-control" id="modalPass" name="Password" placeholder="Password" required>
+                            <label><i class="fa-solid fa-lock me-1"></i> Mật khẩu</label>
                         </div>
-
                         <div class="d-flex justify-content-between align-items-center mb-4 small">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="modalRemember">
-                                <label class="form-check-label text-muted" for="modalRemember">Ghi nhớ tôi</label>
-                            </div>
+                            <div class="form-check"><input class="form-check-input" type="checkbox" id="modalRemember"><label class="form-check-label text-muted" for="modalRemember">Ghi nhớ tôi</label></div>
                             <a href="javascript:void(0)" onclick="openForgotModal()" class="text-decoration-none text-primary">Quên mật khẩu?</a>
                         </div>
-
-                        <div class="d-grid mb-3">
-                            <button type="submit" id="btnLoginSubmit" class="btn btn-custom-login py-2 rounded-pill">ĐĂNG NHẬP</button>
-                        </div>
-
-                        <div class="text-center position-relative my-4">
-                            <hr class="text-muted">
-                            <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">
-                                Hoặc đăng nhập bằng
-                            </span>
-                        </div>
-
-                        <div class="d-grid">
-                            <a href="@Url.Action("LoginByGoogle", "Login")" class="btn btn-outline-danger py-2 rounded-pill fw-bold">
-                                <i class="fa-brands fa-google me-2"></i> Google
-                            </a>
-                        </div>
-                    </form>
+                        <div class="d-grid mb-3"><button type="submit" id="btnLoginSubmit" class="btn btn-custom-login py-2 rounded-pill">ĐĂNG NHẬP</button></div>
+                        <div class="text-center position-relative my-4"><hr class="text-muted"><span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small">Hoặc đăng nhập bằng</span></div>
+                        <div class="d-grid"><a href="@Url.Action("LoginByGoogle", "Login")" class="btn btn-outline-danger py-2 rounded-pill fw-bold"><i class="fa-brands fa-google me-2"></i> Google</a></div>
+                   </form>
                 </div>
-
-                <div class="modal-footer justify-content-center bg-light border-0">
-                    <small>
-                        Chưa có tài khoản?
-                        <a asp-controller="Account" asp-action="Register" class="fw-bold text-decoration-none" style="color: #5563DE">Đăng ký ngay</a>
-                    </small>
-                </div>
+                <div class="modal-footer justify-content-center bg-light border-0"><small>Chưa có tài khoản? <a asp-controller="Account" asp-action="Register" class="fw-bold text-decoration-none" style="color: #5563DE">Đăng ký ngay</a></small></div>
             </div>
         </div>
     </div>
 
     <div class="modal fade" id="forgotPassModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
+             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
                 <div class="modal-header border-0 text-white" style="background: linear-gradient(135deg, #ff7e5f, #feb47b);">
                     <h5 class="modal-title fw-bold"><i class="fa-solid fa-key me-2"></i>LẤY LẠI MẬT KHẨU</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    
                     <div id="fp-step-0" class="text-center">
                         <p class="text-muted mb-4">Bạn muốn tìm lại tài khoản bằng cách nào?</p>
                         <div class="d-grid gap-3">
-                            <button class="btn btn-outline-primary py-2 fw-bold" onclick="showStep('email')">
-                                <i class="fa-solid fa-envelope me-2"></i> Dùng Email đăng ký
-                            </button>
-                            <button class="btn btn-outline-secondary py-2 fw-bold" onclick="showStep('username')">
-                                <i class="fa-solid fa-user me-2"></i> Dùng Tên đăng nhập
-                            </button>
+                            <button class="btn btn-outline-primary py-2 fw-bold" onclick="showStep('email')"><i class="fa-solid fa-envelope me-2"></i> Dùng Email đăng ký</button>
+                            <button class="btn btn-outline-secondary py-2 fw-bold" onclick="showStep('username')"><i class="fa-solid fa-user me-2"></i> Dùng Tên đăng nhập</button>
                         </div>
                     </div>
-
-                    <div id="fp-step-email" style="display: none;">
-                        <div class="d-flex justify-content-between mb-3">
-                            <a href="javascript:void(0)" onclick="backToStep0()" class="text-muted small"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="fpEmail" placeholder="name@example.com">
-                            <label for="fpEmail">Nhập Email của bạn</label>
-                        </div>
-                        <button class="btn btn-warning w-100 fw-bold text-white py-2" onclick="sendOtp('EMAIL')">
-                            GỬI MÃ OTP
-                        </button>
-                    </div>
-
-                    <div id="fp-step-username" style="display: none;">
-                        <div class="d-flex justify-content-between mb-3">
-                            <a href="javascript:void(0)" onclick="backToStep0()" class="text-muted small"><i class="fa-solid fa-arrow-left"></i> Quay lại</a>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="fpUsernameInput" placeholder="Username">
-                            <label for="fpUsernameInput">Nhập Tên đăng nhập</label>
-                        </div>
-                        <button class="btn btn-info w-100 fw-bold text-white py-2" onclick="checkUsername()">
-                            TÌM TÀI KHOẢN
-                        </button>
-                    </div>
-
-                    <div id="fp-step-userinfo" style="display: none; text-align: center;">
-                        <div class="mb-4">
-                            <div class="bg-light rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 80px; height: 80px;">
-                                <i class="fa-solid fa-user-check fa-3x text-success"></i>
-                            </div>
-                            <h5 class="fw-bold text-primary" id="lblFullName">User Name</h5>
-                            <p class="text-muted small">Email liên kết: <strong id="lblMaskedEmail" class="text-dark">abc***@@gmail.com</strong></p>
-                        </div>
-                        <button class="btn btn-primary w-100 fw-bold py-2" onclick="sendOtp('USERNAME')">
-                            ĐÚNG LÀ TÔI - GỬI OTP
-                        </button>
-                        <div class="mt-3">
-                            <a href="javascript:void(0)" onclick="showStep('username')" class="text-muted small">Không phải tôi? Nhập lại</a>
-                        </div>
-                    </div>
-
-                    <div id="fp-step-otp" style="display: none;">
-                        <p class="text-muted small mb-3">Mã OTP đã được gửi. Vui lòng kiểm tra email.</p>
-                        <div class="form-floating mb-3">
-                            <input type="text" class="form-control text-center fw-bold" id="fpOtp" maxlength="6" style="letter-spacing: 5px; font-size: 1.2rem;">
-                            <label>Nhập mã OTP (6 số)</label>
-                        </div>
+                    <div id="fp-step-email" style="display:none">
+                        <div class="d-flex justify-content-between mb-3"><a href="javascript:void(0)" onclick="backToStep0()" class="text-muted small"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
+                        <div class="form-floating mb-3"><input type="email" class="form-control" id="fpEmail" placeholder="Email"><label>Nhập Email</label></div>
+                        <button class="btn btn-warning w-100 fw-bold text-white py-2" onclick="sendOtp('EMAIL')">GỬI MÃ OTP</button>
+                     </div>
+                     <div id="fp-step-username" style="display:none">
+                        <div class="d-flex justify-content-between mb-3"><a href="javascript:void(0)" onclick="backToStep0()" class="text-muted small"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
+                        <div class="form-floating mb-3"><input type="text" class="form-control" id="fpUsernameInput" placeholder="User"><label>Nhập Tên đăng nhập</label></div>
+                        <button class="btn btn-info w-100 fw-bold text-white py-2" onclick="checkUsername()">TÌM TÀI KHOẢN</button>
+                     </div>
+                     <div id="fp-step-userinfo" style="display:none; text-align:center;">
+                        <div class="mb-4"><h5 class="fw-bold text-primary" id="lblFullName">User</h5><p class="text-muted small">Email: <strong id="lblMaskedEmail">...</strong></p></div>
+                        <button class="btn btn-primary w-100 fw-bold py-2" onclick="sendOtp('USERNAME')">ĐÚNG LÀ TÔI - GỬI OTP</button>
+                        <div class="mt-3"><a href="javascript:void(0)" onclick="showStep('username')" class="text-muted small">Nhập lại</a></div>
+                     </div>
+                     <div id="fp-step-otp" style="display:none">
+                        <p class="text-muted small mb-3">Mã OTP đã gửi. Kiểm tra email.</p>
+                        <div class="form-floating mb-3"><input type="text" class="form-control text-center fw-bold" id="fpOtp" maxlength="6" style="letter-spacing:5px; font-size:1.2rem;"><label>Nhập OTP</label></div>
                         <button class="btn btn-primary w-100 fw-bold py-2" onclick="verifyOtp()">XÁC NHẬN</button>
-                    </div>
-
-                    <div id="fp-step-reset" style="display: none;">
-                        <p class="text-success small fw-bold">Xác thực thành công! Nhập mật khẩu mới.</p>
-                        <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="fpNewPass" placeholder="Pass">
-                            <label>Mật khẩu mới</label>
-                        </div>
+                     </div>
+                     <div id="fp-step-reset" style="display:none">
+                        <p class="text-success small fw-bold">Thành công! Nhập mật khẩu mới.</p>
+                        <div class="form-floating mb-3"><input type="password" class="form-control" id="fpNewPass" placeholder="Pass"><label>Mật khẩu mới</label></div>
                         <button class="btn btn-success w-100 fw-bold py-2" onclick="doResetPass()">ĐỔI MẬT KHẨU</button>
-                    </div>
-
+                     </div>
                 </div>
             </div>
         </div>
@@ -266,57 +356,30 @@
     <script>
         var isUserLoggedIn = @(User.Identity?.IsAuthenticated.ToString().ToLower() ?? "false");
 
-
-        // ===============================================
-        // LOGIC KIỂM TRA ĐĂNG NHẬP CHO PC BUILD
-        // ===============================================
+        // 1. LOGIC PC BUILD
         function checkLoginForPcBuild() {
-            if (isUserLoggedIn) {
-                // 1. Đã đăng nhập => Cho vào luôn
-                window.location.href = '@Url.Action("Index", "CustomersPC")';
-            } else {
-                // 2. Chưa đăng nhập => Hiện bảng thông báo
+            if (isUserLoggedIn) { window.location.href = '@Url.Action("Index", "CustomersPC")'; }
+            else {
                 Swal.fire({
-                    title: 'Yêu cầu đăng nhập',
-                    text: "Bạn cần đăng nhập để hệ thống lưu lại cấu hình PC mà bạn đang xây dựng!",
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonColor: '#5563DE',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Đăng nhập ngay',
-                    cancelButtonText: 'Chỉ xem thôi'
+                    title: 'Yêu cầu đăng nhập', text: "Bạn cần đăng nhập để lưu cấu hình!", icon: 'info',
+                    showCancelButton: true, confirmButtonColor: '#5563DE', cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đăng nhập ngay', cancelButtonText: 'Chỉ xem thôi'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // 3. Nếu khách đồng ý => Bật Modal Login lên
-
-                        // Set đường dẫn để đăng nhập xong nó tự nhảy vào trang Build PC
                         const returnUrlInput = document.querySelector('#ajaxLoginForm input[name="returnUrl"]');
-                        if (returnUrlInput) {
-                            returnUrlInput.value = '/CustomersPC';
-                        }
-
-                        // Gọi Modal của Bootstrap hiển thị lên
-                        const loginModalElement = document.getElementById('loginModal');
-                        // Kiểm tra xem modal đã được khởi tạo chưa để tránh lỗi
-                        let loginModal = bootstrap.Modal.getInstance(loginModalElement);
-                        if (!loginModal) {
-                            loginModal = new bootstrap.Modal(loginModalElement);
-                        }
-                        loginModal.show();
+                        if (returnUrlInput) returnUrlInput.value = '/CustomersPC';
+                        new bootstrap.Modal(document.getElementById('loginModal')).show();
                     }
                 });
             }
         }
 
-        // 1. Cập nhật số lượng giỏ hàng
+        // 2. CART COUNT
         function updateHeaderCartCount() {
             const countElement = document.getElementById('cart-count');
             if (countElement) { 
                 if (isUserLoggedIn) {
-                    fetch('/api/APICart/count')
-                        .then(res => res.json())
-                        .then(count => { countElement.innerText = `(${count})`; })
-                        .catch(err => console.error("Lỗi lấy số lượng giỏ hàng:", err));
+                    fetch('/api/APICart/count').then(res => res.json()).then(count => { countElement.innerText = `(${count})`; }).catch(err => console.error(err));
                 } else {
                     const cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
                     const totalCount = cart.reduce((sum, item) => sum + (item.Quantity || item.quantity || 0), 0);
@@ -326,207 +389,114 @@
         }
         document.addEventListener('DOMContentLoaded', updateHeaderCartCount);
 
-        // 2. Set ReturnURL cho Modal Login
+        // 3. SET RETURN URL LOGIN
         document.addEventListener('DOMContentLoaded', function() {
             const returnUrlInput = document.querySelector('#ajaxLoginForm input[name="returnUrl"]');
-            if(returnUrlInput) {
+            if(returnUrlInput && window.location.pathname !== '/CustomersPC') {
                 returnUrlInput.value = window.location.pathname + window.location.search;
             }
         });
 
-        // 3. LOGIC AJAX LOGIN
+        // 4. AJAX LOGIN
         async function handleAjaxLogin(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             const form = document.getElementById('ajaxLoginForm');
             const submitBtn = document.getElementById('btnLoginSubmit');
             const originalText = submitBtn.innerHTML;
-
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
             try {
-                const formData = new FormData(form);
-                const response = await fetch('/Login/Index', {
-                    method: 'POST',
-                    body: formData
-                });
+                const response = await fetch('/Login/Index', { method: 'POST', body: new FormData(form) });
                 const data = await response.json();
-
                 if (data.success) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Chào mừng trở lại!',
-                        text: 'Đăng nhập thành công',
-                        timer: 1500,
-                        showConfirmButton: false
-                    }).then(() => {
-                        window.location.href = data.redirectUrl;
-                    });
+                    Swal.fire({ icon: 'success', title: 'Thành công!', timer: 1500, showConfirmButton: false })
+                    .then(() => { window.location.href = data.redirectUrl; });
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Đăng nhập thất bại',
-                        html: data.message
-                    });
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
+                    Swal.fire({ icon: 'error', title: 'Thất bại', html: data.message });
+                    submitBtn.disabled = false; submitBtn.innerHTML = originalText;
                 }
             } catch (error) {
-                Swal.fire({ icon: 'error', title: 'Lỗi hệ thống', text: 'Không thể kết nối đến server.' });
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = originalText;
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Lỗi kết nối server.' });
+                submitBtn.disabled = false; submitBtn.innerHTML = originalText;
             }
         }
 
-        // ==========================================
-        // 4. LOGIC QUÊN MẬT KHẨU (NÂNG CẤP FULL)
-        // ==========================================
-        let fpContext = { email: "", username: "" }; 
-
-        // Mở Modal Quên mật khẩu
+        // 5. FORGOT PASSWORD LOGIC
+        let fpContext = { email: "", username: "" };
         function openForgotModal() {
-            const loginModalEl = document.getElementById('loginModal');
-            const loginModal = bootstrap.Modal.getInstance(loginModalEl);
+            const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
             if (loginModal) loginModal.hide();
-
             new bootstrap.Modal(document.getElementById('forgotPassModal')).show();
             backToStep0();
         }
+        function backToStep0() { hideAllSteps(); document.getElementById('fp-step-0').style.display = 'block'; fpContext = { email: "", username: "" }; }
+        function showStep(stepName) { hideAllSteps(); document.getElementById('fp-step-' + stepName).style.display = 'block'; }
+        function hideAllSteps() { ['0', 'email', 'username', 'userinfo', 'otp', 'reset'].forEach(s => document.getElementById('fp-step-' + s).style.display = 'none'); }
 
-        // Điều hướng các bước
-        function backToStep0() {
-            hideAllSteps();
-            document.getElementById('fp-step-0').style.display = 'block';
-            fpContext = { email: "", username: "" };
-        }
-        function showStep(stepName) {
-            hideAllSteps();
-            document.getElementById('fp-step-' + stepName).style.display = 'block';
-        }
-        function hideAllSteps() {
-            const steps = ['0', 'email', 'username', 'userinfo', 'otp', 'reset'];
-            steps.forEach(s => document.getElementById('fp-step-' + s).style.display = 'none');
-        }
-
-        // Logic Check Username
         async function checkUsername() {
             const username = document.getElementById('fpUsernameInput').value;
-            if (!username) return Swal.fire('Lỗi', 'Chưa nhập tên đăng nhập', 'warning');
-
-            const btn = event.target;
-            const oldHtml = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm...';
-            btn.disabled = true;
-
+            if (!username) return Swal.fire('Lỗi', 'Chưa nhập user', 'warning');
+            const btn = event.target; const oldHtml = btn.innerHTML;
+            btn.innerHTML = 'Đang tìm...'; btn.disabled = true;
             try {
-                const formData = new FormData();
-                formData.append('username', username);
-                const res = await fetch('/Login/CheckUserInfo', { method: 'POST', body: formData });
+                const fd = new FormData(); fd.append('username', username);
+                const res = await fetch('/Login/CheckUserInfo', { method: 'POST', body: fd });
                 const data = await res.json();
-
                 if (data.success) {
                     document.getElementById('lblFullName').innerText = data.fullName;
                     document.getElementById('lblMaskedEmail').innerText = data.maskedEmail;
-                    fpContext.username = username; 
-                    showStep('userinfo'); 
-                } else {
-                    Swal.fire('Thất bại', data.message, 'error');
-                }
-            } catch (e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
+                    fpContext.username = username; showStep('userinfo');
+                } else { Swal.fire('Lỗi', data.message, 'error'); }
+            } catch (e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); } 
             finally { btn.innerHTML = oldHtml; btn.disabled = false; }
         }
 
-        // Logic Gửi OTP
         async function sendOtp(method) {
-            let apiUrl = '';
-            let formData = new FormData();
-            const btn = event.target;
-            const oldHtml = btn.innerHTML;
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
-            btn.disabled = true;
-
+            let apiUrl = '', formData = new FormData();
+            const btn = event.target; const oldHtml = btn.innerHTML;
+            btn.innerHTML = 'Đang gửi...'; btn.disabled = true;
             if (method === 'EMAIL') {
                 const email = document.getElementById('fpEmail').value;
-                if(!email) { btn.disabled=false; btn.innerHTML = oldHtml; return Swal.fire('Lỗi', 'Nhập email đi', 'warning'); }
-                fpContext.email = email;
-                
-                apiUrl = '/Login/SendOtp';
-                formData.append('email', email);
-            } 
-            else if (method === 'USERNAME') {
-                apiUrl = '/Login/SendOtpByUsername';
-                formData.append('username', fpContext.username);
+                if(!email) { btn.disabled=false; btn.innerHTML=oldHtml; return Swal.fire('Lỗi','Nhập email','warning'); }
+                fpContext.email = email; apiUrl = '/Login/SendOtp'; formData.append('email', email);
+            } else if (method === 'USERNAME') {
+                apiUrl = '/Login/SendOtpByUsername'; formData.append('username', fpContext.username);
             }
-
             try {
                 const res = await fetch(apiUrl, { method: 'POST', body: formData });
                 const data = await res.json();
-
-                if (data.success) {
-                    Swal.fire('Thành công', 'Đã gửi mã OTP!', 'success');
-                    showStep('otp');
-                } else {
-                    Swal.fire('Lỗi', data.message, 'error');
-                }
+                if (data.success) { Swal.fire('OK', 'Đã gửi OTP', 'success'); showStep('otp'); } 
+                else { Swal.fire('Lỗi', data.message, 'error'); }
             } catch (e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
             finally { btn.innerHTML = oldHtml; btn.disabled = false; }
         }
 
-        // Verify OTP
         async function verifyOtp() {
             const otp = document.getElementById('fpOtp').value;
-            if(!otp) return Swal.fire('Lỗi', 'Nhập OTP đi', 'warning');
-
-            const formData = new FormData();
-            formData.append('otp', otp);
-            
-            if (fpContext.username) formData.append('username', fpContext.username);
-            else formData.append('email', fpContext.email);
-
+            if(!otp) return Swal.fire('Lỗi','Nhập OTP','warning');
+            const fd = new FormData(); fd.append('otp', otp);
+            if (fpContext.username) fd.append('username', fpContext.username); else fd.append('email', fpContext.email);
             try {
-                const res = await fetch('/Login/VerifyOtp', { method: 'POST', body: formData });
+                const res = await fetch('/Login/VerifyOtp', { method: 'POST', body: fd });
                 const data = await res.json();
-                
-                if (data.success) showStep('reset');
-                else Swal.fire('Sai mã', data.message, 'error');
-            } catch(e) { Swal.fire('Lỗi', 'Lỗi', 'error'); }
+                if (data.success) showStep('reset'); else Swal.fire('Sai mã', data.message, 'error');
+            } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
         }
 
-        // Reset Pass (Đã fix lỗi cú pháp Regex cho Razor View)
         async function doResetPass() {
             const newPass = document.getElementById('fpNewPass').value;
-            
-            // 1. Độ dài
-            if (newPass.length < 8) 
-                return Swal.fire('Mật khẩu yếu', 'Mật khẩu phải có ít nhất 8 ký tự.', 'warning');
-            
-            // 2. Chữ hoa, số, ký tự đặc biệt (Đã thêm @@ để escape cho Razor)
+            if (newPass.length < 8) return Swal.fire('Yếu', 'Pass phải >= 8 ký tự', 'warning');
             const strongRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@@#\\$%\\^&\\*])");
-            
-            if (!strongRegex.test(newPass)) {
-                return Swal.fire({
-                    icon: 'warning',
-                    title: 'Mật khẩu chưa đủ mạnh',
-                    html: 'Mật khẩu cần có:<br/>- Ít nhất 1 chữ hoa (A-Z)<br/>- Ít nhất 1 số (0-9)<br/>- Ít nhất 1 ký tự đặc biệt (!@@#$%^&*)'
-                });
-            }
+            if (!strongRegex.test(newPass)) return Swal.fire('Yếu', 'Cần có chữ hoa, số và ký tự đặc biệt', 'warning');
 
-            const formData = new FormData();
-            formData.append('newPassword', newPass);
-            
-            if (fpContext.username) formData.append('username', fpContext.username);
-            else formData.append('email', fpContext.email);
-
+            const fd = new FormData(); fd.append('newPassword', newPass);
+            if (fpContext.username) fd.append('username', fpContext.username); else fd.append('email', fpContext.email);
             try {
-                const res = await fetch('/Login/ResetPassword', { method: 'POST', body: formData });
+                const res = await fetch('/Login/ResetPassword', { method: 'POST', body: fd });
                 const data = await res.json();
-                if (data.success) {
-                    Swal.fire('Xong', 'Đổi pass thành công', 'success').then(() => location.reload());
-                } else {
-                    Swal.fire('Lỗi', data.message, 'error');
-                }
-            } catch(e) { Swal.fire('Lỗi', 'Lỗi', 'error'); }
+                if (data.success) Swal.fire('Xong', 'Đổi pass thành công', 'success').then(() => location.reload());
+                else Swal.fire('Lỗi', data.message, 'error');
+            } catch(e) { Swal.fire('Lỗi', 'Lỗi kết nối', 'error'); }
         }
     </script>
 </body>

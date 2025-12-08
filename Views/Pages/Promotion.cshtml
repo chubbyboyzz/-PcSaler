@@ -1,0 +1,417 @@
+﻿@model IEnumerable<PcSaler.DBcontext.Entites.Product>
+
+@{
+    ViewData["Title"] = "Săn Sale - Khuyến mãi cực hot";
+}
+
+<style>
+    /* FLASH SALE BANNER */
+    .flash-sale-banner {
+        background: linear-gradient(135deg, #ff0047, #ff6b00);
+        color: white;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .flash-sale-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
+            animation: bg-move 20s linear infinite;
+        }
+    @@keyframes bg-move {
+        0% {
+            transform: rotate(0);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* COUNTDOWN */
+    .countdown-item {
+        background: rgba(0,0,0,0.3);
+        padding: 5px 10px;
+        border-radius: 6px;
+        font-weight: bold;
+        min-width: 40px;
+        text-align: center;
+        display: inline-block;
+        backdrop-filter: blur(5px);
+        font-family: 'Courier New', monospace;
+    }
+
+    /* VOUCHER TICKET */
+    .voucher-ticket {
+        background: white;
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s;
+        border: 1px solid #eee;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        display: flex;
+    }
+
+        .voucher-ticket:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+    .voucher-left {
+        width: 100px;
+        background: linear-gradient(180deg, #e3f2fd, #bbdefb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        border-right: 2px dashed #ccc;
+        position: relative;
+    }
+
+        .voucher-left::after, .voucher-left::before {
+            content: '';
+            position: absolute;
+            right: -10px;
+            width: 20px;
+            height: 20px;
+            background: #f5f6fa;
+            border-radius: 50%;
+        }
+
+        .voucher-left::before {
+            top: -10px;
+        }
+
+        .voucher-left::after {
+            bottom: -10px;
+        }
+
+    .voucher-right {
+        flex: 1;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    /* PRODUCT CARD SALE */
+    .sale-badge-corner {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #ff0000;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 5px rgba(255,0,0,0.3);
+        animation: pulse 2s infinite;
+        z-index: 5;
+    }
+    @@keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .old-price {
+        text-decoration: line-through;
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .deal-progress {
+        height: 6px;
+        border-radius: 3px;
+        background: #eee;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .deal-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #ff9f43, #ff6b6b);
+        border-radius: 3px;
+        transition: width 1s;
+    }
+</style>
+
+<div class="container py-4">
+
+    <div class="flash-sale-banner p-4 p-md-5 mb-5 d-flex flex-column flex-md-row align-items-center justify-content-between">
+        <div style="z-index: 2;">
+            <span class="badge bg-warning text-dark mb-2 px-3 py-2 fw-bold">⚡ FLASH SALE</span>
+            <h1 class="fw-bold display-5 mb-2">ĐẠI TIỆC CÔNG NGHỆ</h1>
+            <p class="fs-5 mb-4 opacity-75">Giảm tới 50% cho Laptop & Gaming Gear. Duy nhất hôm nay!</p>
+            <div class="d-flex align-items-center gap-2 fs-5">
+                <span>Kết thúc trong:</span>
+                <span class="countdown-item" id="cd-h">02</span> :
+                <span class="countdown-item" id="cd-m">45</span> :
+                <span class="countdown-item" id="cd-s">12</span>
+            </div>
+        </div>
+        <img src="/images/OIP.png"
+             style="height: 300px; z-index: 2; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5)); transform: rotate(-10deg) translateY(10px);"
+             class="d-none d-md-block animate__animated animate__fadeInRight"
+             alt="Gaming Laptop">
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="fw-bold text-primary m-0"><i class="fa-solid fa-ticket-simple me-2"></i>Kho Voucher</h3>
+        <a href="#" class="text-decoration-none small fw-bold" data-bs-toggle="modal" data-bs-target="#termsModal">
+            Xem điều kiện <i class="fa-solid fa-circle-info"></i>
+        </a>
+    </div>
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="voucher-ticket">
+                <div class="voucher-left"><i class="fa-solid fa-laptop fa-2x text-primary mb-1"></i><small class="fw-bold text-primary">LAPTOP</small></div>
+                <div class="voucher-right">
+                    <h5 class="fw-bold text-dark mb-1">Giảm 500K</h5><p class="small text-muted mb-2">Đơn từ 15tr</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto"><small class="text-danger fw-bold">HSD: 30/12</small><button class="btn btn-sm btn-primary px-3 rounded-pill" onclick="copyCode('LAPTOP500')">Lưu mã</button></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="voucher-ticket">
+                <div class="voucher-left"><i class="fa-solid fa-microchip fa-2x text-success mb-1"></i><small class="fw-bold text-success">PC BUILD</small></div>
+                <div class="voucher-right">
+                    <h5 class="fw-bold text-dark mb-1">Giảm 300K</h5><p class="small text-muted mb-2">Build PC trọn bộ</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto"><small class="text-danger fw-bold">HSD: 30/12</small><button class="btn btn-sm btn-success px-3 rounded-pill" onclick="copyCode('BUILD300')">Lưu mã</button></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+            <div class="voucher-ticket">
+                <div class="voucher-left"><i class="fa-solid fa-truck-fast fa-2x text-warning mb-1"></i><small class="fw-bold text-warning">FREE SHIP</small></div>
+                <div class="voucher-right">
+                    <h5 class="fw-bold text-dark mb-1">Miễn Phí Ship</h5><p class="small text-muted mb-2">Đơn từ 2 triệu</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto"><small class="text-danger fw-bold">HSD: Vĩnh viễn</small><button class="btn btn-sm btn-warning text-white px-3 rounded-pill" onclick="copyCode('FREESHIP')">Lưu mã</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4 d-flex align-items-end gap-3">
+        <h3 class="fw-bold text-danger m-0">🔥 Deal Sốc Hôm Nay</h3>
+        <span class="badge bg-danger">Kết thúc sớm</span>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-4 g-4">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                // === LOGIC XỬ LÝ ẢNH ===
+                string finalImg = "/images/no-image.png";
+                if (!string.IsNullOrEmpty(item.ImageURL))
+                {
+                    if (item.ImageURL.StartsWith("/") || item.ImageURL.Contains("http")) { finalImg = item.ImageURL; }
+                    else { finalImg = "/images/products/" + item.ImageURL; }
+                }
+
+                // === LOGIC FAKE GIÁ CŨ (Tạo cảm giác giảm giá) ===
+                // Giả vờ giá gốc cao hơn 30%
+                decimal fakeOldPrice = item.Price * 1.3m;
+                // Random % đã bán (cho sinh động)
+                int soldPercent = new Random().Next(40, 95);
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm position-relative">
+                        <span class="sale-badge-corner">-30%</span>
+
+                        <a href="@Url.Action("Details", "Product", new { id = item.ProductID })">
+                            <img src="@finalImg" class="card-img-top p-3" style="height: 200px; object-fit: contain;"
+                                 alt="@item.ProductName" onerror="this.onerror=null; this.src='/images/no-image.png';">
+                        </a>
+
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="fw-bold text-truncate mb-1">
+                                <a href="@Url.Action("Details", "Product", new { id = item.ProductID })" class="text-decoration-none text-dark">
+                                    @item.ProductName
+                                </a>
+                            </h6>
+
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="text-danger fw-bold fs-5">@item.Price.ToString("N0")₫</span>
+                                <small class="old-price">@fakeOldPrice.ToString("N0")₫</small>
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="small text-muted mb-1 d-flex justify-content-between">
+                                    <span>Đã bán:</span>
+                                    <span class="text-danger fw-bold">@soldPercent%</span>
+                                </div>
+                                <div class="deal-progress">
+                                    <div class="deal-bar" style="width: @soldPercent%"></div>
+                                </div>
+                                <button class="btn btn-primary w-100 mt-3 btn-sm fw-bold" onclick="addToCart(@item.ProductID, 'PRODUCT')">
+                                    <i class="fa-solid fa-cart-plus me-1"></i> Mua Ngay
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <p class="text-muted">Đang cập nhật deal mới...</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- TERMS & CONDITIONS MODAL -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-header text-white" style="background: linear-gradient(135deg, #0984e3, #74b9ff);">
+                <h5 class="modal-title fw-bold"><i class="fa-solid fa-file-contract me-2"></i>Quy định khuyến mãi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <h6 class="fw-bold text-primary mb-3">1. Quy định sử dụng Voucher</h6>
+                <ul class="text-muted small ps-3 mb-4">
+                    <li class="mb-2">Mỗi đơn hàng chỉ được áp dụng 01 mã giảm giá.</li>
+                    <li class="mb-2">Mã giảm giá không có giá trị quy đổi thành tiền mặt.</li>
+                    <li class="mb-2">Trường hợp đơn hàng bị hủy/đổi trả, mã giảm giá sẽ không được hoàn lại.</li>
+                    <li class="mb-2">Voucher "LAPTOP500" chỉ áp dụng cho Laptop Gaming, Ultrabook có giá trị từ 15.000.000đ trở lên.</li>
+                </ul>
+
+                <h6 class="fw-bold text-danger mb-3">2. Quy định Flash Sale & Deal Sốc</h6>
+                <ul class="text-muted small ps-3 mb-4">
+                    <li class="mb-2">Số lượng sản phẩm Flash Sale có hạn, chương trình có thể kết thúc sớm hơn dự kiến khi hết hàng.</li>
+                    <li class="mb-2">Mỗi khách hàng chỉ được mua tối đa 01 sản phẩm trong danh mục Deal Sốc/Flash Sale.</li>
+                    <li class="mb-2">Giá Flash Sale chưa bao gồm phí vận chuyển (nếu có).</li>
+                </ul>
+
+                <h6 class="fw-bold text-success mb-3">3. Chính sách vận chuyển</h6>
+                <ul class="text-muted small ps-3 mb-0">
+                    <li class="mb-2">Mã "FREESHIP" áp dụng cho đơn hàng tiêu chuẩn, tối đa 50.000đ phí ship.</li>
+                    <li class="mb-2">Đối với PC Build trọn bộ, PCShop hỗ trợ lắp đặt và giao hàng tận nơi trong bán kính 20km.</li>
+                </ul>
+            </div>
+
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary btn-sm px-4 rounded-pill" data-bs-dismiss="modal">Đã hiểu</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#termsModal').appendTo("body");
+        });
+        // --- 1. LOGIC COPY MÃ VOUCHER ---
+        function copyCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000, timerProgressBar: true });
+                Toast.fire({ icon: 'success', title: 'Đã lưu mã: ' + code });
+            });
+        }
+
+        // --- 2. LOGIC ĐỒNG HỒ ĐẾM NGƯỢC ---
+        function startTimer() {
+            let duration = 3 * 60 * 60 + 45 * 60 + 12;
+            const dH = document.querySelector('#cd-h'), dM = document.querySelector('#cd-m'), dS = document.querySelector('#cd-s');
+
+            // Kiểm tra xem các element có tồn tại không để tránh lỗi null
+            if(dH && dM && dS) {
+                setInterval(() => {
+                    duration--; if (duration < 0) duration = 3 * 60 * 60;
+                    let h = Math.floor(duration / 3600), m = Math.floor((duration % 3600) / 60), s = Math.floor(duration % 60);
+                    dH.textContent = h<10?"0"+h:h; dM.textContent = m<10?"0"+m:m; dS.textContent = s<10?"0"+s:s;
+                }, 1000);
+            }
+        }
+        startTimer();
+
+        // --- 3. LOGIC MUA HÀNG (API + LOCALSTORAGE) ---
+        function addToCart(id, type) {
+            // Lấy biến isUserLoggedIn từ Layout
+            const isLoggedIn = (typeof isUserLoggedIn !== 'undefined') ? isUserLoggedIn : false;
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+
+            // Hiệu ứng loading
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            if (isLoggedIn) {
+                // CASE 1: Đã đăng nhập -> Gọi API
+                fetch('/api/APICart/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ItemID: id, ItemType: type, Quantity: 1 })
+                })
+                .then(res => {
+                    if (res.ok) {
+                        onAddToCartSuccess();
+                    } else {
+                        return res.json().then(e => { throw new Error(e.message); });
+                    }
+                })
+                .catch(err => Swal.fire({ icon: 'error', title: 'Lỗi', text: err.message }))
+                .finally(() => {
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                });
+            } else {
+                // CASE 2: Khách vãng lai -> Lưu LocalStorage
+                setTimeout(() => {
+                    let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
+                    const existingItem = cart.find(x => x.ItemID === id && x.ItemType === type);
+
+                    if (existingItem) {
+                        existingItem.Quantity = (existingItem.Quantity || 0) + 1;
+                    } else {
+                        cart.push({ ItemID: id, ItemType: type, Quantity: 1, AddedDate: new Date() });
+                    }
+
+                    localStorage.setItem('guest_cart', JSON.stringify(cart));
+                    onAddToCartSuccess();
+
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }, 300);
+            }
+        }
+
+        // --- HÀM THÔNG BÁO THÀNH CÔNG ---
+        function onAddToCartSuccess() {
+            const Toast = Swal.mixin({
+                toast: true, position: 'top-end', showConfirmButton: false,
+                timer: 1500, timerProgressBar: true
+            });
+            Toast.fire({ icon: 'success', title: 'Đã thêm vào giỏ hàng!' });
+
+            // Cập nhật số lượng trên Header
+            if (typeof updateHeaderCartCount === 'function') {
+                updateHeaderCartCount();
+            }
+        }
+    </script>
+}
+
+}
