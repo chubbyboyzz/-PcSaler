@@ -50,27 +50,28 @@ namespace PcSaler.Controllers
         public async Task<IActionResult> PlaceOrder(CheckoutViewModel model)
         {
             var userId = GetUserId();
-
-            // =========================================================
-            // [FIX QUAN TRỌNG]: TÍNH LẠI TIỀN TỪ SERVER (Tránh lỗi 0đ)
-            // =========================================================
-
-            // 1. Lấy lại giỏ hàng từ Database (dữ liệu chuẩn nhất)
             var currentCart = await _cartService.GetCartItems(userId);
 
-            // Nếu giỏ hàng trống thì đá về trang giỏ
             if (currentCart == null || !currentCart.Any())
             {
                 return RedirectToAction("Index", "Cart");
             }
 
-            // 2. Gán lại dữ liệu vào model để xử lý
+            // Gán lại dữ liệu để xử lý logic
             model.CartItems = currentCart;
-            // Tính tổng tiền tại đây -> Đảm bảo số tiền luôn đúng
             model.TotalAmount = currentCart.Sum(x => x.Price * x.Quantity);
 
-            // 3. (Tùy chọn) Xóa lỗi validate của các trường không cần thiết
-            // Ví dụ: Chọn COD thì không cần bắt nhập số thẻ Visa
+            // =========================================================
+            // [FIX] XÓA BỎ CHECK LỖI CHO CÁC TRƯỜNG KHÔNG CẦN THIẾT
+            // =========================================================
+
+            // 1. TotalAmount (Vì ta tự tính ở server, không cần form gửi lên)
+            ModelState.Remove("TotalAmount"); // <--- THÊM DÒNG NÀY VÀO
+
+            // 2. CartItems (Nếu model báo lỗi danh sách null)
+            ModelState.Remove("CartItems");   // <--- THÊM CẢ DÒNG NÀY CHO CHẮC
+
+            // 3. Xóa lỗi validate thanh toán như cũ
             if (model.PaymentMethod != "VISA")
             {
                 ModelState.Remove("CardNumber");
@@ -83,24 +84,22 @@ namespace PcSaler.Controllers
                 ModelState.Remove("PaypalEmail");
             }
 
-            // Check lại xem Form có hợp lệ không
+            // Giờ mới check IsValid
             if (!ModelState.IsValid)
             {
+                // Debug: Đặt breakpoint ở đây xem nó còn lỗi gì trong ModelState.Values
                 return View("Index", model);
             }
 
-            // Gọi Service tạo đơn hàng
             var result = await _orderService.PlaceOrder(userId, model);
 
             if (result)
             {
-                // Thành công -> Chuyển sang trang Success
-                // Truyền method và amount (số tiền vừa tính được) sang để hiển thị
                 return RedirectToAction("Success", new { method = model.PaymentMethod, amount = model.TotalAmount });
             }
             else
             {
-                ModelState.AddModelError("", "Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.");
+                ModelState.AddModelError("", "Có lỗi xảy ra khi xử lý đơn hàng.");
                 return View("Index", model);
             }
         }

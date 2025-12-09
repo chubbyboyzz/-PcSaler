@@ -212,6 +212,15 @@ CREATE TABLE ProductAttributes (
 );
 GO
 
+IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'ShippingAddress' AND Object_ID = Object_ID(N'Orders'))
+BEGIN
+    ALTER TABLE Orders
+    ADD ShippingAddress NVARCHAR(255) NULL; -- Cho phép NULL để tránh lỗi dữ liệu cũ
+    
+    PRINT 'Đã thêm cột ShippingAddress thành công!';
+END
+GO
+
 -- 15. Bảng Khoảng giá lọc (PriceRanges)
 -- (Bảng này dùng để cấu hình UI lọc giá)
 -- ===============================

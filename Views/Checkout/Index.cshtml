@@ -5,6 +5,7 @@
 
 <div class="container py-5">
     <h2 class="mb-4 text-center fw-bold text-uppercase">Thanh toán đơn hàng</h2>
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
 
     <form asp-action="PlaceOrder" method="post" id="checkoutForm" novalidate>
         <div class="row">
