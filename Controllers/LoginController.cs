@@ -26,7 +26,6 @@ namespace PcSaler.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index(string returnUrl = "/")
         {
-            // Nếu đã login rồi thì logout phiên cũ để tránh xung đột
             if (User.Identity?.IsAuthenticated == true)
             {
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -36,28 +35,45 @@ namespace PcSaler.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        // --- HÀM NÀY ĐÃ ĐƯỢC SỬA ĐỂ CHECK CAPTCHA ---
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Index(LoginViewModel model, string returnUrl = "/")
         {
+            // 1. CHECK VALIDATION CƠ BẢN
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("<br/>", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                 return Json(new { success = false, message = errors });
             }
 
-            // Gọi Service check user/pass
+            // 2. CHECK USERNAME / PASSWORD TRƯỚC (Theo ý ông)
             var user = await _loginService.LoginUserAsync(model.Username, model.Password);
 
             if (user == null)
             {
+                // Sai tài khoản/mật khẩu -> Báo lỗi luôn, KHÔNG hiện captcha
                 return Json(new { success = false, message = "Tài khoản hoặc mật khẩu không đúng." });
             }
 
-            // Ghi Cookie đăng nhập
+            // 3. TÀI KHOẢN ĐÚNG RỒI -> GIỜ MỚI CHECK CAPTCHA
+            // Lấy token từ Session
+            string? verifiedToken = HttpContext.Session.GetString("CaptchaVerifiedToken");
+
+            if (string.IsNullOrEmpty(verifiedToken))
+            {
+                // Nếu User/Pass đúng mà chưa xếp hình -> Trả về signal "requireCaptcha"
+                // Để Frontend biết mà bật cái khung xếp hình lên
+                return Json(new { success = false, requireCaptcha = true, message = "Vui lòng xác thực bảo mật!" });
+            }
+
+            // 4. NẾU ĐÃ CÓ TOKEN (Tức là đã xếp hình xong rồi và submit lại)
+            // Xóa token đi
+            HttpContext.Session.Remove("CaptchaVerifiedToken");
+
+            // Đăng nhập thành công
             await SignInUser(user);
 
-            // Kiểm tra URL redirect an toàn
             if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl) || returnUrl == "/")
             {
                 returnUrl = Url.Action("Index", "Home");
@@ -75,9 +91,9 @@ namespace PcSaler.Controllers
 
         #endregion
 
-        #region 2. XỬ LÝ QUÊN MẬT KHẨU (FORGOT PASSWORD API)
-
-        // Bước 0: Kiểm tra Username (Cho flow tìm bằng Tên đăng nhập)
+        #region 2. XỬ LÝ QUÊN MẬT KHẨU (FORGOT PASSWORD API) - GIỮ NGUYÊN
+        // ... (Code cũ giữ nguyên không đổi) ...
+        // Bước 0: Kiểm tra Username
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> CheckUserInfo(string username)
@@ -97,11 +113,11 @@ namespace PcSaler.Controllers
             {
                 success = true,
                 fullName = user.FullName ?? user.Username,
-                maskedEmail = MaskEmail(user.Email) // Trả về email đã che
+                maskedEmail = MaskEmail(user.Email)
             });
         }
 
-        // Bước 1A: Gửi OTP (Theo Email trực tiếp)
+        // Bước 1A: Gửi OTP (Theo Email)
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> SendOtp(string email)
@@ -116,7 +132,7 @@ namespace PcSaler.Controllers
                 : Json(new { success = false, message = "Email này chưa đăng ký." });
         }
 
-        // Bước 1B: Gửi OTP (Theo Username - Tự tìm Email để gửi)
+        // Bước 1B: Gửi OTP (Theo Username)
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> SendOtpByUsername(string username)
@@ -131,12 +147,11 @@ namespace PcSaler.Controllers
                 : Json(new { success = false, message = "Không thể gửi mail." });
         }
 
-        // Bước 2: Kiểm tra OTP (Hỗ trợ cả Email hoặc Username)
+        // Bước 2: Kiểm tra OTP
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyOtp(string email, string username, string otp)
         {
-            // Nếu frontend gửi username thay vì email, ta tự đi tìm email
             if (string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
             {
                 var user = await _loginService.GetUsersByUsername(username);
@@ -158,14 +173,9 @@ namespace PcSaler.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(string email, string username, string newPassword)
         {
-            // --- 1. VALIDATION MẠNH MẼ (Chặn hacker dùng tool) ---
-
-            // Check độ dài
             if (string.IsNullOrEmpty(newPassword) || newPassword.Length < 8)
                 return Json(new { success = false, message = "Mật khẩu phải dài ít nhất 8 ký tự." });
 
-            // Check độ phức tạp: Phải có Chữ hoa, Số, Ký tự đặc biệt
-            // Regex.IsMatch trả về true nếu tìm thấy mẫu
             bool hasUpper = Regex.IsMatch(newPassword, @"[A-Z]");
             bool hasDigit = Regex.IsMatch(newPassword, @"[0-9]");
             bool hasSpecial = Regex.IsMatch(newPassword, @"[!@#$%^&*()_+=\[{\]};:<>|./?,-]");
@@ -175,28 +185,23 @@ namespace PcSaler.Controllers
                 return Json(new { success = false, message = "Mật khẩu yếu: Cần ít nhất 1 chữ hoa, 1 số và 1 ký tự đặc biệt." });
             }
 
-            // --- 2. XỬ LÝ LOGIC TÌM TÀI KHOẢN ---
-
-            // Nếu frontend chỉ gửi username (do user chọn cách tìm bằng tên), ta tự tìm email
             if (string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(username))
             {
                 var user = await _loginService.GetUsersByUsername(username);
                 if (user != null) email = user.Email;
             }
 
-            // Nếu tìm mãi vẫn không ra email -> Lỗi
             if (string.IsNullOrEmpty(email))
                 return Json(new { success = false, message = "Lỗi định danh tài khoản." });
 
-            // --- 3. GỌI SERVICE ĐỔI PASS ---
             await _loginService.ResetPasswordAsync(email, newPassword);
 
             return Json(new { success = true, message = "Đổi mật khẩu thành công! Hãy đăng nhập ngay." });
         }
-
         #endregion
 
-        #region 4. ĐĂNG NHẬP GOOGLE (EXTERNAL AUTH)
+        #region 4. ĐĂNG NHẬP GOOGLE & HELPERS (GIỮ NGUYÊN)
+        // ... (Code cũ giữ nguyên không đổi) ...
 
         [AllowAnonymous]
         public IActionResult LoginByGoogle()
@@ -216,7 +221,6 @@ namespace PcSaler.Controllers
 
             if (string.IsNullOrEmpty(email)) return RedirectToAction("Index", "Home");
 
-            // Logic: Nếu chưa có thì tự tạo user mới
             var user = await _loginService.GetUsersByEmail(email);
             if (user == null)
             {
@@ -237,10 +241,6 @@ namespace PcSaler.Controllers
             await SignInUser(user);
             return RedirectToAction("Index", "Home");
         }
-
-        #endregion
-
-        #region 4. HÀM PHỤ TRỢ (HELPERS)
 
         private async Task SignInUser(Customer user)
         {
@@ -269,7 +269,6 @@ namespace PcSaler.Controllers
             if (local.Length <= 2) return email;
             return $"{local.Substring(0, 2)}*****{local.Substring(local.Length - 1, 1)}@{parts[1]}";
         }
-
         #endregion
     }
 }

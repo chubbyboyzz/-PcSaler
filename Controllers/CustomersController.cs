@@ -103,7 +103,7 @@ namespace PcSaler.Controllers
                 items = order.OrderDetails.Select(od => new
                 {
                     productName = od.Product.ProductName,
-                    image = od.Product.ImageURL,
+                    image = $"/Product/GetImage/{od.ProductID}",
                     price = od.UnitPrice,
                     quantity = od.Quantity,
                     total = od.UnitPrice * od.Quantity

@@ -133,31 +133,7 @@
                             </div>
 
                             <a href="@(isPcBuild? Url.Action("Details", "PcBuild", new { id = p.ProductID }) : Url.Action("Details", "Product", new { id = p.ProductID }))">
-                                @{
-                                    // LOGIC XỬ LÝ ẢNH "CHẤP HẾT" MỌI KIỂU LƯU TRONG DB
-                                    string finalImg = "/images/no-image.png";
-
-                                    if (!string.IsNullOrWhiteSpace(p.ImageURL))
-                                    {
-                                        // 1. Dùng Path.GetFileName để CẮT BỎ đường dẫn cũ, chỉ lấy tên file
-                                        // Ví dụ: DB lưu '/images/cpu/chip.jpg' -> Code chỉ lấy 'chip.jpg'
-                                        string fileName = System.IO.Path.GetFileName(p.ImageURL);
-
-                                        // 2. Tự động chia luồng về 2 folder chuẩn
-                                        if (isPcBuild)
-                                        {
-                                            // Máy bộ -> Vào folder pcbuilds
-                                            finalImg = "/images/pcbuilds/" + fileName;
-                                        }
-                                        else
-                                        {
-                                            // Linh kiện -> Vào folder products
-                                            finalImg = "/images/products/" + fileName;
-                                        }
-                                    }
-                                }
-
-                                <img src="@finalImg"
+                                <img src="@(isPcBuild ? "/images/pcbuilds/pc-setup.png" : Url.Action("GetImage", "Product", new { id = p.ProductID }))"
                                      class="card-img-top p-2"
                                      style="height:140px; object-fit:contain;"
                                      alt="@p.ProductName"

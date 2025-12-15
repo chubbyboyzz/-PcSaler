@@ -10,5 +10,7 @@ namespace PcSaler.Models
 
         [Required(ErrorMessage = "Enter password, please!")]
         public string? Password { get; set; }
-    }
+
+        public string? CaptchaCode { get; set; }
+        }
 }

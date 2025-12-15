@@ -13,7 +13,7 @@ namespace PcSaler.DBcontext.Entites
         public string? Specifications { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
-        public string? ImageURL { get; set; }
+        public byte[]? ProductImage { get; set; }
         public int WarrantyMonths { get; set; } = 12;
         public DateTime? ReleaseDate { get; set; }
 

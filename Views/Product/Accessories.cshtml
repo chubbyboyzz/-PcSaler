@@ -80,25 +80,7 @@
                     <div class="col">
                         <div class="card h-100 shadow-sm border-0 product-card">
 
-                            @* --- LOGIC XỬ LÝ ẢNH (Copy từ Index.cshtml) --- *@
-                            @{
-                                string finalImg = "/images/no-image.png";
-                                // Lưu ý: Trong Entity Product trường này thường tên là 'Image', còn ViewModel là 'ImageURL'
-                                // Tôi dùng 'Image' cho khớp với Entity, nếu lỗi ông đổi thành ImageURL nhé
-                                string dbImage = item.ImageURL;
-
-                                if (!string.IsNullOrEmpty(dbImage))
-                                {
-                                    if (dbImage.StartsWith("/"))
-                                    {
-                                        finalImg = dbImage; // [cite: 5]
-                                    }
-                                    else
-                                    {
-                                        finalImg = "/images/products/" + System.IO.Path.GetFileName(dbImage); // [cite: 7]
-                                    }
-                                }
-                            }
+                            @* --- LOGIC ẢNH ĐÃ SỬA: GỌI THẲNG CONTROLLER --- *@
 
                             @* Badge Sale/New *@
                             @if (item.Price > 5000000)
@@ -111,10 +93,13 @@
                                 <div class="card-badge badge-new">NEW</div>
                             }
 
-                            @* Ảnh sản phẩm *@
-                            <img src="@finalImg" class="card-img-top p-3" alt="@item.ProductName"
+                            @* Ảnh sản phẩm: Dùng GetImage lấy Binary từ DB *@
+                            <img src="@Url.Action("GetImage", "Product", new { id = item.ProductID })"
+                                 class="card-img-top p-3"
+                                 alt="@item.ProductName"
                                  style="height: 200px; object-fit: contain;"
-                                 [cite_start]onerror="this.onerror=null; this.src='/images/no-image.png';"> @* [cite: 9] *@
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='/images/no-image.png';">
 
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title text-truncate">
@@ -152,14 +137,14 @@
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // --- LOGIC GIỎ HÀNG (Copy y hệt từ Index.cshtml sang để chạy đồng bộ) --- [cite: 17]
+        // --- LOGIC GIỎ HÀNG (Copy y hệt từ Index.cshtml sang để chạy đồng bộ) ---
 
         // Lấy trạng thái đăng nhập
         var isUserLoggedIn = @((User.Identity?.IsAuthenticated ?? false).ToString().ToLower());
 
         function addToCart(id, type) {
             if (isUserLoggedIn) {
-                // Đã đăng nhập: Gọi API [cite: 18]
+                // Đã đăng nhập: Gọi API
                 fetch('/api/APICart/add', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -171,12 +156,12 @@
                     }
                 });
             } else {
-                // Chưa đăng nhập: Lưu LocalStorage [cite: 21]
+                // Chưa đăng nhập: Lưu LocalStorage
                 let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
                 let item = cart.find(x => x.ItemID == id && x.ItemType == type);
 
                 if(item) item.Quantity++;
-                else cart.push({ItemID: id, ItemType: type, Quantity: 1}); // [cite: 23]
+                else cart.push({ItemID: id, ItemType: type, Quantity: 1});
 
                 localStorage.setItem('guest_cart', JSON.stringify(cart));
                 Swal.fire({icon: 'success', title: 'Thành công', text: 'Đã thêm vào giỏ (Khách)', timer: 1000, showConfirmButton: false});

@@ -24,6 +24,7 @@
             background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
             animation: bg-move 20s linear infinite;
         }
+
     @@keyframes bg-move {
         0% {
             transform: rotate(0);
@@ -116,6 +117,7 @@
         animation: pulse 2s infinite;
         z-index: 5;
     }
+
     @@keyframes pulse {
         0% {
             transform: scale(1);
@@ -218,18 +220,10 @@
         {
             @foreach (var item in Model)
             {
-                // === LOGIC XỬ LÝ ẢNH ===
-                string finalImg = "/images/no-image.png";
-                if (!string.IsNullOrEmpty(item.ImageURL))
-                {
-                    if (item.ImageURL.StartsWith("/") || item.ImageURL.Contains("http")) { finalImg = item.ImageURL; }
-                    else { finalImg = "/images/products/" + item.ImageURL; }
-                }
+                // === LOGIC CŨ ĐÃ BỊ LOẠI BỎ ĐỂ DÙNG DB IMAGE ===
 
-                // === LOGIC FAKE GIÁ CŨ (Tạo cảm giác giảm giá) ===
-                // Giả vờ giá gốc cao hơn 30%
+                // === LOGIC FAKE GIÁ CŨ (Giữ nguyên) ===
                 decimal fakeOldPrice = item.Price * 1.3m;
-                // Random % đã bán (cho sinh động)
                 int soldPercent = new Random().Next(40, 95);
 
                 <div class="col">
@@ -237,8 +231,13 @@
                         <span class="sale-badge-corner">-30%</span>
 
                         <a href="@Url.Action("Details", "Product", new { id = item.ProductID })">
-                            <img src="@finalImg" class="card-img-top p-3" style="height: 200px; object-fit: contain;"
-                                 alt="@item.ProductName" onerror="this.onerror=null; this.src='/images/no-image.png';">
+
+                            <img src="@Url.Action("GetImage", "Product", new { id = item.ProductID })"
+                                 class="card-img-top p-3"
+                                 style="height: 200px; object-fit: contain;"
+                                 alt="@item.ProductName"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.src='/images/no-image.png';">
                         </a>
 
                         <div class="card-body d-flex flex-column">
@@ -279,7 +278,6 @@
     </div>
 </div>
 
-<!-- TERMS & CONDITIONS MODAL -->
 <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg">
@@ -412,6 +410,4 @@
             }
         }
     </script>
-}
-
 }

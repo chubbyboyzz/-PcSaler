@@ -90,20 +90,25 @@ namespace PcSaler.Services
                         Quantity = item.Quantity,
                         ProductName = product.ProductName,
                         Price = product.Price,
-                        ImageURL = product.ImageURL
+
+                        // --- SỬA ĐOẠN NÀY ---
+                        // CŨ: ImageURL = product.ImageURL (Lỗi vì cột này đã xóa)
+                        // MỚI: Tự tạo đường dẫn trỏ về Controller lấy ảnh Binary
+                        ImageURL = $"/Product/GetImage/{product.ProductID}"
+                        // --------------------
                     });
                 }
                 else
                 {
-                    
+                    // Item ảo (VD: PC Build chưa lưu vào Product)
                     result.Add(new CartItemViewModel
                     {
                         ItemID = item.ItemID,
-                        ItemType = item.ItemType, // Giữ nguyên Type quan trọng này
+                        ItemType = item.ItemType,
                         Quantity = item.Quantity,
                         ProductName = !string.IsNullOrEmpty(item.ItemType) ? item.ItemType : "Cấu hình PC",
-                        Price = 0, // Giá item ảo là 0
-                        ImageURL = "pc-setup.png" // Ảnh dummy
+                        Price = 0,
+                        ImageURL = "pc-setup.png" // Ảnh dummy giữ nguyên
                     });
                 }
             }
@@ -133,12 +138,14 @@ namespace PcSaler.Services
                         Quantity = item.Quantity,
                         ProductName = product.ProductName,
                         Price = product.Price,
-                        ImageURL = product.ImageURL
+
+                        // --- SỬA ĐOẠN NÀY TƯƠNG TỰ ---
+                        ImageURL = $"/Product/GetImage/{product.ProductID}"
+                        // -----------------------------
                     });
                 }
                 else
                 {
-                    
                     result.Add(item);
                 }
             }

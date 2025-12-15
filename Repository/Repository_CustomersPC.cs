@@ -16,7 +16,6 @@ namespace PcSaler.Repository
         }
 
         // 1. LẤY HOẶC KHỞI TẠO 3 SLOT CHO KHÁCH
-        // SỬA: Đổi kiểu trả về thành List<PCBuildDetailViewModel>
         public async Task<List<PCBuildDetailViewModel>> GetUserSlots(int customerId)
         {
             // 1. Lấy dữ liệu từ DB (Giữ nguyên)
@@ -40,7 +39,6 @@ namespace PcSaler.Repository
                         Description = "Cấu hình đang xây dựng",
                         TotalPrice = 0,
                         CreatedAt = DateTime.Now,
-                        // QUAN TRỌNG: Khởi tạo luôn list rỗng để tránh null sau này
                         Details = new List<CustomPCDetail>()
                     };
                     _context.CustomPCs.Add(newSlot);
@@ -49,31 +47,33 @@ namespace PcSaler.Repository
                 }
             }
 
-            // 3. MAP DỮ LIỆU (SỬA LỖI TẠI ĐÂY)
+            // 3. MAP DỮ LIỆU
             return slots.Select(s => new PCBuildDetailViewModel
             {
                 PCBuildID = s.CustomPCID,
                 PCBuildName = s.BuildName,
                 TotalPrice = s.TotalPrice,
                 Description = s.Description,
-                ImageURL = "custom-pc-placeholder.png",
+                ImageURL = "custom-pc-placeholder.png", // Ảnh đại diện slot (giữ nguyên ảnh tĩnh)
 
-                // SỬA LỖI: Dùng toán tử ?? để nếu Details null thì dùng List rỗng
                 Components = (s.Details ?? new List<CustomPCDetail>()).Select(d => new PCComponentViewModel
                 {
                     ComponentType = d.ComponentType,
                     ProductID = d.ProductID,
                     ProductName = d.Product?.ProductName ?? "Sản phẩm đã ngừng kinh doanh",
                     UnitPrice = d.Product?.Price ?? 0,
-                    ImageURL = d.Product?.ImageURL ?? "no-img.png",
+
+                    // --- SỬA ĐOẠN NÀY ---
+                    // CŨ: ImageURL = d.Product?.ImageURL ?? "no-img.png"
+                    // MỚI: Trỏ về Controller lấy ảnh Binary
+                    ImageURL = "/Product/GetImage/" + d.ProductID,
+                    // --------------------
+
                     Quantity = d.Quantity
                 }).ToList()
 
             }).OrderBy(s => s.PCBuildName).ToList();
         }
-
-        // ... (CÁC HÀM UpdateSlotItem, RemoveSlotItem, AddToCartFromSlot GIỮ NGUYÊN) ...
-        // ... (Copy từ file cũ vào đây, không thay đổi logic xử lý) ...
 
         // 2. AUTO-SAVE: CẬP NHẬT LINH KIỆN VÀO SLOT
         public async Task UpdateSlotItem(int customerId, int customPcId, string componentType, int productId)
@@ -143,7 +143,7 @@ namespace PcSaler.Repository
             if (slot == null || !slot.Details.Any())
                 throw new Exception("Cấu hình trống, vui lòng chọn linh kiện!");
 
-            // 2. Lấy Giỏ hàng của khách (QUAN TRỌNG: Phải Include CartItems để check trùng)
+            // 2. Lấy Giỏ hàng của khách
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.CustomerID == customerId);
@@ -155,18 +155,15 @@ namespace PcSaler.Repository
                 {
                     CustomerID = customerId,
                     CreatedAt = DateTime.Now,
-                    CartItems = new List<CartItem>() // Khởi tạo list rỗng
+                    CartItems = new List<CartItem>()
                 };
                 _context.Carts.Add(cart);
-                // Lưu tạm để có CartID (nếu EF Core chưa tự sinh)
                 await _context.SaveChangesAsync();
             }
 
             // 3. DUYỆT TỪNG LINH KIỆN ĐỂ MERGE VÀO GIỎ
             foreach (var detail in slot.Details)
             {
-                // Logic giống CartService: Tìm xem sản phẩm này đã có trong giỏ chưa?
-                // (So khớp ItemID và ItemType="PRODUCT")
                 var existingItem = cart.CartItems?
                     .FirstOrDefault(ci => ci.ItemID == detail.ProductID
                                        && ci.ItemType == "PRODUCT");
@@ -177,12 +174,12 @@ namespace PcSaler.Repository
                 }
                 else
                 {
-                    // B. CHƯA CÓ -> THÊM MỚI
+                    // THÊM MỚI
                     var newItem = new CartItem
                     {
                         CartID = cart.CartID,
-                        ItemType = "PRODUCT",      // Chuyển thành sản phẩm lẻ
-                        ItemID = detail.ProductID, // ID sản phẩm
+                        ItemType = "PRODUCT",
+                        ItemID = detail.ProductID,
                         Quantity = detail.Quantity,
                         AddedDate = DateTime.Now
                     };
@@ -194,11 +191,9 @@ namespace PcSaler.Repository
             // Reset giá tiền slot về 0
             slot.TotalPrice = 0;
 
-            // 5. LƯU TẤT CẢ THAY ĐỔI (Merge giỏ hàng + Xóa slot)
+            // 5. LƯU TẤT CẢ THAY ĐỔI
             await _context.SaveChangesAsync();
         }
 
     }
-
 }
-

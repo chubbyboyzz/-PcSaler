@@ -26,13 +26,11 @@ namespace PcSaler.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            // SỬA: Chỉ lấy ID nội bộ Database
             var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            // SỬA: Chuyển hướng về đúng Login/Index nếu chưa có ID
             if (string.IsNullOrEmpty(userIdClaim)) return RedirectToAction("Index", "Login");
 
-            int userId = int.Parse(userIdClaim); // Parse ngon lành
+            int userId = int.Parse(userIdClaim);
 
             var profile = await _customerService.GetProfileByIdAsync(userId);
             if (profile == null) return NotFound();
@@ -100,10 +98,18 @@ namespace PcSaler.Controllers
                 status = order.CurrentStatus?.StatusName ?? "Đang xử lý",
                 customerName = order.Customer.FullName,
                 shippingAddress = finalAddress,
+
+                // MAPPING DỮ LIỆU ĐƠN HÀNG VỀ CLIENT
                 items = order.OrderDetails.Select(od => new
                 {
                     productName = od.Product.ProductName,
-                    image = od.Product.ImageURL,
+
+                    // --- SỬA ĐOẠN NÀY ---
+                    // CŨ: image = od.Product.ImageURL (Lỗi)
+                    // MỚI: Tự tạo link trỏ về GetImage controller
+                    image = $"/Product/GetImage/{od.ProductID}",
+                    // --------------------
+
                     price = od.UnitPrice,
                     quantity = od.Quantity,
                     total = od.UnitPrice * od.Quantity
