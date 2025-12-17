@@ -1,100 +1,186 @@
-﻿/* Nút Slot (Cấu hình 1, 2, 3...) - Style Tab công nghệ */
+﻿/* =========================================================
+   1. FIX LỖI HIỂN THỊ ẢNH (QUAN TRỌNG)
+   ========================================================= */
+/* Giả sử ảnh nằm trong class .component-img hoặc thẻ img trong bảng */
+.component-image-container img,
+.table-img,
+.tech-card img {
+    width: 100%;
+    height: 100%;
+    max-width: 120px; /* Giới hạn chiều rộng tối đa */
+    max-height: 120px; /* Giới hạn chiều cao */
+    object-fit: contain; /* QUAN TRỌNG: Giữ tỉ lệ ảnh, không bị zoom/méo */
+    object-position: center;
+    display: block;
+    margin: 0 auto; /* Căn giữa ảnh */
+    transition: transform 0.3s ease;
+}
+
+    /* Hiệu ứng nhẹ khi di chuột vào ảnh */
+    .component-image-container img:hover {
+        transform: scale(1.05);
+    }
+
+/* =========================================================
+   2. NÚT SLOT (CẤU HÌNH) - STYLE PREMIUM
+   ========================================================= */
+.slot-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
 .slot-btn {
-    background: rgba(255, 255, 255, 0.8); /* Nền kính mờ */
-    border: 1px solid rgba(9, 132, 227, 0.3); /* Viền xanh nhạt */
-    color: var(--text-main);
+    background: #ffffff;
+    border: 1px solid #e1e4e8;
+    color: #4a5568;
     font-family: 'Inter', sans-serif;
     font-weight: 600;
-    padding: 12px;
-    border-radius: 10px;
+    font-size: 0.95rem;
+    padding: 12px 24px;
+    border-radius: 12px;
+    cursor: pointer;
     position: relative;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-    /* Hiệu ứng hover: Sáng lên và nổi nhẹ */
+    /* Icon trong nút slot (nếu có) */
+    .slot-btn i {
+        font-size: 1.1rem;
+        color: #a0aec0;
+        transition: color 0.25s ease;
+    }
+
+    /* Hover State */
     .slot-btn:hover:not(.active) {
-        background: white;
-        border-color: var(--primary-color);
-        box-shadow: 0 5px 15px rgba(9, 132, 227, 0.2); /* Glow xanh */
-        color: var(--primary-color);
+        background: #f8fafc;
+        border-color: #cbd5e0;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        color: #2d3748;
     }
 
-    /* Trạng thái đang chọn (Active): Gradient nổi bật */
+    /* Active State - Sang trọng hơn, không dùng gradient gắt */
     .slot-btn.active {
-        background: linear-gradient(135deg, var(--primary-color), #00cec9); /* Gradient Xanh-Teal */
-        color: white;
-        border: none;
-        box-shadow: 0 8px 20px rgba(9, 132, 227, 0.4); /* Glow mạnh */
-        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        background: #0984e3; /* Màu chủ đạo */
+        color: #ffffff;
+        border-color: #0984e3;
+        box-shadow: 0 4px 15px rgba(9, 132, 227, 0.35); /* Glow mềm */
     }
 
-    /* Hiệu ứng khi bấm chuột xuống */
+        .slot-btn.active i {
+            color: #ffffff;
+        }
+
+    /* Active effect click */
     .slot-btn:active {
-        transform: scale(0.98); /* Thu nhỏ nhẹ tạo cảm giác bấm */
-        box-shadow: 0 2px 5px rgba(9, 132, 227, 0.3);
+        transform: scale(0.97);
     }
 
-* =========================================================
-NÚT SỬA & XÓA (Hành động trên linh kiện đã chọn)
-========================================================= */
-/* Style chung cho nút hành động nhỏ */
+/* =========================================================
+   3. NÚT SỬA & XÓA - STYLE SOFT UI (TINH TẾ)
+   ========================================================= */
+
+.action-group {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end; /* Căn phải */
+}
+
 .build-action-btn {
-    border-radius: 8px; /* Bo góc mềm mại */
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 0.8rem; /* Chữ nhỏ gọn */
-    padding: 6px 14px;
-    border: none; /* Bỏ viền mặc định */
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Hiệu ứng mượt */
-    display: inline-flex;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    color: white !important; /* Chữ màu trắng */
-    text-transform: uppercase; /* Chữ in hoa cho mạnh mẽ */
-    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 1rem;
+    position: relative;
 }
 
-/* Hiệu ứng icon bên trong (nếu có) */
-.build-action-btn i {
-    margin-right: 6px;
-    font-size: 0.9rem;
-}
+    /* Tooltip giả khi hover (Tùy chọn) */
+    .build-action-btn::after {
+        content: attr(title);
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%) scale(0);
+        background: #2d3748;
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        white-space: nowrap;
+        opacity: 0;
+        transition: all 0.2s;
+        pointer-events: none;
+    }
 
-/* Hiệu ứng khi di chuột chung */
-.build-action-btn:hover {
-    transform: translateY(-2px); /* Nổi lên nhẹ */
-}
+    .build-action-btn:hover::after {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
 
-/* Hiệu ứng khi bấm xuống chung */
-.build-action-btn:active {
-    transform: scale(0.95); /* Thu nhỏ lại */
-}
-
-/* --- Nút Sửa (Edit) - Gradient Cam Vàng Cao Cấp --- */
+/* --- Nút Sửa (Edit) --- */
 .btn-build-edit {
-    /* Gradient từ cam sáng sang vàng mật ong */
-    background: linear-gradient(135deg, #f0932b, #ffbe76);
-    box-shadow: 0 4px 10px rgba(240, 147, 43, 0.3); /* Bóng màu cam */
+    background: rgba(240, 147, 43, 0.1); /* Nền cam nhạt trong suốt */
+    color: #f0932b; /* Chữ cam đậm */
 }
 
     .btn-build-edit:hover {
-        /* Đảo chiều gradient và tăng độ sáng */
-        background: linear-gradient(135deg, #ffbe76, #f0932b);
-        box-shadow: 0 6px 15px rgba(240, 147, 43, 0.5); /* Glow mạnh hơn */
+        background: #f0932b; /* Nền cam đặc khi hover */
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(240, 147, 43, 0.4);
+        transform: translateY(-2px);
     }
 
-/* --- Nút Xóa (Delete) - Gradient Đỏ Công Nghệ --- */
+/* --- Nút Xóa (Delete) --- */
 .btn-build-delete {
-    /* Gradient từ đỏ tươi sang đỏ đậm */
-    background: linear-gradient(135deg, #eb4d4b, #c0392b);
-    box-shadow: 0 4px 10px rgba(235, 77, 75, 0.3); /* Bóng màu đỏ */
+    background: rgba(235, 77, 75, 0.1); /* Nền đỏ nhạt trong suốt */
+    color: #eb4d4b; /* Chữ đỏ đậm */
 }
 
     .btn-build-delete:hover {
-        /* Đảo chiều gradient */
-        background: linear-gradient(135deg, #c0392b, #eb4d4b);
-        box-shadow: 0 6px 15px rgba(235, 77, 75, 0.5); /* Glow đỏ mạnh */
+        background: #eb4d4b; /* Nền đỏ đặc khi hover */
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(235, 77, 75, 0.4);
+        transform: translateY(-2px);
+    }
+
+/* =========================================================
+   4. CẢI THIỆN CONTAINER (Làm giao diện đỡ "nghèo")
+   ========================================================= */
+/* Thêm class này vào thẻ div bao quanh danh sách linh kiện */
+.tech-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05); /* Đổ bóng lớn tạo chiều sâu */
+    border: 1px solid rgba(0,0,0,0.03);
+    overflow: hidden;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Dòng tiêu đề hoặc từng hàng linh kiện */
+.component-row {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #f1f2f6;
+    transition: background 0.2s;
+}
+
+    .component-row:hover {
+        background-color: #f8f9fa; /* Sáng lên khi di chuột vào hàng */
+    }
+
+    .component-row:last-child {
+        border-bottom: none;
     }

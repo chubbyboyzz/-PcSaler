@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using PcSaler.DBcontext.Entites;
 using PcSaler.Models;
 using PcSaler.Services;
@@ -14,14 +15,17 @@ namespace PcSaler.Controllers
     public class LoginController : Controller
     {
         private readonly LoginService _loginService;
+        private readonly IMemoryCache _memoryCache;
 
-        public LoginController(LoginService loginService)
+        public LoginController(LoginService loginService, IMemoryCache memoryCache)
         {
             _loginService = loginService;
+            _memoryCache = memoryCache;
         }
 
-        #region 1. XỬ LÝ ĐĂNG NHẬP & ĐĂNG XUẤT (STANDARD)
+        #region 1. XỬ LÝ ĐĂNG NHẬP (LOGIN)
 
+        // GET: Login (Chặn truy cập trực tiếp bằng đường dẫn)
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Index(string returnUrl = "/")
@@ -32,48 +36,119 @@ namespace PcSaler.Controllers
             }
 
             ViewData["ReturnUrl"] = returnUrl;
-            return RedirectToAction("Index", "Home");
+            // Trả về dòng này để debug nếu Form gửi sai Method
+            return Content("Vui lòng đăng nhập thông qua nút Đăng nhập trên trang chủ (Method POST).");
         }
 
-        // --- HÀM NÀY ĐÃ ĐƯỢC SỬA ĐỂ CHECK CAPTCHA ---
+        // POST: Login (Xử lý chính)
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Index(LoginViewModel model, string returnUrl = "/")
         {
-            // 1. CHECK VALIDATION CƠ BẢN
+            // 1. Validate dữ liệu đầu vào
             if (!ModelState.IsValid)
             {
                 var errors = string.Join("<br/>", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
                 return Json(new { success = false, message = errors });
             }
 
-            // 2. CHECK USERNAME / PASSWORD TRƯỚC (Theo ý ông)
+            // 2. Kiểm tra xem tài khoản có đang bị KHÓA TẠM THỜI không?
+            string lockoutKey = $"Lockout_{model.Username}";
+            if (_memoryCache.TryGetValue(lockoutKey, out DateTime unlockTime))
+            {
+                if (DateTime.Now < unlockTime)
+                {
+                    var remainingSeconds = (int)(unlockTime - DateTime.Now).TotalSeconds;
+                    return Json(new
+                    {
+                        success = false,
+                        isLocked = true, // Cờ báo hiệu khóa để JS đếm ngược
+                        remainingTime = remainingSeconds,
+                        message = $"Tài khoản tạm khóa. Vui lòng thử lại sau {remainingSeconds} giây."
+                    });
+                }
+            }
+
+            // 3. Thử đăng nhập với DB
             var user = await _loginService.LoginUserAsync(model.Username, model.Password);
 
             if (user == null)
             {
-                // Sai tài khoản/mật khẩu -> Báo lỗi luôn, KHÔNG hiện captcha
-                return Json(new { success = false, message = "Tài khoản hoặc mật khẩu không đúng." });
+                // --- LOGIC ĐẾM LẦN SAI & KHÓA ---
+
+                // Bước A: Kiểm tra xem User này có TỒN TẠI thật không?
+                var existingUser = await _loginService.GetUsersByUsername(model.Username);
+
+                if (existingUser == null)
+                {
+                    // User không tồn tại -> Báo lỗi thường, KHÔNG ĐẾM, KHÔNG KHÓA
+                    return Json(new
+                    {
+                        success = false,
+                        isLocked = false,
+                        message = "Tài khoản hoặc mật khẩu không chính xác!"
+                    });
+                }
+
+                // Bước B: User có thật nhưng sai mật khẩu -> BẮT ĐẦU ĐẾM
+                string failCountKey = $"FailCount_{model.Username}";
+
+                // Lấy số lần sai hiện tại (mặc định 0)
+                int failCount = _memoryCache.GetOrCreate(failCountKey, entry =>
+                {
+                    entry.SlidingExpiration = TimeSpan.FromMinutes(15); // Reset sau 15p
+                    return 0;
+                });
+
+                failCount++; // Tăng số lần sai
+                _memoryCache.Set(failCountKey, failCount);
+
+                // Bước C: Kiểm tra ngưỡng phạt (Sai từ lần 3 trở đi mới khóa)
+                if (failCount >= 3)
+                {
+                    // Công thức: 30 * 2^(số lần quá hạn). Lần 3 = 30s, Lần 4 = 60s...
+                    double waitSeconds = 30 * Math.Pow(2, failCount - 3);
+
+                    var lockUntil = DateTime.Now.AddSeconds(waitSeconds);
+                    _memoryCache.Set(lockoutKey, lockUntil, TimeSpan.FromSeconds(waitSeconds));
+
+                    return Json(new
+                    {
+                        success = false,
+                        isLocked = true,
+                        remainingTime = (int)waitSeconds,
+                        message = $"Sai mật khẩu {failCount} lần. Bị khóa trong {waitSeconds} giây."
+                    });
+                }
+                else
+                {
+                    // Sai dưới 3 lần -> Chỉ báo lỗi
+                    int attemptsLeft = 3 - failCount;
+                    return Json(new
+                    {
+                        success = false,
+                        isLocked = false,
+                        message = $"Mật khẩu không đúng! (Còn {attemptsLeft} lần thử)"
+                    });
+                }
             }
 
-            // 3. TÀI KHOẢN ĐÚNG RỒI -> GIỜ MỚI CHECK CAPTCHA
-            // Lấy token từ Session
+            // 4. Đăng nhập thành công -> Kiểm tra Captcha
             string? verifiedToken = HttpContext.Session.GetString("CaptchaVerifiedToken");
-
             if (string.IsNullOrEmpty(verifiedToken))
             {
-                // Nếu User/Pass đúng mà chưa xếp hình -> Trả về signal "requireCaptcha"
-                // Để Frontend biết mà bật cái khung xếp hình lên
                 return Json(new { success = false, requireCaptcha = true, message = "Vui lòng xác thực bảo mật!" });
             }
 
-            // 4. NẾU ĐÃ CÓ TOKEN (Tức là đã xếp hình xong rồi và submit lại)
-            // Xóa token đi
+            // Xóa Token Captcha và Xóa án phạt
             HttpContext.Session.Remove("CaptchaVerifiedToken");
+            _memoryCache.Remove($"Lockout_{model.Username}");
+            _memoryCache.Remove($"FailCount_{model.Username}");
 
-            // Đăng nhập thành công
+            // Ghi Cookie đăng nhập
             await SignInUser(user);
 
+            // Điều hướng
             if (string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl) || returnUrl == "/")
             {
                 returnUrl = Url.Action("Index", "Home");
@@ -82,32 +157,36 @@ namespace PcSaler.Controllers
             return Json(new { success = true, redirectUrl = returnUrl });
         }
 
+        #endregion
+
+        #region 2. XỬ LÝ ĐĂNG XUẤT (LOGOUT)
+
         public async Task<IActionResult> Logout()
         {
+            // Xóa Cookie xác thực
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Xóa sạch Session (Giỏ hàng, Captcha...)
             HttpContext.Session.Clear();
+
+            // Quay về trang chủ
             return RedirectToAction("Index", "Home");
         }
 
         #endregion
 
-        #region 2. XỬ LÝ QUÊN MẬT KHẨU (FORGOT PASSWORD API) - GIỮ NGUYÊN
-        // ... (Code cũ giữ nguyên không đổi) ...
-        // Bước 0: Kiểm tra Username
+        #region 3. XỬ LÝ QUÊN MẬT KHẨU (FORGOT PASSWORD API)
+
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> CheckUserInfo(string username)
         {
-            if (string.IsNullOrEmpty(username))
-                return Json(new { success = false, message = "Vui lòng nhập tên đăng nhập!" });
+            if (string.IsNullOrEmpty(username)) return Json(new { success = false, message = "Vui lòng nhập tên đăng nhập!" });
 
             var user = await _loginService.GetUsersByUsername(username);
 
-            if (user == null)
-                return Json(new { success = false, message = "Tên đăng nhập không tồn tại." });
-
-            if (string.IsNullOrEmpty(user.Email))
-                return Json(new { success = false, message = "Tài khoản này chưa cập nhật Email." });
+            if (user == null) return Json(new { success = false, message = "Tên đăng nhập không tồn tại." });
+            if (string.IsNullOrEmpty(user.Email)) return Json(new { success = false, message = "Tài khoản chưa cập nhật Email." });
 
             return Json(new
             {
@@ -117,22 +196,18 @@ namespace PcSaler.Controllers
             });
         }
 
-        // Bước 1A: Gửi OTP (Theo Email)
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> SendOtp(string email)
         {
-            if (string.IsNullOrEmpty(email))
-                return Json(new { success = false, message = "Vui lòng nhập Email!" });
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false, message = "Vui lòng nhập Email!" });
 
             var result = await _loginService.SendForgotPasswordEmailAsync(email);
-
             return result
-                ? Json(new { success = true, message = "Mã OTP đã được gửi đến email." })
+                ? Json(new { success = true, message = "Mã OTP đã được gửi." })
                 : Json(new { success = false, message = "Email này chưa đăng ký." });
         }
 
-        // Bước 1B: Gửi OTP (Theo Username)
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> SendOtpByUsername(string username)
@@ -141,13 +216,11 @@ namespace PcSaler.Controllers
             if (user == null) return Json(new { success = false, message = "Lỗi hệ thống." });
 
             var result = await _loginService.SendForgotPasswordEmailAsync(user.Email);
-
             return result
                 ? Json(new { success = true, message = "Đã gửi mã OTP!" })
                 : Json(new { success = false, message = "Không thể gửi mail." });
         }
 
-        // Bước 2: Kiểm tra OTP
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> VerifyOtp(string email, string username, string otp)
@@ -162,13 +235,11 @@ namespace PcSaler.Controllers
                 return Json(new { success = false, message = "Thiếu thông tin xác thực!" });
 
             var isValid = await _loginService.VerifyOtpAsync(email, otp);
-
             return isValid
                 ? Json(new { success = true, message = "Xác thực thành công!" })
-                : Json(new { success = false, message = "Mã OTP không đúng hoặc đã hết hạn." });
+                : Json(new { success = false, message = "Mã OTP không đúng hoặc hết hạn." });
         }
 
-        // Bước 3: Đổi mật khẩu mới
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword(string email, string username, string newPassword)
@@ -191,17 +262,15 @@ namespace PcSaler.Controllers
                 if (user != null) email = user.Email;
             }
 
-            if (string.IsNullOrEmpty(email))
-                return Json(new { success = false, message = "Lỗi định danh tài khoản." });
+            if (string.IsNullOrEmpty(email)) return Json(new { success = false, message = "Lỗi định danh tài khoản." });
 
             await _loginService.ResetPasswordAsync(email, newPassword);
-
-            return Json(new { success = true, message = "Đổi mật khẩu thành công! Hãy đăng nhập ngay." });
+            return Json(new { success = true, message = "Đổi mật khẩu thành công!" });
         }
+
         #endregion
 
-        #region 4. ĐĂNG NHẬP GOOGLE & HELPERS (GIỮ NGUYÊN)
-        // ... (Code cũ giữ nguyên không đổi) ...
+        #region 4. ĐĂNG NHẬP GOOGLE & TỰ ĐỘNG ĐĂNG KÝ (API)
 
         [AllowAnonymous]
         public IActionResult LoginByGoogle()
@@ -214,33 +283,45 @@ namespace PcSaler.Controllers
         public async Task<IActionResult> GoogleResponse()
         {
             var result = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
+
+            // Nếu hủy hoặc lỗi -> Về trang chủ
             if (!result.Succeeded) return RedirectToAction("Index", "Home");
 
+            // Lấy thông tin từ Google
             var email = result.Principal.FindFirst(ClaimTypes.Email)?.Value;
             var name = result.Principal.FindFirst(ClaimTypes.Name)?.Value;
 
             if (string.IsNullOrEmpty(email)) return RedirectToAction("Index", "Home");
 
+            // Kiểm tra xem User đã có trong DB chưa?
             var user = await _loginService.GetUsersByEmail(email);
+
             if (user == null)
             {
+                // [LOGIC TỰ ĐỘNG ĐĂNG KÝ] Nếu chưa có -> Tạo mới luôn
                 user = new Customer
                 {
-                    Username = email,
+                    Username = email, // Dùng email làm username
                     Email = email,
-                    FullName = name,
+                    FullName = name ?? "Google User",
                     CreatedAt = DateTime.Now,
-                    PasswordHash = "GOOGLE_AUTH_NO_PASSWORD",
+                    PasswordHash = "GOOGLE_AUTH_NO_PASSWORD", // Đánh dấu acc này không dùng pass thường
                     Address = "Chưa cập nhật",
                     Phone = ""
                 };
+
                 await _loginService.addAsync(user);
                 await _loginService.SaveChangeAsync();
             }
 
+            // Đăng nhập luôn cho User
             await SignInUser(user);
             return RedirectToAction("Index", "Home");
         }
+
+        #endregion
+
+        #region 5. HÀM PHỤ TRỢ (HELPER)
 
         private async Task SignInUser(Customer user)
         {
@@ -269,6 +350,7 @@ namespace PcSaler.Controllers
             if (local.Length <= 2) return email;
             return $"{local.Substring(0, 2)}*****{local.Substring(local.Length - 1, 1)}@{parts[1]}";
         }
+
         #endregion
     }
 }

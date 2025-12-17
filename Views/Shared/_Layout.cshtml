@@ -18,6 +18,7 @@
         .login-modal-header { background: linear-gradient(135deg, #5563DE, #74ABE2); color: white; }
         .btn-custom-login { background: #5563DE; color: white; font-weight: 600; transition: all 0.3s; }
         .btn-custom-login:hover { background: #3c48b5; color: white; transform: translateY(-2px); }
+        .btn-custom-login:disabled { background: #6c757d; cursor: not-allowed; transform: none; }
         .form-control:focus { border-color: #5563DE; box-shadow: 0 0 0 0.2rem rgba(85, 99, 222, 0.25); }
 
         /* Floating Buttons Style */
@@ -38,7 +39,7 @@
         .navbar-nav .nav-link { font-weight: 600; text-transform: uppercase; font-size: 0.9rem; color: #444; }
         .navbar-nav .nav-link:hover { color: #5563DE; }
 
-        /* --- SLIDER CAPTCHA CSS (Mới thêm) --- */
+        /* --- SLIDER CAPTCHA CSS --- */
         .captcha-container { position: relative; width: 300px; height: 150px; margin: 0 auto 15px; background: #f2f2f2; border-radius: 4px; overflow: hidden; }
         .captcha-bg { width: 100%; height: 100%; display: block; }
         .captcha-piece { position: absolute; top: 0; left: 0; width: 45px; height: 45px; z-index: 2; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
@@ -58,7 +59,7 @@
             <div class="row align-items-center gy-3">
                 <div class="col-6 col-lg-3">
                     <a class="navbar-brand fw-bold fs-3 text-primary d-flex align-items-center" href="@Url.Action("Index", "Home")">
-                         <i class="fa-solid fa-computer me-2"></i>PCShop
+                        <i class="fa-solid fa-computer me-2"></i>PCShop
                     </a>
                 </div>
 
@@ -81,9 +82,9 @@
                                 <li><a class="dropdown-item" href="@Url.Action("Profile", "Customers")"><i class="fa-solid fa-id-card me-2"></i>Hồ sơ</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                  <li>
-                                    <form method="post" action="@Url.Action("Logout", "Login")">
+                                     <form method="post" action="@Url.Action("Logout", "Login")">
                                         <button type="submit" class="dropdown-item text-danger"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</button>
-                                    </form>
+                                     </form>
                                 </li>
                             </ul>
                          </div>
@@ -94,7 +95,7 @@
                             <div class="fs-4"><i class="fa-regular fa-user"></i></div>
                             <div class="text-start d-none d-xl-block" style="line-height: 1.2;">
                                  <small class="text-muted" style="font-size: 11px;">Tài khoản</small><br>
-                                <span class="fw-bold small">Đăng nhập</span>
+                                 <span class="fw-bold small">Đăng nhập</span>
                             </div>
                         </a>
                     }
@@ -111,10 +112,10 @@
                 <nav class="navbar navbar-expand-lg navbar-light p-0">
                      <div class="dropdown me-3">
                         <button class="btn btn-primary rounded-0 fw-bold px-4 py-2 d-flex align-items-center gap-2" 
-                                type="button" id="categoryDropdownMenu" data-bs-toggle="dropdown">
+                               type="button" id="categoryDropdownMenu" data-bs-toggle="dropdown">
                              <i class="fa-solid fa-bars"></i> DANH MỤC
                         </button>
-                         <div class="dropdown-menu shadow-lg border-0 mt-0 w-100" aria-labelledby="categoryDropdownMenu">
+                        <div class="dropdown-menu shadow-lg border-0 mt-0 w-100" aria-labelledby="categoryDropdownMenu">
                              @await Component.InvokeAsync("CategoryMenu")
                           </div>
                     </div>
@@ -125,24 +126,12 @@
 
                     <div class="collapse navbar-collapse" id="mainNav">
                         <ul class="navbar-nav me-auto">
-                            <li class="nav-item">
-                                 <a class="nav-link px-3 active" href="@Url.Action("Index", "Home")">Trang chủ</a>
-                            </li>
-                            <li class="nav-item">
-                                 <a class="nav-link px-3" href="@Url.Action("Index", "PcBuild")">Bộ PC</a>
-                            </li>
-                            <li class="nav-item">
-                                 <a class="nav-link px-3" href="@Url.Action("Accessories", "Product")">Phụ kiện</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 text-danger" href="@Url.Action("Promotion", "Pages")">Khuyến mãi</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 text-danger" href="@Url.Action("Contact", "Pages")">Liên Hệ</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link px-3 text-danger" href="@Url.Action("Warranty", "Pages")">Bảo Hành</a>
-                             </li>
+                            <li class="nav-item"><a class="nav-link px-3 active" href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+                            <li class="nav-item"><a class="nav-link px-3" href="@Url.Action("Index", "PcBuild")">Bộ PC</a></li>
+                            <li class="nav-item"><a class="nav-link px-3" href="@Url.Action("Accessories", "Product")">Phụ kiện</a></li>
+                            <li class="nav-item"><a class="nav-link px-3 text-danger" href="@Url.Action("Promotion", "Pages")">Khuyến mãi</a></li>
+                            <li class="nav-item"><a class="nav-link px-3 text-danger" href="@Url.Action("Contact", "Pages")">Liên Hệ</a></li>
+                            <li class="nav-item"><a class="nav-link px-3 text-danger" href="@Url.Action("Warranty", "Pages")">Bảo Hành</a></li>
                         </ul>
 
                         <div class="py-2 py-lg-0">
@@ -163,7 +152,6 @@
     <footer class="bg-dark text-light pt-5 pb-3 mt-auto" style="border-top: 3px solid #0d6efd;">
          <div class="container">
             <div class="row g-4">
-
                 <div class="col-lg-4 col-md-6">
                     <h5 class="text-uppercase fw-bold text-white mb-3">
                         <i class="fa-solid fa-computer text-primary me-2"></i>PCShop
@@ -171,7 +159,7 @@
                     <p class="text-light small" style="line-height: 1.6; text-align: justify;">
                         Tiên phong trong lĩnh vực cung cấp giải pháp máy tính đồ họa, Gaming Gear và Laptop High-end.
                         PCShop cam kết mang lại trải nghiệm mua sắm an tâm tuyệt đối cho khách hàng.
-                     </p>
+                    </p>
                     <div class="d-flex gap-3 mt-3">
                         <a href="https://www.facebook.com/Hieumit2005" class="text-white fs-5 hover-effect"><i class="fa-brands fa-facebook"></i></a>
                         <a href="https://www.youtube.com/@@hieunguyen-yf1xi" class="text-white fs-5 hover-effect"><i class="fa-brands fa-youtube"></i></a>
@@ -181,17 +169,16 @@
 
                 <div class="col-lg-4 col-md-6">
                     <h6 class="text-uppercase fw-bold text-white mb-4">Hệ thống Showroom</h6>
-                     <div class="d-flex flex-column gap-3">
+                    <div class="d-flex flex-column gap-3">
                         <div>
                             <div class="d-flex align-items-center mb-1">
-                                 <i class="fa-solid fa-map-location-dot text-warning me-2"></i>
+                                <i class="fa-solid fa-map-location-dot text-warning me-2"></i>
                                 <strong class="text-warning">Hà Nội (Trụ sở chính)</strong>
                             </div>
-                             <p class="text-light small mb-0 ms-4 border-start border-secondary ps-3">
+                            <p class="text-light small mb-0 ms-4 border-start border-secondary ps-3">
                                 Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm
                             </p>
-                         </div>
-
+                        </div>
                         <div>
                             <div class="d-flex align-items-center mb-1">
                                 <i class="fa-solid fa-location-dot text-primary me-2"></i>
@@ -201,42 +188,38 @@
                                 Tòa nhà Innovation, Công viên phần mềm Quang Trung, Q.12
                             </p>
                         </div>
-
                         <div>
-                             <div class="d-flex align-items-center mb-1">
+                            <div class="d-flex align-items-center mb-1">
                                 <i class="fa-solid fa-location-dot text-primary me-2"></i>
                                 <strong class="text-white">Đà Nẵng</strong>
-                             </div>
+                            </div>
                             <p class="text-light small mb-0 ms-4 border-start border-secondary ps-3">
                                 137 Nguyễn Thị Thập, Phường Hòa Minh, Quận Liên Chiểu
-                             </p>
+                            </p>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-lg-4 col-md-12">
-                     <h6 class="text-uppercase fw-bold text-white mb-4">Tổng đài hỗ trợ</h6>
-
+                    <h6 class="text-uppercase fw-bold text-white mb-4">Tổng đài hỗ trợ</h6>
                     <div class="p-3 rounded mb-3" style="background-color: rgba(255,255,255,0.08); border: 1px dashed #555;">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <span class="text-light small"><i class="fa-solid fa-phone-volume me-2"></i>Mua hàng:</span>
                             <strong class="text-warning fs-5">1800 6969</strong>
-                         </div>
+                        </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-light small"><i class="fa-solid fa-screwdriver-wrench me-2"></i>Bảo hành:</span>
-                             <strong class="text-warning fs-5">1900 6161</strong>
+                            <strong class="text-warning fs-5">1900 6161</strong>
                         </div>
                     </div>
-
                     <div class="small text-light">
-                         <p class="mb-1"><i class="fa-solid fa-envelope me-2 text-primary"></i> <strong>Email:</strong> cskh@pcshop.edu.vn</p>
+                        <p class="mb-1"><i class="fa-solid fa-envelope me-2 text-primary"></i> <strong>Email:</strong> cskh@pcshop.edu.vn</p>
                         <p class="mb-0"><i class="fa-regular fa-clock me-2 text-primary"></i> <strong>Giờ mở cửa:</strong> 24/7</p>
                     </div>
                 </div>
-
             </div>
 
-             <hr class="my-4 border-secondary opacity-50">
+            <hr class="my-4 border-secondary opacity-50">
 
             <div class="col-md-6 text-center text-md-end mt-2 mt-md-0">
                 <span class="text-white-50 small me-2">Chấp nhận thanh toán:</span>
@@ -261,7 +244,7 @@
     </div>
 
     <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-         <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
                 <div class="modal-header login-modal-header border-0">
                     <div><h5 class="modal-title fw-bold">CHÀO MỪNG TRỞ LẠI</h5><small class="text-white-50">Đăng nhập để tiếp tục mua sắm</small></div>
@@ -271,7 +254,7 @@
                      <form id="ajaxLoginForm" onsubmit="handleAjaxLogin(event)">
                         <input type="hidden" name="returnUrl" value="/" />
                         <div class="form-floating mb-3">
-                             <input type="text" class="form-control" id="modalUser" name="Username" placeholder="Username" required>
+                            <input type="text" class="form-control" id="modalUser" name="Username" placeholder="Username" required>
                             <label><i class="fa-solid fa-user me-1"></i> Tên đăng nhập</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -279,27 +262,23 @@
                             <label><i class="fa-solid fa-lock me-1"></i> Mật khẩu</label>
                         </div>
 
-                        <div class="mb-3">
-                           <div class="mb-3" id="captchaArea" style="display:none;"> <div class="captcha-container">
-                            <img id="captchaBg" class="captcha-bg" src="" alt="Background">
-                            <img id="captchaPiece" class="captcha-piece" src="" alt="Piece">
-                        </div>
-    
-                        <div class="slider-container">
-                            <div class="slider-bar" id="sliderBar"></div>
-                            <div class="slider-knob" id="sliderKnob">
-                                <i class="fa-solid fa-arrow-right"></i>
+                        <div class="mb-3" id="captchaArea" style="display:none;"> 
+                             <div class="captcha-container">
+                                <img id="captchaBg" class="captcha-bg" src="" alt="Background">
+                                <img id="captchaPiece" class="captcha-piece" src="" alt="Piece">
                             </div>
-                            <div class="text-center pt-2 text-muted small user-select-none" style="position:absolute; width:100%; top:0; pointer-events:none;">
-                                Kéo sang phải để ghép hình
+                            <div class="slider-container">
+                                <div class="slider-bar" id="sliderBar"></div>
+                                <div class="slider-knob" id="sliderKnob">
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </div>
+                                <div class="text-center pt-2 text-muted small user-select-none" style="position:absolute; width:100%; top:0; pointer-events:none;">
+                                    Kéo sang phải để ghép hình
+                                </div>
                             </div>
-                        </div>
-    
-                        <input type="hidden" id="isCaptchaVerified" value="false">
-                        </div>
-                            
                             <input type="hidden" id="isCaptchaVerified" value="false">
                         </div>
+                        
                         <div class="d-flex justify-content-between align-items-center mb-4 small">
                             <div class="form-check"><input class="form-check-input" type="checkbox" id="modalRemember"><label class="form-check-label text-muted" for="modalRemember">Ghi nhớ tôi</label></div>
                             <a href="javascript:void(0)" onclick="openForgotModal()" class="text-decoration-none text-primary">Quên mật khẩu?</a>
@@ -309,8 +288,7 @@
                         <div class="d-grid"><a href="@Url.Action("LoginByGoogle", "Login")" class="btn btn-outline-danger py-2 rounded-pill fw-bold"><i class="fa-brands fa-google me-2"></i> Google</a></div>
                    </form>
                 </div>
-                <div class="modal-footer justify-content-center bg-light border-0"><small>Chưa có tài khoản?
-                     <a asp-controller="Account" asp-action="Register" class="fw-bold text-decoration-none" style="color: #5563DE">Đăng ký ngay</a></small></div>
+                <div class="modal-footer justify-content-center bg-light border-0"><small>Chưa có tài khoản? <a asp-controller="Account" asp-action="Register" class="fw-bold text-decoration-none" style="color: #5563DE">Đăng ký ngay</a></small></div>
             </div>
         </div>
     </div>
@@ -319,32 +297,32 @@
         <div class="modal-dialog modal-dialog-centered">
              <div class="modal-content border-0 shadow-lg" style="border-radius: 15px; overflow: hidden;">
                 <div class="modal-header border-0 text-white" style="background: linear-gradient(135deg, #ff7e5f, #feb47b);">
-                     <h5 class="modal-title fw-bold"><i class="fa-solid fa-key me-2"></i>LẤY LẠI MẬT KHẨU</h5>
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-key me-2"></i>LẤY LẠI MẬT KHẨU</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                     <div id="fp-step-0" class="text-center">
+                    <div id="fp-step-0" class="text-center">
                         <p class="text-muted mb-4">Bạn muốn tìm lại tài khoản bằng cách nào?</p>
                         <div class="d-grid gap-3">
                             <button class="btn btn-outline-primary py-2 fw-bold" onclick="showStep('email')"><i class="fa-solid fa-envelope me-2"></i> Dùng Email đăng ký</button>
                             <button class="btn btn-outline-secondary py-2 fw-bold" onclick="showStep('username')"><i class="fa-solid fa-user me-2"></i> Dùng Tên đăng nhập</button>
                         </div>
                     </div>
-                     <div id="fp-step-email" style="display:none">
+                    <div id="fp-step-email" style="display:none">
                         <div class="d-flex justify-content-between mb-3"><a href="javascript:void(0)" onclick="backToStep0()" class="text-muted small"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
                         <div class="form-floating mb-3"><input type="email" class="form-control" id="fpEmail" placeholder="Email"><label>Nhập Email</label></div>
                         <button class="btn btn-warning w-100 fw-bold text-white py-2" onclick="sendOtp('EMAIL')">GỬI MÃ OTP</button>
                      </div>
                      <div id="fp-step-username" style="display:none">
                         <div class="d-flex justify-content-between mb-3"><a href="javascript:void(0)" onclick="backToStep0()" class="text-muted small"><i class="fa-solid fa-arrow-left"></i> Quay lại</a></div>
-                         <div class="form-floating mb-3"><input type="text" class="form-control" id="fpUsernameInput" placeholder="User"><label>Nhập Tên đăng nhập</label></div>
+                        <div class="form-floating mb-3"><input type="text" class="form-control" id="fpUsernameInput" placeholder="User"><label>Nhập Tên đăng nhập</label></div>
                         <button class="btn btn-info w-100 fw-bold text-white py-2" onclick="checkUsername()">TÌM TÀI KHOẢN</button>
                      </div>
                      <div id="fp-step-userinfo" style="display:none; text-align:center;">
                         <div class="mb-4"><h5 class="fw-bold text-primary" id="lblFullName">User</h5><p class="text-muted small">Email: <strong id="lblMaskedEmail">...</strong></p></div>
                         <button class="btn btn-primary w-100 fw-bold py-2" onclick="sendOtp('USERNAME')">ĐÚNG LÀ TÔI - GỬI OTP</button>
                         <div class="mt-3"><a href="javascript:void(0)" onclick="showStep('username')" class="text-muted small">Nhập lại</a></div>
-                      </div>
+                     </div>
                      <div id="fp-step-otp" style="display:none">
                         <p class="text-muted small mb-3">Mã OTP đã gửi. Kiểm tra email.</p>
                         <div class="form-floating mb-3"><input type="text" class="form-control text-center fw-bold" id="fpOtp" maxlength="6" style="letter-spacing:5px; font-size:1.2rem;"><label>Nhập OTP</label></div>
@@ -408,19 +386,17 @@
         });
 
         // ==========================================
-        // 4. LOGIC SLIDER CAPTCHA (KÉO THẢ) - MỚI
+        // 4. LOGIC SLIDER CAPTCHA (KÉO THẢ)
         // ==========================================
         let isDragging = false;
         let startX = 0;
 
-        // Khi Modal mở lên -> Load ảnh mới
         const loginModalEl = document.getElementById('loginModal');
         if (loginModalEl) {
             loginModalEl.addEventListener('shown.bs.modal', loadCaptcha);
         }
 
         async function loadCaptcha() {
-            // Reset lại giao diện về ban đầu
             const knob = document.getElementById('sliderKnob');
             const piece = document.getElementById('captchaPiece');
             const bar = document.getElementById('sliderBar');
@@ -437,7 +413,6 @@
             knob.style.background = "#fff";
             knob.style.cursor = "pointer";
 
-            // Gọi API lấy ảnh
             try {
                 const res = await fetch('/Captcha/GetCaptchaImage');
                 if (!res.ok) throw new Error("Lỗi load ảnh");
@@ -445,44 +420,31 @@
                 
                 document.getElementById('captchaBg').src = data.bg;
                 document.getElementById('captchaPiece').src = data.piece;
-                // Đặt độ cao Y cho mảnh ghép khớp với lỗ hổng
                 document.getElementById('captchaPiece').style.top = data.y + 'px';
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
 
-        // Sự kiện kéo thả
         const sliderKnob = document.getElementById('sliderKnob');
-
         if(sliderKnob) {
             sliderKnob.addEventListener('mousedown', startDrag);
-            sliderKnob.addEventListener('touchstart', startDrag); // Hỗ trợ Mobile
-
+            sliderKnob.addEventListener('touchstart', startDrag);
             window.addEventListener('mouseup', stopDrag);
             window.addEventListener('touchend', stopDrag);
-
             window.addEventListener('mousemove', doDrag);
             window.addEventListener('touchmove', doDrag);
         }
 
         function startDrag(e) {
-            // Nếu đã verify xong thì không cho kéo nữa
             if (document.getElementById('isCaptchaVerified').value === "true") return;
             isDragging = true;
-            // Lấy tọa độ X (chuẩn hóa cho cả chuột và cảm ứng)
             startX = e.clientX || e.touches[0].clientX;
         }
 
         function doDrag(e) {
             if (!isDragging) return;
-            
             const clientX = e.clientX || e.touches[0].clientX;
             let moveX = clientX - startX;
-            
-            // Giới hạn kéo (Max = 300px width container - 50px width nút = 250px)
-            const maxMove = 250; 
-
+            const maxMove = 250;
             if (moveX < 0) moveX = 0;
             if (moveX > maxMove) moveX = maxMove;
 
@@ -490,20 +452,18 @@
             const piece = document.getElementById('captchaPiece');
             const bar = document.getElementById('sliderBar');
 
-            // Cập nhật giao diện
             knob.style.left = moveX + 'px';
             bar.style.width = moveX + 'px';
-            piece.style.left = moveX + 'px'; // Mảnh ghép chạy theo nút
+            piece.style.left = moveX + 'px';
         }
 
         async function stopDrag(e) {
             if (!isDragging) return;
             isDragging = false;
-            
+
             const knob = document.getElementById('sliderKnob');
             const currentX = parseInt(knob.style.left);
-            
-            // Gửi tọa độ lên Server check
+
             try {
                 const res = await fetch('/Captcha/Verify', {
                     method: 'POST',
@@ -513,16 +473,16 @@
                 const data = await res.json();
                 
                 if (data.success) {
-                    // THÀNH CÔNG
                     document.getElementById('isCaptchaVerified').value = "true";
                     knob.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
                     knob.style.background = "#d1e7dd";
-                    knob.style.cursor = "default"; // Khóa nút lại
-                } else {
-                    // THẤT BẠI -> Reset để kéo lại
-                    loadCaptcha(); 
+                    knob.style.cursor = "default";
                     
-                    // Hiệu ứng rung nhẹ báo sai (Optional)
+                    // Tự động đăng nhập sau 0.5s
+                    setTimeout(() => { handleAjaxLogin(null); }, 500);
+
+                } else {
+                    loadCaptcha();
                     knob.style.background = "#f8d7da";
                     setTimeout(() => knob.style.background = "#fff", 300);
                 }
@@ -532,37 +492,35 @@
             }
         }
 
-            async function handleAjaxLogin(event) {
+        // ==========================================
+        // 5. AJAX LOGIN HANDLER (ĐÃ NÂNG CẤP COUNTDOWN)
+        // ==========================================
+        async function handleAjaxLogin(event) {
             if(event) event.preventDefault();
-
+            
             const captchaVerified = document.getElementById('isCaptchaVerified').value === "true";
             const captchaArea = document.getElementById('captchaArea');
             const submitBtn = document.getElementById('btnLoginSubmit');
             const originalText = "ĐĂNG NHẬP";
 
-            // --- BƯỚC 1: NẾU CHƯA CAPTCHA THÌ HIỆN RA ---
+            // BƯỚC 1: NẾU CHƯA CAPTCHA THÌ HIỆN RA
             if (!captchaVerified) {
-                // Kiểm tra xem user đã nhập user/pass chưa (tránh hiện captcha khi chưa nhập gì)
                 const user = document.getElementById('modalUser').value;
                 const pass = document.getElementById('modalPass').value;
+                
                 if(!user || !pass) {
                     return Swal.fire('Thông báo', 'Vui lòng nhập tài khoản và mật khẩu trước!', 'warning');
                 }
 
-                // Hiện Captcha
                 if (captchaArea.style.display === 'none') {
                     captchaArea.style.display = 'block';
-                    loadCaptcha(); // Load ảnh
-
-                    // Thông báo nhẹ hoặc Focus vào thanh trượt (Optional)
-                    // Swal.fire({ title: 'Xác thực', text: 'Vui lòng trượt hình để tiếp tục', timer: 1500, showConfirmButton: false });
+                    loadCaptcha();
                 }
-                return; // DỪNG LẠI, KHÔNG GỬI SERVER
+                return;
             }
 
-            // --- BƯỚC 2: ĐÃ CAPTCHA -> GỬI SERVER CHECK PASS ---
+            // BƯỚC 2: GỬI REQUEST
             const form = document.getElementById('ajaxLoginForm');
-
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
 
@@ -573,12 +531,41 @@
                 if (data.success) {
                     Swal.fire({ icon: 'success', title: 'Thành công!', timer: 1500, showConfirmButton: false })
                     .then(() => { window.location.href = data.redirectUrl; });
-                } else {
-                    // Sai Pass hoặc lỗi khác -> Reset Captcha bắt làm lại (Bảo mật)
+                } 
+                else if (data.isLocked) {
+                    // --- XỬ LÝ KHÓA (COUNTDOWN) ---
+                    Swal.fire({ icon: 'error', title: 'Tạm khóa', text: data.message });
+                    
+                    // Reset Captcha bắt làm lại
                     loadCaptcha();
                     document.getElementById('isCaptchaVerified').value = "false";
-                    // captchaArea.style.display = 'none'; // Muốn ẩn đi bắt hiện lại thì bỏ comment dòng này
+                    
+                    // Bắt đầu đếm ngược trên nút
+                    let timeLeft = data.remainingTime;
+                    submitBtn.classList.add('btn-secondary');
+                    submitBtn.classList.remove('btn-custom-login');
+                    
+                    // Xóa interval cũ nếu có
+                    if (window.loginCountdownInterval) clearInterval(window.loginCountdownInterval);
 
+                    window.loginCountdownInterval = setInterval(() => {
+                        timeLeft--;
+                        submitBtn.innerHTML = `<i class="fa-solid fa-ban"></i> Thử lại sau ${timeLeft}s`;
+                        
+                        if (timeLeft <= 0) {
+                            clearInterval(window.loginCountdownInterval);
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalText;
+                            submitBtn.classList.remove('btn-secondary');
+                            submitBtn.classList.add('btn-custom-login');
+                        }
+                    }, 1000);
+                } 
+                else {
+                    // Lỗi sai pass bình thường
+                    loadCaptcha();
+                    // document.getElementById('isCaptchaVerified').value = "false"; (loadCaptcha đã reset rồi)
+                    
                     Swal.fire({ icon: 'error', title: 'Thất bại', html: data.message });
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalText;
@@ -587,48 +574,6 @@
                 Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Lỗi kết nối server.' });
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalText;
-            }
-        }
-
-        // SỬA HÀM STOP DRAG: Verify xong thì TỰ ĐỘNG LOGIN
-        async function stopDrag(e) {
-            if (!isDragging) return;
-            isDragging = false;
-
-            const knob = document.getElementById('sliderKnob');
-            const currentX = parseInt(knob.style.left);
-
-            try {
-                const res = await fetch('/Captcha/Verify', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ x: currentX })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    // THÀNH CÔNG
-                    document.getElementById('isCaptchaVerified').value = "true";
-
-                    knob.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
-                    knob.style.background = "#d1e7dd";
-                    knob.style.cursor = "default";
-
-                    // === TỰ ĐỘNG GỬI FORM LOGIN ĐI ===
-                    // setTimeout để người dùng kịp nhìn thấy dấu tích xanh
-                    setTimeout(() => {
-                        handleAjaxLogin(null);
-                    }, 500);
-
-                } else {
-                    // THẤT BẠI -> Reset
-                    loadCaptcha();
-                    knob.style.background = "#f8d7da";
-                    setTimeout(() => knob.style.background = "#fff", 300);
-                }
-            } catch (e) {
-                console.error(e);
-                loadCaptcha();
             }
         }
 

@@ -1,12 +1,10 @@
-﻿// File: ViewComponents/CategoryMenuViewComponent.cs
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PcSaler.DBcontext; // Đảm bảo đúng namespace
+using PcSaler.DBcontext; 
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PcSaler.ViewComponents // Thay đổi namespace nếu cần
+namespace PcSaler.ViewComponents 
 {
     // Class phải kế thừa từ ViewComponent
     public class CategoryMenuViewComponent : ViewComponent

@@ -4,30 +4,28 @@
     ViewData["Title"] = "PC Build - Máy Bộ Cấu Hình Sẵn";
 }
 
-<!-- Banner đầu trang -->
-<div class="bg-dark text-white py-5 mb-4 text-center" style="background: linear-gradient(45deg, #1a2a6c, #b21f1f, #fdbb2d);">
-    <div class="container">
-        <h1 class="display-4 fw-bold">PC GAMING & WORKSTATION</h1>
-        <p class="lead">Cấu hình tối ưu - Hiệu năng đỉnh cao - Bảo hành trọn gói</p>
-    </div>
-</div>
+<link rel="stylesheet" href="~/css/pc-build-list.css" asp-append-version="true" />
 
-<div class="container">
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+<div class="tech-page-container">
+
+    <div class="tech-banner">
+        <h1>PC GAMING & WORKSTATION</h1>
+        <p>Cấu hình tối ưu - Hiệu năng đỉnh cao - Bảo hành trọn gói</p>
+    </div>
+
+    <div class="tech-grid">
         @if (Model != null && Model.Any())
         {
             @foreach (var item in Model)
             {
-                // --- KHỐI LOGIC XỬ LÝ ẢNH (Clean Code) ---
-                string finalImg = "/images/no-image.png"; // Fallback mặc định
+                // --- KHỐI LOGIC XỬ LÝ ẢNH (GIỮ NGUYÊN) ---
+                string finalImg = "/images/no-image.png";
                 if (!string.IsNullOrEmpty(item.ImageURL))
                 {
-                    // Nếu DB đã lưu full đường dẫn (bắt đầu bằng /)
                     if (item.ImageURL.StartsWith("/"))
                     {
                         finalImg = item.ImageURL;
                     }
-                    // Nếu DB chỉ lưu tên file (ví dụ: pc-gaming-01.jpg)
                     else
                     {
                         finalImg = $"/images/pcbuilds/{item.ImageURL}";
@@ -35,59 +33,37 @@
                 }
                 // -------------------------------------------
 
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 hover-effect">
-                        <div class="position-relative overflow-hidden">
-                            <img src="@finalImg"
-                                 class="card-img-top object-fit-cover"
-                                 alt="@item.PCBuildName"
-                                 style="height: 250px; transition: transform 0.3s;"
-                                 onerror="this.onerror=null; this.src='/images/no-image.png';">
+                // Thẻ Card Custom
+                <div class="tech-item-card">
+                    <div class="tech-img-wrapper">
+                        <span class="tech-badge">HOT</span>
+                        <a href="@Url.Action("Details", "PcBuild", new { id = item.PCBuildID })">
+                            <img src="@finalImg" alt="@item.PCBuildName" onerror="this.onerror=null; this.src='/images/no-image.png';">
+                        </a>
+                    </div>
 
-                            <span class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 m-2 rounded-pill fw-bold small">HOT</span>
+                    <div class="tech-content">
+                        <a href="@Url.Action("Details", "PcBuild", new { id = item.PCBuildID })" class="tech-title">
+                            @item.PCBuildName
+                        </a>
+
+                        <div class="tech-price">
+                            @item.TotalPrice.ToString("#,##0") đ
                         </div>
 
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title fw-bold text-dark text-uppercase">
-                                <a href="@Url.Action("Details", "PcBuild", new { id = item.PCBuildID })" class="text-decoration-none text-dark stretched-link">
-                                    @item.PCBuildName
-                                </a>
-                            </h5>
-                            <p class="card-text text-danger fw-bold fs-5 mb-3">
-                                @item.TotalPrice.ToString("#,##0") đ
-                            </p>
-                            <div class="mt-auto d-grid gap-2">
-                                <a href="@Url.Action("Details", "PcBuild", new { id = item.PCBuildID })" class="btn btn-outline-primary fw-semibold">
-                                    <i class="fa-solid fa-eye me-2"></i>Xem cấu hình chi tiết
-                                </a>
-                            </div>
-                        </div>
+                        <a href="@Url.Action("Details", "PcBuild", new { id = item.PCBuildID })" class="tech-btn-action">
+                            <i class="fa-solid fa-eye"></i> Xem cấu hình chi tiết
+                        </a>
                     </div>
                 </div>
             }
         }
         else
         {
-            <div class="col-12 text-center py-5">
-                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" width="100" class="mb-3 opacity-50" />
-                <h4 class="text-muted">Chưa có bộ PC nào được cập nhật.</h4>
+            <div class="tech-empty">
+                <i class="fa-solid fa-ghost"></i>
+                <h3>Chưa có bộ PC nào được cập nhật.</h3>
             </div>
         }
     </div>
 </div>
-
-<style>
-    /* Hiệu ứng hover cho card */
-    .hover-effect {
-        transition: all 0.3s ease;
-    }
-
-        .hover-effect:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
-        }
-
-            .hover-effect:hover img {
-                transform: scale(1.05); /* Zoom ảnh nhẹ khi di chuột */
-            }
-</style>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PcSaler.DBcontext.Entites;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using PcSaler.Helpers;
 
 namespace PcSaler.DBcontext
 {

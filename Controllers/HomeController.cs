@@ -5,6 +5,8 @@ using PcSaler.Services;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using PcSaler.DBcontext; // [THÊM] Để dùng PCShopContext
+using Microsoft.EntityFrameworkCore; // [THÊM] Để dùng FindAsync
 
 namespace PcSaler.Controllers
 {
@@ -12,48 +14,67 @@ namespace PcSaler.Controllers
     {
         private readonly CategoryService _categoryService;
         private readonly ProductService _productService;
-        // Inject thêm Service xử lý PC Build
         private readonly IPcBuildService _pcBuildService;
+        private readonly PCShopContext _context; // [THÊM] Context để lấy ảnh
 
-        public HomeController(ProductService productService, CategoryService categoryService, IPcBuildService pcBuildService)
+        // Inject thêm PCShopContext vào Constructor
+        public HomeController(
+            ProductService productService,
+            CategoryService categoryService,
+            IPcBuildService pcBuildService,
+            PCShopContext context)
         {
             _productService = productService;
             _categoryService = categoryService;
             _pcBuildService = pcBuildService;
+            _context = context;
         }
+
+        // --- [MỚI] Action lấy ảnh PC Build từ Database ---
+        [HttpGet]
+        public async Task<IActionResult> GetImage(int id)
+        {
+            // Tìm PC Build theo ID
+            var pcBuild = await _context.PCBuilds.FindAsync(id);
+
+            // Nếu tìm thấy và có ảnh (byte[])
+            if (pcBuild != null && pcBuild.PCImage != null && pcBuild.PCImage.Length > 0)
+            {
+                return File(pcBuild.PCImage, "image/jpeg");
+            }
+
+            // Nếu không có ảnh, trả về ảnh mặc định trong thư mục wwwroot
+            return Redirect("/images/pc-setup.png");
+        }
+        // ------------------------------------------------
 
         public async Task<IActionResult> Index(int? cat, string? q)
         {
-            // 1. Lấy danh sách danh mục và sản phẩm thường từ bảng Products
-            // (Lúc này cái danh mục ID 15 "PC build" sẽ không có sản phẩm nào)
+            // 1. Lấy danh sách danh mục và sản phẩm thường
             var model = await _categoryService.GetCategoryProducts(cat, q);
 
-            // 2. Lấy danh sách PC Bộ từ bảng PCBuilds (Dữ liệu thật)
+            // 2. Lấy danh sách PC Bộ (Dữ liệu này đã được Repository xử lý đường dẫn ảnh)
             var pcBuilds = await _pcBuildService.GetAllPCBuild();
 
-            // 3. LOGIC HỢP NHẤT (MAPPING)
+            // 3. LOGIC HỢP NHẤT
             if (pcBuilds != null && pcBuilds.Any())
             {
-                // Chuyển đổi dữ liệu từ PCBuildDetailViewModel sang ProductListViewModel
-                // Để View Index.cshtml có thể hiển thị được
                 var mappedBuilds = pcBuilds.Select(x => new ProductListViewModel
                 {
-                    ProductID = x.PCBuildID,       // Mượn trường ProductID để lưu ID máy bộ
-                    ProductName = x.PCBuildName,   // Tên máy bộ
-                    Price = x.TotalPrice,          // Giá tổng
+                    ProductID = x.PCBuildID,
+                    ProductName = x.PCBuildName,
+                    Price = x.TotalPrice,
 
-                    // Xử lý ảnh: Nếu null thì dùng ảnh mặc định
-                    ImageURL = !string.IsNullOrEmpty(x.ImageURL) ? x.ImageURL : "pc-setup.png",
+                    // [SỬA] Ép cứng đường dẫn trỏ về Action GetImage ở trên
+                    // Dù Repository có trả về gì thì ở đây ta chốt hạ đường dẫn này cho chắc chắn
+                    ImageURL = "/Home/GetImage/" + x.PCBuildID,
 
-                    // QUAN TRỌNG: Fake số lượng tồn kho để không bị hiện badge "Hết hàng"
                     Stock = 100
                 }).ToList();
 
-                // 4. Tìm danh mục đích để bơm dữ liệu vào
-                // Ưu tiên 1: Tìm theo ID 15 (Theo ảnh Database ông gửi)
+                // 4. Tìm danh mục đích (PC Build)
                 var targetCategory = model.FirstOrDefault(c => c.CategoryID == 15);
 
-                // Ưu tiên 2: Nếu không thấy ID 15 thì tìm theo tên
                 if (targetCategory == null)
                 {
                     targetCategory = model.FirstOrDefault(c => c.CategoryName.Trim().ToUpper().Contains("PC BUILD"));
@@ -61,17 +82,13 @@ namespace PcSaler.Controllers
 
                 if (targetCategory != null)
                 {
-                    // === TRƯỜNG HỢP A: Tìm thấy danh mục trong DB ===
-                    // Gán danh sách máy bộ vào danh mục này
                     targetCategory.Products = mappedBuilds;
                 }
                 else
                 {
-                    // === TRƯỜNG HỢP B: Không tìm thấy (Dự phòng) ===
-                    // Tạo một danh mục ảo và chèn lên đầu trang
                     var virtualCat = new CategoryViewModel
                     {
-                        CategoryID = -999, // ID âm để đánh dấu
+                        CategoryID = -999,
                         CategoryName = "PC BUILD",
                         ComponentType = "PC_BUILD",
                         Products = mappedBuilds
@@ -80,7 +97,6 @@ namespace PcSaler.Controllers
                 }
             }
 
-            // Đổ dữ liệu bổ trợ cho View
             ViewBag.Categories = await _categoryService.GetAllCategories();
             ViewBag.SelectedCat = cat;
             ViewBag.Query = q ?? "";

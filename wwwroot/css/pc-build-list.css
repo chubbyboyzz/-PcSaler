@@ -1,0 +1,160 @@
+﻿:root {
+    --tech-blue: #0984e3;
+    --tech-dark: #2d3436;
+    --tech-gray: #dfe6e9;
+    --tech-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    --tech-hover-shadow: 0 15px 40px rgba(9, 132, 227, 0.15);
+}
+
+/* Reset container */
+.tech-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Banner Custom */
+.tech-banner {
+    background: linear-gradient(135deg, #1e272e, #0984e3);
+    border-radius: 20px;
+    padding: 60px 20px;
+    text-align: center;
+    color: white;
+    margin-bottom: 50px;
+    box-shadow: var(--tech-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+    .tech-banner h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 10px;
+        letter-spacing: -1px;
+    }
+
+/* Grid Layout (Thay thế Row/Col của Bootstrap) */
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+/* Card Sản Phẩm Custom */
+.tech-item-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+    .tech-item-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--tech-hover-shadow);
+        border-color: rgba(9, 132, 227, 0.3);
+    }
+
+/* Phần Chứa Ảnh (Fix lỗi vỡ ảnh) */
+.tech-img-wrapper {
+    width: 100%;
+    height: 240px; /* Chiều cao cố định */
+    padding: 20px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+    .tech-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* THẦN CHÚ: Giữ tỉ lệ ảnh */
+        filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+        transition: transform 0.4s ease;
+    }
+
+.tech-item-card:hover .tech-img-wrapper img {
+    transform: scale(1.08);
+}
+
+/* Badge HOT */
+.tech-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #ff4757;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3);
+}
+
+/* Phần Nội Dung */
+.tech-content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.tech-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--tech-dark);
+    margin-bottom: 10px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+    .tech-title:hover {
+        color: var(--tech-blue);
+    }
+
+.tech-price {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #e84393;
+    margin-bottom: 15px;
+}
+
+/* Nút Bấm Custom */
+.tech-btn-action {
+    margin-top: auto;
+    display: block;
+    text-align: center;
+    background: white;
+    color: var(--tech-blue);
+    border: 2px solid var(--tech-blue);
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+    .tech-btn-action:hover {
+        background: var(--tech-blue);
+        color: white;
+        box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);
+    }
+
+/* Trạng thái trống */
+.tech-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px;
+    color: #b2bec3;
+}

@@ -6,17 +6,15 @@
 <div class="row">
     <div class="col-md-6">
         @{
-            // 1. Logic xử lý đường dẫn ảnh (Copy tư duy từ Index)
-            string finalImg = "/images/no-image.png"; // Mặc định là .png nhé
+            // 1. Logic xử lý đường dẫn ảnh
+            string finalImg = "/images/no-image.png";
 
             if (!string.IsNullOrEmpty(Model.ImageURL))
             {
-                // Nếu DB lưu full path (có dấu /)
                 if (Model.ImageURL.StartsWith("/"))
                 {
                     finalImg = Model.ImageURL;
                 }
-                // Nếu DB chỉ lưu tên file -> Tự động trỏ vào folder products
                 else
                 {
                     finalImg = "/images/products/" + Model.ImageURL;
@@ -32,25 +30,29 @@
     </div>
 
     <div class="col-md-6">
-        <h3>@Model.ProductName</h3>
-        <p class="text-muted">@Model.CategoryName</p>
+        <h3 class="fw-bold text-primary">@Model.ProductName</h3>
+        <p class="text-muted"><i class="fa-solid fa-layer-group me-1"></i> @Model.CategoryName</p>
 
-        <h4 class="text-danger">@Model.Price.ToString("N0") ₫</h4>
+        <h3 class="text-danger fw-bold mb-4">@Model.Price.ToString("N0") ₫</h3>
+
         <form id="addToCartForm">
             <input type="hidden" name="ItemID" value="@Model.ProductID" />
             <input type="hidden" name="Quantity" value="1" />
-            <input type="hidden" name="ItemType" value="PRODUCT" /> <button type="submit" class="btn btn-primary" id="addToCartButton">
-                Thêm vào giỏ
+            <input type="hidden" name="ItemType" value="PRODUCT" />
+
+            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm" id="addToCartButton">
+                <i class="fa-solid fa-cart-plus me-2"></i> Thêm vào giỏ
             </button>
         </form>
-        <h5 class="mt-4">Cấu hình chi tiết</h5>
-        <table class="table table-sm mt-3">
+
+        <h5 class="mt-5 border-bottom pb-2">Cấu hình chi tiết</h5>
+        <table class="table table-striped table-hover mt-3 small">
             <tbody>
-                <tr><th>Hãng</th><td>@Model.Brand</td></tr>
+                <tr><th style="width: 150px;">Hãng sản xuất</th><td>@Model.Brand</td></tr>
                 <tr><th>Model</th><td>@Model.Model</td></tr>
                 <tr><th>Bảo hành</th><td>@Model.WarrantyMonths tháng</td></tr>
                 <tr><th>Ngày ra mắt</th><td>@Model.ReleaseDate?.ToString("dd/MM/yyyy")</td></tr>
-                <tr><th>Thông số</th><td>@Html.Raw(Model.Specifications)</td></tr>
+                <tr><th>Thông số kỹ thuật</th><td>@Html.Raw(Model.Specifications)</td></tr>
             </tbody>
         </table>
     </div>
@@ -68,48 +70,40 @@
             const formData = new FormData(e.target);
             const data = {};
             formData.forEach((value, key) => (data[key] = value));
-            // Chuyển Quantity và ItemID sang số để tránh lỗi logic sau này
+
+            // Chuyển đổi dữ liệu số
             data.ItemID = parseInt(data.ItemID);
             data.Quantity = parseInt(data.Quantity);
 
             const button = document.getElementById('addToCartButton');
-            const originalText = button.textContent;
+            const originalText = button.innerHTML; // Lưu cả icon
+
+            // Hiệu ứng Loading
             button.disabled = true;
-            button.textContent = 'Đang xử lý...';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Đang xử lý...';
 
-                    if (isAuthenticated) {
-            // === ĐÃ ĐĂNG NHẬP ===
-            fetch('/api/APICart/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)})
-            .then(response => {
-                if (response.ok) {
-                    alert('Đã thêm sản phẩm thành công!');
-
-                    // --> THÊM DÒNG NÀY ĐỂ CẬP NHẬT HEADER:
-                    updateHeaderCartCount();
-                }
-                // ...
-            });
-        } else {
-            // === KHÁCH VÃNG LAI ===
-            addToLocalStorage(data);
-
-            // --> THÊM DÒNG NÀY ĐỂ CẬP NHẬT HEADER:
-            updateHeaderCartCount();
-        }
+            if (isAuthenticated) {
+                // === THÀNH VIÊN (GỌI API) ===
+                addToDatabase(data, button, originalText);
+            } else {
+                // === KHÁCH VÃNG LAI (LOCAL STORAGE) ===
+                // Giả lập độ trễ 500ms cho giống thật
+                setTimeout(() => {
+                    addToLocalStorage(data);
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }, 500);
+            }
         });
 
-                function addToLocalStorage(newItem) {
+        // HÀM XỬ LÝ KHÁCH VÃNG LAI
+        function addToLocalStorage(newItem) {
             let cart = JSON.parse(localStorage.getItem('guest_cart')) || [];
 
-            // Lấy thêm thông tin chi tiết từ giao diện để lưu
-            // (Vì LocalStorage không truy vấn DB được, phải lưu luôn tên/ảnh/giá)
+            // Lấy thêm thông tin chi tiết từ giao diện để lưu (cho đẹp Cart)
             const productName = document.querySelector('h3').innerText;
-            const priceText = document.querySelector('.text-danger').innerText.replace(/[^\d]/g, ''); // Bỏ chữ 'đ', dấu chấm
+            // Lấy giá tiền, bỏ chữ 'đ' và dấu phẩy/chấm
+            const priceText = document.querySelector('.text-danger').innerText.replace(/[^\d]/g, '');
             const price = parseInt(priceText);
             const imageUrl = document.querySelector('.img-fluid').getAttribute('src');
 
@@ -118,7 +112,6 @@
             if (existingItemIndex > -1) {
                 cart[existingItemIndex].Quantity += newItem.Quantity;
             } else {
-                // Thêm các trường hiển thị vào object
                 newItem.ProductName = productName;
                 newItem.Price = price;
                 newItem.ImageURL = imageUrl;
@@ -127,15 +120,22 @@
 
             localStorage.setItem('guest_cart', JSON.stringify(cart));
 
-            // Cập nhật số trên menu
+            // Cập nhật số trên menu (Hàm này nằm bên _Layout)
             if (typeof updateHeaderCartCount === "function") {
                 updateHeaderCartCount();
             }
 
-            alert('Đã thêm vào giỏ hàng (Máy khách)!');
+            // [THAY ĐỔI] Dùng SweetAlert thay alert thường
+            Swal.fire({
+                icon: 'success',
+                title: 'Thêm thành công!',
+                text: 'Sản phẩm đã được thêm vào giỏ hàng của bạn.',
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
 
-        // Hàm xử lý gọi API (Thành viên) - Code cũ của bạn tách ra đây
+        // HÀM XỬ LÝ THÀNH VIÊN
         function addToDatabase(data, button, originalText) {
             fetch('/api/APICart/add', {
                 method: 'POST',
@@ -146,22 +146,45 @@
             })
             .then(response => {
                 if (response.ok) {
-                    alert('Đã thêm sản phẩm vào giỏ hàng (Đã đồng bộ Database)!');
+                    // Cập nhật Header
+                    if (typeof updateHeaderCartCount === "function") updateHeaderCartCount();
+
+                    // [THAY ĐỔI] Thông báo đẹp
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Tuyệt vời!',
+                        text: 'Sản phẩm đã được đồng bộ vào tài khoản của bạn.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
                 } else if (response.status === 401) {
-                    alert('Phiên đăng nhập hết hạn.');
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Phiên hết hạn',
+                        text: 'Vui lòng đăng nhập lại để tiếp tục.',
+                        confirmButtonColor: '#5563DE'
+                    });
                 } else {
                     return response.json().then(errorData => {
-                        alert('Lỗi: ' + (errorData.message || 'Có lỗi xảy ra.'));
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: errorData.message || 'Có lỗi xảy ra.',
+                        });
                     });
                 }
             })
             .catch(error => {
                 console.error('Lỗi:', error);
-                alert('Lỗi kết nối.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Mất kết nối',
+                    text: 'Không thể liên lạc với máy chủ.',
+                });
             })
             .finally(() => {
                 button.disabled = false;
-                button.textContent = originalText;
+                button.innerHTML = originalText;
             });
         }
     </script>

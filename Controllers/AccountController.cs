@@ -54,7 +54,7 @@ namespace PcSaler.Controllers
 
             // 4. Lưu vào DB (QUAN TRỌNG: Phải lưu xong mới có ID để tạo Cookie)
             await _repo.addAsync(newUser);
-            await _repo.SaveChangeAsync(); // Lúc này newUser.CustomerID sẽ được DB tự sinh ra
+            await _repo.SaveChangeAsync(); // Lúc này newUser.CustomerID sẽ được DB tự sinh r   a
 
             // ============================================================
             // 5. AUTO LOGIN (LOGIC MỚI THÊM VÀO)

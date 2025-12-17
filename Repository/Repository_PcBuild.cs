@@ -22,9 +22,10 @@ namespace PcSaler.Repository
                     PCBuildID = x.PCBuildID,
                     PCBuildName = x.PCBuildName,
                     TotalPrice = x.TotalPrice,
-                    // Giữ nguyên ImageURL của PCBuild (nếu bảng PCBuilds vẫn còn cột này)
-                    // Nếu bảng PCBuilds cũng xóa cột ImageURL rồi thì ông sửa thành: ImageURL = "pc-setup.png"
-                    ImageURL = x.ImageURL
+
+                    // [SỬA] Vì DB không còn cột ImageURL, ta tạo đường dẫn ảo trỏ về Controller
+                    // Controller "Home" phải có hàm "GetImage(int id)" trả về File Content
+                    ImageURL = "/Home/GetImage/" + x.PCBuildID
                 })
                 .OrderByDescending(x => x.PCBuildID)
                 .ToListAsync();
@@ -40,7 +41,9 @@ namespace PcSaler.Repository
                     PCBuildName = b.PCBuildName,
                     Description = b.Description,
                     TotalPrice = b.TotalPrice,
-                    ImageURL = b.ImageURL, // Ảnh đại diện của cả bộ PC
+
+                    // [SỬA] Đường dẫn ảnh cho bộ PC
+                    ImageURL = "/Home/GetImage/" + b.PCBuildID,
 
                     // --- LẤY DANH SÁCH LINH KIỆN BÊN TRONG ---
                     Components = _context.PCBuildDetails
@@ -48,14 +51,12 @@ namespace PcSaler.Repository
                         .Select(d => new PCComponentViewModel
                         {
                             ProductID = d.ProductID,
-                            ProductName = d.Product.ProductName, // Lấy tên linh kiện
+                            ProductName = d.Product.ProductName,
                             ComponentType = d.ComponentType,
 
-                            // --- SỬA ĐOẠN NÀY ---
-                            // CŨ: ImageURL = d.Product.ImageURL (Lỗi vì Product đã xóa ImageURL)
-                            // MỚI: Trỏ về hàm GetImage lấy ảnh Binary của linh kiện đó
+                            // [SỬA] Đường dẫn ảnh cho từng linh kiện (Product)
+                            // Giả sử ông có ProductController với hàm GetImage tương tự
                             ImageURL = "/Product/GetImage/" + d.ProductID,
-                            // --------------------
 
                             Quantity = d.Quantity,
                             UnitPrice = d.Product.Price

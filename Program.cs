@@ -72,6 +72,8 @@ namespace PcSaler
             builder.Services.AddScoped<ICustomerService, CustomerService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IPcBuildService, PcSaler.Repository.Repository_PcBuild>();
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSession();
 
             // Email sender service
             builder.Services.AddTransient<IEmailSender, EmailSender>();
